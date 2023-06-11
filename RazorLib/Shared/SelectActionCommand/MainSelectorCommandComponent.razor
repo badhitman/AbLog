@@ -1,0 +1,129 @@
+﻿@using RazorLib.Shared.SelectActionCommand.Controller;
+@using RazorLib.Shared.SelectActionCommand.Exit;
+@using MudBlazor;
+@using BlazorLib
+@using SharedLib
+
+@inject ILogger<MainSelectorCommandComponent> _loger
+@inject IRefitService _refit
+@inject ISnackbar _snackbar
+
+@inherits BlazorBusyComponentBaseModel
+
+<div class="card mt-2 text-dark bg-light">
+    <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted">Выбор команды</h6>
+        <div class="row gy-2 gx-3 align-items-center">
+            <div class="col-auto">
+                <div class="input-group">
+                    <select @bind="CommandType" title="Тип команды" class="form-select" id="inputGroupSelectTypeCommand">
+                        <option value="@(TypesCommandsEnum.Port)">Управление портом</option>
+                        <option value="@(TypesCommandsEnum.Controller)">Прямая команда</option>
+                        <option value="@(TypesCommandsEnum.Exit)">Выход/переход</option>
+                    </select>
+                </div>
+            </div>
+            @if (CommandType == TypesCommandsEnum.Port || CommandType == TypesCommandsEnum.Controller)
+            {
+                <ControllerSelectorComponent ControllerActionHandler="SelectHandlerAction" CurrentCommand="CurrentCommand" @ref="ControllerSelectorRef" EntriesTreeHW="EntriesTreeHW" />
+            }
+            else if (CommandType == TypesCommandsEnum.Exit)
+            {
+                <ExitSelectorComponent AllCsripts="AllCsripts" SelectDirectHandler="SelectHandlerAction" CurrentCommand="CurrentCommand" @ref="ExitSelectorRef" />
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Устройства
+    /// </summary>
+    [Parameter, EditorRequired]
+    public EntryNestedModel[] EntriesTreeHW { get; set; } = default!;
+
+    /// <summary>
+    /// Выбранная/текущая команда перехода (если null, то выход)
+    /// </summary>
+    [Parameter, EditorRequired]
+    public CommandModelDB CurrentCommand { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action<CommandModelDB> RootSelectorHandler { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IEnumerable<ScriptModelDB> AllCsripts { get; set; } = default!;
+
+    /// <summary>
+    /// Типы команд:
+    /// Команда контролера, порт или выход/переход
+    /// </summary>
+    public TypesCommandsEnum CommandType
+    {
+        get => CurrentCommand?.CommandType ?? TypesCommandsEnum.Exit;
+        private set
+        {
+            if (CurrentCommand is null)
+                return;
+
+            CurrentCommand.CommandType = value;
+
+            SelectHandlerAction();
+        }
+    }
+
+    public ControllerSelectorComponent? ControllerSelectorRef { get; private set; }
+
+    public ExitSelectorComponent? ExitSelectorRef { get; private set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender && CurrentCommand?.Execution == 0 && EntriesTreeHW.Any())
+        {
+            switch (CommandType)
+            {
+                case TypesCommandsEnum.Controller:
+                    if (EntriesTreeHW.Any())
+                    {
+                        CurrentCommand.Execution = EntriesTreeHW.First().Id;
+                    }
+                    break;
+                case TypesCommandsEnum.Port:
+                    if (EntriesTreeHW.Any(x => x.Childs.Any()))
+                    {
+                        CurrentCommand.Execution = EntriesTreeHW.First(x => x.Childs.Any()).Childs.First().Id;
+                    }
+                    break;
+                case TypesCommandsEnum.Exit:
+                    break;
+            }
+            SelectHandlerAction();
+        }
+    }
+
+    void SelectHandlerAction() => RootSelectorHandler(CurrentCommand);
+
+    //protected override void OnInitialized()
+    //{
+    //    if (CurrentCommand?.Execution == 0)
+    //    {
+    //        switch (CommandType)
+    //        {
+    //            case TypesCommandsEnum.Controller:
+    //                if (EntriesTreeHW.Any())
+    //                {
+    //                    CurrentCommand.Execution = EntriesTreeHW.First().Id;
+    //                }
+    //                break;
+    //            case TypesCommandsEnum.PortImap:
+    //                if (EntriesTreeHW.Any(x => x.Childs.Any()))
+    //                {
+    //                    CurrentCommand.Execution = EntriesTreeHW.First(x => x.Childs.Any()).Childs.First().Id;
+    //                }
+    //                break;
+    //            case TypesCommandsEnum.Exit:
+    //                break;
+    //        }
+    //    }
+    //}
+}

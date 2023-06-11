@@ -1,0 +1,55 @@
+﻿@using Microsoft.JSInterop;
+
+@inherits InputTextArea
+
+@inject IJSRuntime JSRuntime
+
+<textarea @attributes="AdditionalAttributes"
+          id="@Id"
+          class="@CssClass"
+          value="@CurrentValue" disabled="@ReadOnly"></textarea>
+
+@code {
+    string? _id;
+    public string? Id
+    {
+        get => _id ?? $"CKEditor_{uid}";
+        set => _id = value;
+    }
+
+    [Parameter]
+    public bool ReadOnly { get; set; } = false;
+
+    readonly string uid = Guid.NewGuid().ToString().ToLower().Replace("-", "");
+    //string rendered_val = string.Empty;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("CKEditorInterop.init", Id, ReadOnly, DotNetObjectReference.Create(this));
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("CKEditorInterop.isReadOnly", Id, ReadOnly);
+        }
+    }
+
+    [JSInvokable]
+    public Task EditorDataChanged(string? data)
+    {
+        CurrentValue = data ?? string.Empty;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async Task SetValue(string? data)
+    {
+        await JSRuntime.InvokeVoidAsync("CKEditorInterop.setValue", Id, data);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        JSRuntime.InvokeVoidAsync("CKEditorInterop.destroy", Id);
+        base.Dispose(disposing);
+    }
+}

@@ -1,0 +1,124 @@
+﻿@using MudBlazor;
+@using SharedLib
+@using BlazorLib
+
+@inject IRefitService _refit
+@inject ISnackbar _snackbar
+
+<div class="col-auto">
+    <div class="input-group">
+        <label class="input-group-text" for="inputGroupSelectCommandSetFirst">Блок</label>
+        <select @bind="SelectedControllerId" class="form-select" id="inputGroupSelectCommandSetFirst">
+            @foreach (EntryNestedModel hw in EntriesTreeHW)
+            {
+                <option value="@(hw.Id)">@(hw.Name) <sup>[#@(hw.Id)]</sup></option>
+            }
+        </select>
+    </div>
+</div>
+
+@if (CurrentCommand?.CommandType == TypesCommandsEnum.Port && SelectedControllerId > 0)
+{
+    EntryNestedModel? curr_entry = EntriesTreeHW.FirstOrDefault(x => x.Id == SelectedControllerId);
+    int _selectedPortId = SelectorPortRef?.SelectedPortId.GetValueOrDefault(0) ?? 0;
+    if (_selectedPortId < 1 && curr_entry?.Childs.Any() == true)
+    {
+        _selectedPortId = curr_entry.Childs.First().Id;
+    }
+    <PortSelectorComponent CurrentPort="CurrentPort" CurrentCommand="CurrentCommand" SelectPortHandler="ControllerActionHandler" @ref="SelectorPortRef" Ports="@(curr_entry?.Childs)" />
+}
+else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
+{
+    <ControllerCmdComponent CurrentCommand="CurrentCommand" HandlerAction="ControllerActionHandler" @ref="CommdControllerRef" />
+}
+
+@code {
+    /// <summary>
+    /// Перечень доступных контролеров вместе со своими портами
+    /// </summary>
+    [Parameter, EditorRequired]
+    public EntryNestedModel[] EntriesTreeHW { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action ControllerActionHandler { get; set; } = default!;
+
+    /// <summary>
+    /// Команда
+    /// </summary>
+    [Parameter, EditorRequired]
+    public CommandModelDB CurrentCommand { get; set; } = default!;
+
+    public int SelectedControllerId
+    {
+        get
+        {
+            return CurrentCommand?.CommandType switch
+            {
+                TypesCommandsEnum.Controller => CurrentCommand.Execution,
+                TypesCommandsEnum.Port => EntriesTreeHW.FirstOrDefault(x => x.Childs.Any(y => y.Id == CurrentCommand.Execution))?.Id ?? 0,
+                _ => 0
+            };
+        }
+        set
+        {
+            if (CurrentCommand?.CommandType != TypesCommandsEnum.Controller && CurrentCommand?.CommandType != TypesCommandsEnum.Port)
+                return;
+
+            bool is_upd = CurrentCommand.Execution != value;
+            CurrentCommand.Execution = value;
+            if (is_upd)
+            {
+                if (ControllerActionHandler is not null)
+                    ControllerActionHandler();
+                else
+                    StateHasChanged();
+            }
+        }
+    }
+
+    PortHardwareModel? CurrentPort;
+    EntryModel? CurrentController;
+
+    /// <summary>
+    /// Ссылка на вью компонента выбора порта
+    /// </summary>
+    public PortSelectorComponent? SelectorPortRef { get; private set; }
+    /// <summary>
+    /// Ссылка на вью компонента ввода команды (низкоуровневая) контроллера.
+    /// i: Актуальна в случае, если
+    /// </summary>
+    public ControllerCmdComponent? CommdControllerRef { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (CurrentCommand is null)
+            return;
+
+        if (CurrentCommand.Execution > 0)
+            switch (CurrentCommand.CommandType)
+            {
+                case TypesCommandsEnum.Controller:
+                    await RestByControllerId(CurrentCommand.Execution);
+                    break;
+                case TypesCommandsEnum.Port:
+                    await RestByPortId(CurrentCommand.Execution);
+                    break;
+                default:
+                    break;
+            }
+    }
+
+    async Task RestByPortId(int port_id)
+    {
+        Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit.GetPortHW(port_id);
+        CurrentPort = rest.Content?.Port;
+        CurrentController = CurrentPort?.Hardware;
+        await RestByControllerId(CurrentController!.Id);
+    }
+
+    async Task RestByControllerId(int controller_id)
+    {
+        Refit.ApiResponse<HardwareResponseModel> rest = await _refit.GetHardware(controller_id);
+        CurrentController = rest.Content!.Hardware;
+    }
+}

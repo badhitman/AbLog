@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using BlazorWasmApp.UIInterfaces
+@using Microsoft.JSInterop
+
+@inject IJSRuntime js_runtime
+
+@implements ITab
+
+<li title="@Tooltip">
+    <a @onclick="ActivateTabHandler" class="nav-link @TitleCssClass" role="button">
+        @Title
+    </a>
+</li>
+
+@code {
+    [CascadingParameter]
+    public TabSetComponent? ContainerTabSet { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Tooltip { get; set; }
+
+    [Parameter]
+    public bool IsDisabled { get; set; } = false;
+
+    [Parameter]
+    public Action OnClickHandle { get; set; } = () => { };
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    private string? TitleCssClass =>
+        ContainerTabSet?.ActiveTab == this ? "active" : IsDisabled ? "disabled" : null;
+
+    protected override void OnInitialized()
+    {
+        ContainerTabSet?.AddTab(this);
+    }
+
+    void ActivateTabHandler(MouseEventArgs args)
+    {
+        js_runtime.InvokeVoidAsync("tooltipeHide");
+        ActivateTab();
+        OnClickHandle();
+    }
+
+    public void ActivateTab()
+    {
+        ContainerTabSet?.SetActiveTab(this);
+    }
+}

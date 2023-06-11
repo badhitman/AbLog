@@ -1,0 +1,162 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject ISnackbar _snackbar
+@inject IParametersStorageService _con_service
+
+<div class="card">
+    <div class="card-body">
+        @if (IsBusyProgress || TestConnectProcess)
+        {
+            <div class="progress p-0 mb-2">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
+        }
+        <form disabled="@(TestConnectProcess || IsBusyProgress)" class="row g-3" autocomplete="off">
+            <div class="col-md-6">
+                <label for="@(nameof(connect_config.Login))" class="form-label">Логин</label>
+                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control" @bind-value="connect_config.Login" @bind-value:event="oninput" id="@(nameof(connect_config.Login))" name="@(nameof(connect_config.Login))" autocomplete="off">
+            </div>
+            <div class="col-md-6">
+                <label for="@(nameof(connect_config.Password))" class="form-label">Пароль</label>
+                <div class="input-group">
+                    <input disabled="@(TestConnectProcess || IsBusyProgress)" type="@(ShowPass ? "text" : "password")" class="form-control" @bind-value="connect_config.Password" @bind-value:event="oninput" id="@(nameof(connect_config.Password))" name="@(nameof(connect_config.Password))" autocomplete="off">
+                    <button disabled="@(TestConnectProcess || IsBusyProgress)" @onclick="() => { ShowPass = !ShowPass; }" class="btn btn-@(ShowPass ? "danger" : "outline-secondary") oi oi-eye" type="button" style="top: auto;" id="button-addon2">
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">IMAP</h5>
+                    <div>
+                        <label class="form-label"><span class="text-info">host:port</span></label>
+                        <div class="input-group mb-3">
+                            <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control border-info border-end-0" @bind-value="connect_config.HostImap" @bind-value:event="oninput" placeholder="IMAP Host" aria-label="IMAP Server host">
+                            <span class="input-group-text px-1 border-info border-start-0 border-end-0">:</span>
+                            <input disabled="@(TestConnectProcess || IsBusyProgress)" type="number" class="form-control border-info border-start-0" @bind-value="connect_config.PortImap" @bind-value:event="oninput" style="max-width: 100px;" placeholder="Port" aria-label="IMAP Server port">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label"><span class="text-primary">ssl режим: @(connect_config.UseSslImap)</span> | <span class="text-@(connect_config.LogsImap ? "dark" : "secondary")">логирование @(connect_config.LogsImap ? "включено" : "отключено")</span></label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text border-primary">SSL</span>
+                            <select disabled="@(TestConnectProcess || IsBusyProgress)" class="form-select border-primary border-start-0" @bind="connect_config.UseSslImap">
+                                @foreach (SecureSocketOptionsEnum sso in (SecureSocketOptionsEnum[])Enum.GetValues(typeof(SecureSocketOptionsEnum)))
+                                {
+                                    <option value="@sso">@sso.ToFriendlyString()</option>
+                                }
+                            </select>
+                            <div class="input-group-text">
+                                <input disabled="@(TestConnectProcess || IsBusyProgress)" class="form-check-input mt-0" type="checkbox" @bind="connect_config.LogsImap" aria-label="логировать imap" name="@(nameof(connect_config.LogsImap))" id="@(nameof(connect_config.LogsImap))">
+                                <label class="form-check-label ms-1 text-@(connect_config.LogsImap ? "dark" : "secondary")" for="@(nameof(connect_config.LogsImap))">
+                                    logs
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">SMTP</h5>
+                    <div>
+                        <label class="form-label"><span class="text-info">host:port</span></label>
+                        <div class="input-group mb-3">
+                            <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control border-info border-end-0" @bind-value="connect_config.HostSmtp" @bind-value:event="oninput" placeholder="SMTP Host" aria-label="SMTP Server host">
+                            <span class="input-group-text px-1 border-info border-start-0 border-end-0">:</span>
+                            <input disabled="@(TestConnectProcess || IsBusyProgress)" type="number" class="form-control border-info border-start-0" @bind-value="connect_config.PortSmtp" @bind-value:event="oninput" style="max-width: 100px;" placeholder="Port" aria-label="Smtp Server port">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label"><span class="text-primary">(ssl mode: @(connect_config.UseSslSmtp))</span> | <span class="text-@(connect_config.LogsSmtp ? "dark" : "secondary")">логирование @(connect_config.LogsSmtp ? "включено" : "отключено")</span></label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text border-primary">SSL</span>
+                            <select disabled="@(TestConnectProcess || IsBusyProgress)" class="form-select border-primary border-start-0" @bind="connect_config.UseSslSmtp">
+                                @foreach (SecureSocketOptionsEnum sso in (SecureSocketOptionsEnum[])Enum.GetValues(typeof(SecureSocketOptionsEnum)))
+                                {
+                                    <option value="@sso">@sso.ToFriendlyString()</option>
+                                }
+                            </select>
+                            <div class="input-group-text">
+                                <input disabled="@(TestConnectProcess || IsBusyProgress)" class="form-check-input mt-0" type="checkbox" @bind="connect_config.LogsSmtp" aria-label="логировать smtp" name="@(nameof(connect_config.LogsSmtp))" id="@(nameof(connect_config.LogsSmtp))">
+                                <label class="form-check-label ms-1 text-@(connect_config.LogsSmtp ? "dark" : "secondary")" for="@(nameof(connect_config.LogsSmtp))">
+                                    logs
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label for="@nameof(connect_config.Name)" class="form-label">Имя</label>
+                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control" @bind-value="connect_config.Name" @bind-value:event="oninput" id="@nameof(connect_config.Name)" name="@nameof(connect_config.Name)" autocomplete="off">
+            </div>
+            <div class="col-md-6">
+                <label for="@nameof(connect_config.Email)" class="form-label">Email</label>
+                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control" @bind-value="connect_config.Email" @bind-value:event="oninput" id="@nameof(connect_config.Email)" name="@nameof(connect_config.Email)" autocomplete="off">
+            </div>
+
+            <div class="col-md-12 d-grid gap-1 d-md-flex justify-content-md-end">
+                <button @onclick="() => { connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign); }" disabled="@(!CanSave || TestConnectProcess || IsBusyProgress)" class="btn btn-outline-@(CanSave ? "warning" : "secondary") me-md-2" type="button">Отмена</button>
+                <button @onclick="SaveConfig" disabled="@(!CanSave || TestConnectProcess || IsBusyProgress)" class="btn btn-outline-@(CanSave ? "success" : "secondary") me-md-2" type="button">Сохранить</button>
+                <button @onclick="TectConfigConnect" disabled="@(TestConnectProcess || IsBusyProgress)" class="btn btn-outline-primary" type="button">
+                    @if (TestConnectProcess)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <text>Проверка...</text>
+                    }
+                    else
+                    {
+                        <text>Тест подключения</text>
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<ShowMessagesComponent @ref="_messages_ref" />
+@code {
+    bool CanSave => connect_config != connect_config_orign;
+    bool ShowPass;
+
+    EmailConfigModel connect_config = new();
+    EmailConfigModel connect_config_orign = new();
+
+    //ToastContainerComponent? toast_ref;
+    ShowMessagesComponent? _messages_ref;
+
+    bool TestConnectProcess = false;
+
+    async Task SaveConfig()
+    {
+        IsBusyProgress = true;
+        ResponseBaseModel rest = await _con_service.SaveEmailConfig(connect_config);
+        if (rest.IsSuccess)
+        {
+            connect_config_orign = GlobalStatic.CreateDeepCopy(connect_config);
+        }
+        IsBusyProgress = false;
+        _messages_ref?.ShowMessages(rest.Messages);
+    }
+
+    async Task TectConfigConnect()
+    {
+        TestConnectProcess = true;
+        ResponseBaseModel rest = await _con_service.TestEmailConnect(connect_config);
+        _messages_ref?.ShowMessages(rest.Messages);
+        TestConnectProcess = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusyProgress = true;
+        connect_config_orign = await _con_service.GetEmailConfig();
+        connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign);
+        IsBusyProgress = false;
+    }
+}

@@ -9,6 +9,7 @@ namespace RazorLib
     // This class can be registered as scoped DI service and then injected into Blazor
     // components for use.
 
+#pragma warning disable CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
     public class ExampleJsInterop : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
@@ -34,4 +35,5 @@ namespace RazorLib
             }
         }
     }
+#pragma warning restore CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
 }

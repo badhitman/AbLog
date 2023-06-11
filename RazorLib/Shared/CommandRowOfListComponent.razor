@@ -1,0 +1,119 @@
+﻿@using MudBlazor;
+@using SharedLib
+
+@if (!IsOpen)
+{
+    <style>
+        tr td:last-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+
+        tr td:first-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+    </style>
+}
+
+<tr>
+    @if (IsOpen)
+    {
+        <td class="position-relative" colspan="3">
+            <div class="alert alert-primary alert-dismissible mb-0" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 8 8">
+                    <path fill="currentColor" d="M1.5 0C.67 0 0 .67 0 1.5S.67 3 1.5 3H2v1h-.5C.67 4 0 4.67 0 5.5S.67 7 1.5 7S3 6.33 3 5.5V5h1v.5C4 6.33 4.67 7 5.5 7S7 6.33 7 5.5S6.33 4 5.5 4H5V3h.5C6.33 3 7 2.33 7 1.5S6.33 0 5.5 0S4 .67 4 1.5V2H3v-.5C3 .67 2.33 0 1.5 0zm0 1c.28 0 .5.22.5.5V2h-.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5zm4 0c.28 0 .5.22.5.5s-.22.5-.5.5H5v-.5c0-.28.22-.5.5-.5zM3 3h1v1H3V3zM1.5 5H2v.5c0 .28-.22.5-.5.5S1 5.78 1 5.5s.22-.5.5-.5zM5 5h.5c.28 0 .5.22.5.5s-.22.5-.5.5s-.5-.22-.5-.5V5z" />
+                </svg>
+                <hr />
+                <button @onclick="() => { IsOpen = !IsOpen; }" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+                <div>
+                    <FormEditCommandComponent AllCsripts="AllCsripts" UpdateCommand="UpdateCommand" ScriptId="ScriptId" DeleteCommand="DeleteCommand" CommandSorting="@(Command?.Sorting ?? 0)" CommandEntry="@Command" />
+                </div>
+            </div>
+            <button @onclick="() => { if(AddCommandAct is not null) { AddCommandAct(SequenceNumber); } }" style="z-index:20;" type="button" class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-success border border-success">
+                +
+                <span class="visually-hidden">insert</span>
+            </button>
+            @if (SequenceNumber == 1)
+            {
+                <button @onclick="() => { if(AddCommandAct is not null) { AddCommandAct(0); } }" style="z-index:20;" type="button" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success border border-success">
+                    +
+                    <span class="visually-hidden">insert</span>
+                </button>
+            }
+        </td>
+    }
+    else
+    {
+        <th scope="row">@(SequenceNumber)<sup>@Command?.Sorting</sup></th>
+        <td>
+            <span class="text-@(Command!.Id > 0 ? "primary" : "danger")">
+                com:
+                @if (Command!.Id > 0)
+                {
+                    @($"#{Command!.Id} '{Command.Name}'")
+                }
+                else
+                {
+                    <span>~ не записан ~</span>
+                }
+            </span>
+        </td>
+        <td class="position-relative">
+            <div class="btn-group me-1" role="group" aria-label="Basic outlined example">
+                <span title="Редактирование команды" @onclick="() => { IsOpen = !IsOpen; }" class="oi oi-command me-1 btn-pointer text-info"></span>
+                <span @onclick="() => { if(AllowDownMove){ MoveCommandAction(VerticalDirectionsEnum.Down, Command?.Id ?? 0); }}" title="@(AllowDownMove && Command.Id > 0 ? "Сдвинуть ниже" : Command.Id > 0 ? "Ниже сдвинуть нельзя" : "Запишите объект")" @onmouseout="() => { down_move_is_hover = false; }" @onmouseover="() => { down_move_is_hover = true; }" class="@(down_move_is_hover && AllowDownMove ? "text-danger " : "")oi oi-@(Command.Id > 0 ? "arrow-circle-bottom" : "target") @((AllowDownMove && Command.Id > 0) ? "btn-pointer text-primary" : $" text-{(Command.Id > 0 ? "secondary" : "muted")}")"></span>
+                <span @onclick="() => { if(AllowUpMove){ MoveCommandAction(VerticalDirectionsEnum.Up, Command?.Id ?? 0); }}" title="@(AllowUpMove && Command.Id > 0 ? "Сдвинуть выше" : Command.Id > 0 ? "Выше сдвинуть нельзя" : "Запишите объект")" @onmouseout="() => { up_move_is_hover = false; }" @onmouseover="() => { up_move_is_hover = true; }" class="@(up_move_is_hover && AllowUpMove ? "text-danger " : "")oi oi-@(Command.Id > 0 ? "arrow-circle-top" : "target") @((AllowUpMove && Command.Id > 0) ? "btn-pointer text-primary" : $" text-{(Command.Id > 0 ? "secondary" : "muted")}") me-2"></span>
+            </div>
+            <button @onclick="() => { if(AddCommandAct is not null) { AddCommandAct(SequenceNumber); } }" type="button" style="z-index:20;" class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-success border border-success badge rounded-pill bg-success border border-success">
+                +
+                <span class="visually-hidden">insert</span>
+            </button>
+            @if (SequenceNumber == 1)
+            {
+                <button @onclick="() => { if(AddCommandAct is not null) { AddCommandAct(0); } }" type="button" style="z-index:20;" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success border border-success">
+                    +
+                    <span class="visually-hidden">insert</span>
+                </button>
+            }
+        </td>
+    }
+</tr>
+
+@code {
+    [Parameter, EditorRequired]
+    public EntrySortingModel Command { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public int SequenceNumber { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action<int> AddCommandAct { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action<int> DeleteCommand { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public int ScriptId { get; set; }
+
+    [Parameter, EditorRequired]
+    public Action<CommandModelDB> UpdateCommand { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IEnumerable<ScriptModelDB> AllCsripts { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public bool AllowUpMove { get; set; }
+
+    [Parameter, EditorRequired]
+    public bool AllowDownMove { get; set; }
+
+    [Parameter, EditorRequired]
+    public Action<VerticalDirectionsEnum, int> MoveCommandAction { get; set; } = default!;
+
+    bool IsOpen = false;
+
+    bool up_move_is_hover = false;
+    bool down_move_is_hover = false;
+}

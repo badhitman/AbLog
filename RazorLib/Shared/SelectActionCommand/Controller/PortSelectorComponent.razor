@@ -1,0 +1,104 @@
+﻿@using MudBlazor;
+@using SharedLib
+
+@inject ISnackbar _snackbar
+
+<div class="col-auto">
+    <div class="input-group">
+        <label class="input-group-text" for="inputGroupSelectCommandSetFirst">Порт</label>
+        <select @bind="SelectedPortId" disabled="@(Ports is null)" class="form-select" id="inputGroupSelectCommandSetFirst">
+            @if (Ports is not null)
+            {
+                foreach (EntryModel port in Ports)
+                {
+                    <option value="@(port.Id)">@(port.Name)</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+@if (CurrentPort?.Id > 0 || (CurrentCommand?.CommandType == TypesCommandsEnum.Port && CurrentCommand.Execution > 0))
+{
+    <div class="col-auto">
+        <div class="input-group">
+            <label class="input-group-text" for="inputGroupSelectCommandSetCommand">Команда</label>
+            <select @bind="PortCommand" class="form-select" id="inputGroupSelectCommandSetCommand">
+                <option value="@(PortsCommandsEnum.Switching)">Перекл</option>
+                <option value="@(PortsCommandsEnum.On)">Вкл</option>
+                <option value="@(PortsCommandsEnum.Off)">Выкл</option>
+            </select>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// Команда
+    /// </summary>
+    [Parameter, EditorRequired]
+    public CommandModelDB CurrentCommand { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public PortHardwareModel CurrentPort { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EntryModel[] Ports { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action SelectPortHandler { get; set; } = default!;
+
+    /// <summary>
+    /// Команды порта: вкл, выкл или переключение в противоположное состояние
+    /// </summary>
+    public PortsCommandsEnum PortCommand
+    {
+        get => CurrentCommand?.ExecutionParametr?.ToLower() switch
+        {
+            "on" => PortsCommandsEnum.On,
+            "off" => PortsCommandsEnum.Off,
+            _ => PortsCommandsEnum.Switching
+        };
+        private set
+        {
+            if (CurrentCommand is null)
+                return;
+
+            string? contr_val_string = CurrentCommand?.ExecutionParametr?.ToLower();
+            PortsCommandsEnum contr_val = contr_val_string switch
+            {
+                "on" => PortsCommandsEnum.On,
+                "off" => PortsCommandsEnum.Off,
+                _ => PortsCommandsEnum.Switching
+            };
+
+            bool is_upd = contr_val != value;
+            CurrentCommand!.ExecutionParametr = value switch
+            {
+                PortsCommandsEnum.On => "on",
+                PortsCommandsEnum.Off => "off",
+                _ => string.Empty
+            };
+            if (is_upd && SelectPortHandler is not null)
+            {
+                SelectPortHandler();
+            }
+        }
+    }
+
+    public int? SelectedPortId
+    {
+        get => CurrentCommand?.Execution;
+        private set
+        {
+            if (CurrentCommand is null)
+                return;
+
+            bool is_upd = value != CurrentCommand?.Execution;
+            CurrentCommand!.Execution = value ?? 0;
+            if (is_upd && SelectPortHandler is not null)
+            {
+                SelectPortHandler();
+            }
+        }
+    }
+}

@@ -1,0 +1,59 @@
+﻿@using SharedLib;
+
+<div style="width: 330px;" class="toast fade show text-@Message.TextColor bg-@Message.BgColor @GetDurationOpacityCSS()" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+        <div class="toast-body">
+            @Message.Text
+        </div>
+        <button @onclick="() => DeleteMessage(Message.Id)" type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Сообщение для отображения
+    /// </summary>
+    [Parameter, EditorRequired]
+    public MessageThemeModel Message { get; set; } = default!;
+
+    /// <summary>
+    /// Событие удаления сообщения по нажатию по кнопке/крестику
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Action<string> DeleteMessage { get; set; } = default!;
+
+    /// <summary>
+    /// Срок жизни сообщения секунд (минимум: 3 сек)
+    /// </summary>
+    [Parameter]
+    public int LifeTimeSec { get; set; }
+
+    double DurationOpacity75, DurationOpacity50, DurationOpacity25;
+
+    protected override void OnInitialized()
+    {
+        DurationOpacity75 = (LifeTimeSec * 1000) - 900;
+        DurationOpacity50 = (LifeTimeSec * 1000) - 600;
+        DurationOpacity25 = (LifeTimeSec * 1000) - 300;
+    }
+
+    public string GetDurationOpacityCSS()
+    {
+        TimeSpan dts = DateTime.Now - Message.CreatedAt;
+        double DurationOpacity = (LifeTimeSec * 1000) - 1500;
+        double delt_dt = dts.TotalMilliseconds;
+        string _css_res = "";
+
+        if (delt_dt < DurationOpacity75)
+            return _css_res;
+
+        if (delt_dt < DurationOpacity50)
+            _css_res = " opacity-75";
+        else if (delt_dt < DurationOpacity25)
+            _css_res = " opacity-50";
+        else
+            _css_res = " opacity-25";
+
+        return _css_res;
+    }
+}

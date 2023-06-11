@@ -1,0 +1,172 @@
+﻿@using SharedLib;
+@using BlazorLib;
+@using MudBlazor;
+
+@inject ILogger<ConditionListRowComponent> _loger
+@inject IRefitService _refit
+@inject ISnackbar _snackbar
+
+@inherits BlazorBusyComponentBaseModel
+
+<li class="list-group-item@(Condition.Id > 0 ? "" : " bg-warning text-white")">
+    @if (Condition.Id < 1)
+    {
+        <span style="cursor:help;" title="Элемент на записан в БД" class="position-absolute top-50 start-0 translate-middle badge rounded-pill bg-danger border border-secondary">
+            ▬
+            <span class="visually-hidden">unread messages</span>
+        </span>
+    }
+
+    <div class="input-group">
+        <input @bind-value="Condition.Name" title="@(string.IsNullOrWhiteSpace(Condition.Name) ? "Желательно указать имя" : "")" @bind-value:event="oninput" type="text" class="form-control@(string.IsNullOrWhiteSpace(Condition.Name) ? " border border-danger" : "")" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
+        <HardwaresPortsSelectorsPairComponent StateHasChangedCall="StateHasChangedCall" Condition="Condition" TreeHardwares="TreeHardwares" />
+        <select @bind="Condition.ConditionValueType" aria-label="condition-value-type" class="form-select">
+            <option value="@(СomparisonsValuesTypesEnum.ValueAsString)">как Строка</option>
+            <option value="@(СomparisonsValuesTypesEnum.ValueAsDecimal)">как Число</option>
+        </select>
+        <select @bind="Condition.СomparisonMode" aria-label="condition-mode" class="form-select">
+            <option value="@(СomparisonsModesEnum.Equal)">Равно</option>
+            <option value="@(СomparisonsModesEnum.NotEqual)">Неравно</option>
+            <option value="@(СomparisonsModesEnum.MoreThan)">Больше</option>
+            <option value="@(СomparisonsModesEnum.LessThan)">Меньше</option>
+        </select>
+        @if (Condition.ConditionValueType == СomparisonsValuesTypesEnum.ValueAsString)
+        {
+            <input @bind-value="Condition.Value" @bind-value:event="oninput" type="text" class="form-control" placeholder="Value" aria-label="Value" aria-describedby="basic-addon2">
+        }
+        else
+        {
+            <input @bind-value="Condition.Value" @bind-value:event="oninput" type="number" class="form-control" placeholder="Value" aria-label="Value" aria-describedby="basic-addon2">
+        }
+
+        <button @onclick="SaveClickHandler" disabled="@(!canSave)" title="Сохранить изменения" class="btn btn-outline-@(canSave ? "success" : "secondary") oi oi-cloud-upload" type="button"></button>
+        <button @onclick="DeleteClickHandler" class="btn btn-outline-danger oi oi-trash" title="Удалить условие" type="button"> </button>
+    </div>
+</li>
+
+<ModalWindowComponent @ref="Modal">
+    <p>@ModalBodyText</p>
+</ModalWindowComponent>
+<ShowMessagesComponent @ref="showMessages" />
+@code {
+    [Parameter, EditorRequired]
+    public ConditionAnonimModel Condition { get; set; } = default!;
+
+    /// <summary>
+    /// Перечень устройств (вместе с портами)
+    /// </summary>
+    [Parameter, EditorRequired]
+    public EntryNestedModel[] TreeHardwares { get; set; } = default!;
+
+    /// <summary>
+    /// Номер строки (по порядку)
+    /// </summary>
+    [Parameter, EditorRequired]
+    public int SequenceNumber { get; set; }
+
+    /// <summary>
+    /// Типы условных требований: команда, тригер ...
+    /// </summary>
+    [Parameter, EditorRequired]
+    public ConditionsTypesEnum ConditionType { get; set; }
+
+    [Parameter, EditorRequired]
+    public int OwnerId { get; set; }
+
+    [Parameter, EditorRequired]
+    public Action<IEnumerable<ConditionAnonimModel>> UpdateAct { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action<int> DeleteNewConditionAct { get; set; } = default!;
+
+    ModalWindowComponent? Modal { get; set; }
+    string ModalBodyText { get; set; } = string.Empty;
+
+    ShowMessagesComponent? showMessages;
+
+    string? _conditionValue;
+    string? _conditionName;
+    int _conditionHardwareId;
+    int _conditionPortId;
+
+    /// <summary>
+    /// Тип значения для сравнивания (как строка, как число)
+    /// </summary>
+    СomparisonsValuesTypesEnum _conditionValueType;
+
+    /// <summary>
+    /// Режимы сравнения (равно, не равно...)
+    /// </summary>
+    СomparisonsModesEnum _conditionMode;
+
+    bool canSave => Condition.Id < 1 || _conditionHardwareId != Condition.HardwareId ||
+    _conditionPortId != Condition.PortId ||
+    _conditionValueType != Condition.ConditionValueType ||
+    _conditionMode != Condition.СomparisonMode ||
+    (_conditionValue ?? string.Empty) != (Condition.Value ?? string.Empty) ||
+    (_conditionName ?? string.Empty) != (Condition.Name ?? string.Empty);
+
+    protected override void OnInitialized()
+    {
+        _conditionName = Condition.Name;
+        _conditionHardwareId = Condition.HardwareId;
+        _conditionPortId = Condition.PortId;
+        _conditionValueType = Condition.ConditionValueType;
+        _conditionMode = Condition.СomparisonMode;
+        _conditionValue = Condition.Value;
+    }
+
+    async Task DeleteClickHandler()
+    {
+        if (Condition.Id > 0)
+        {
+            Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.DeleteCondition(new ConditionRequestModel() { Id = Condition.Id, ConditionType = ConditionType });
+            if (rest.Content?.Conditions is null)
+            {
+                _snackbar.Add("rest.Content?.Conditions is null ошибка {C2303A75-FD26-4A4C-977C-DD6BE28A6A95}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+                return;
+            }
+
+            UpdateAct(rest.Content.Conditions);
+        }
+        else
+            DeleteNewConditionAct(Condition.Id);
+    }
+
+    async Task SaveClickHandler()
+    {
+        Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.UpdateCondition(new UpdateConditionRequestModel(Condition)
+            {
+                ConditionType = ConditionType,
+                OwnerId = OwnerId
+            });
+
+        if (rest.Content is null)
+        {
+            ModalBodyText = rest.Error?.Message ?? "не известная ошибка";
+            Modal?.Open("Ошибка");
+            return;
+        }
+
+        if (!rest.Content.IsSuccess)
+        {
+            ModalBodyText = "";
+            Modal?.Open("Ошибка", rest.Content.Messages);
+            return;
+        }
+
+        showMessages?.ShowMessages(rest.Content.Messages);
+
+        _conditionName = Condition.Name;
+        _conditionHardwareId = Condition.HardwareId;
+        _conditionPortId = Condition.PortId;
+        _conditionValueType = Condition.ConditionValueType;
+        _conditionMode = Condition.СomparisonMode;
+        _conditionValue = Condition.Value;
+
+        if (rest.Content?.Conditions?.Any() == true)
+            UpdateAct(rest.Content.Conditions);
+    }
+
+    void StateHasChangedCall() => StateHasChanged();
+}

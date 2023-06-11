@@ -1,0 +1,125 @@
+﻿@using SharedLib;
+@using BlazorLib;
+@using MudBlazor;
+@using Refit;
+
+@inject ILogger<ScriptContentionComponent> _logger
+@inject IRefitService _refit
+@inject ISnackbar _snackbar
+
+@inherits BlazorBusyComponentBaseModel
+
+<div class="alert alert-danger my-2" role="alert">
+    Укажите скрипты, которым будет запрещён запуск в то время пока исполняется текущий!
+    Выбранным скриптам будет запрещён автозапуск по тригеру/событию. Ручной (принудительный) запуск пользователем будет доступен.
+</div>
+
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (ScriptId < 1)
+{
+    <figure class="text-center">
+        <blockquote class="blockquote">
+            <p>Не записан.</p>
+        </blockquote>
+        <figcaption class="blockquote-footer">
+            Запишите <cite title="Скрипт не сохранён">скрипт</cite>!
+        </figcaption>
+    </figure>
+}
+else
+{
+    <ul class="list-group list-group-flush">
+        @if (AllScripts is null)
+        {
+            <li disabled type="button" class="list-group-item list-group-item-action">
+                ~ нет ~
+            </li>
+        }
+        else
+        {
+            foreach (ScriptModelDB s in AllScripts)
+            {
+                bool contains = SelectedIds.Contains(s.Id);
+                <li @onclick="async () => { await SetContention(ScriptId, s.Id, !SelectedIds.Contains(s.Id)); }" type="button" class="list-group-item list-group-item-action@(contains ? "" : " opacity-25")" aria-current="@(SelectedIds.Contains(s.Id))">
+                    @(s.Name)
+                    @if (contains)
+                    {
+                        <span title="Этот скрипт не сможет запуститься по событию если текущий скрипт будет в активной фазе исполнения">
+                            <strong class="text-primary">
+                                [Выбран]
+                            </strong>
+                            <sup>Отменить?</sup>
+                        </span>
+                    }
+                    else
+                    {
+                        <span title="Этот скрипт не зависит от текущего">
+                            <span class="text-secondary">
+                                [не важно]
+                            </span>
+                            <sup>Выбрать?</sup>
+                        </span>
+                    }
+                </li>
+            }
+        }
+    </ul>
+}
+
+@code {
+    /// <summary>
+    /// Скрипт Id (выбранный)
+    /// </summary>
+    [Parameter, EditorRequired]
+    public int ScriptId { get; set; }
+
+    /// <summary>
+    /// Все скрипты
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IEnumerable<ScriptModelDB> AllScripts { get; set; } = default!;
+
+    IEnumerable<int> SelectedIds = Enumerable.Empty<int>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ScriptId <= 0)
+        {
+            _snackbar.Add("ScriptId <= 0 ошибка {F56564B7-C1B4-40AE-A0A4-C12244503832}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        await Rest(ScriptId);
+    }
+
+    async Task SetContention(int script_master, int script_slave, bool is_set)
+    {
+        ApiResponse<IdsResponseModel> rest = await _refit.SetContention(new UpdateContentionRequestModel() { IsSet = is_set, ScriptMasterId = script_master, ScriptSlaveId = script_slave });
+
+        if (rest.Content?.Ids is null)
+        {
+            _snackbar.Add("rest.Content?.Ids is null ошибка {E5088810-40A1-4AFA-BF4E-F19635027F16}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        _snackbar.Add(is_set ? "Выбран" : "Отменён", is_set ? Severity.Success : Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        SelectedIds = rest.Content.Ids;
+    }
+
+    public async Task Rest(int script_id)
+    {
+        ApiResponse<IdsResponseModel> rest = await _refit.GetContentions(script_id);
+        if (rest.Content?.Ids is null)
+        {
+            _snackbar.Add("rest.Content?.Ids is null ошибка {CC161D89-B6C7-4436-8CB6-E83ECD10A509}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        SelectedIds = rest.Content.Ids;
+        StateHasChanged();
+    }
+}

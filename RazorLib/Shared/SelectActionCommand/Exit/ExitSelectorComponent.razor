@@ -1,0 +1,61 @@
+﻿@using BlazorLib
+@using MudBlazor;
+@using SharedLib
+
+@inject IRefitService _refit
+@inject ISnackbar _snackbar
+
+<div class="col-auto">
+    <div class="input-group">
+        <label class="input-group-text" for="inputGroupSelectCommandSetFirst">Options</label>
+        <select @bind="CurrentCommandId" class="form-select" id="inputGroupSelectCommandSetFirst">
+            @if (AllCsripts?.Any() == true)
+            {
+                <option class="text-danger" title="Прекратить выполнение" value="0">Выйти</option>
+                @foreach (ScriptModelDB script in AllCsripts!.Where(x => x.Commands?.Any(y => y.Id != CurrentCommandId) == true).AsEnumerable())
+                {
+                    <optgroup label="@(script.Name)">
+                        @foreach (CommandModelDB opt in script.Commands!.AsEnumerable())
+                        {
+                            <option class="text-@(opt.Id == orign_command_id ? "success" : "body")" value="@(opt.Id)">@(opt.Name)</option>
+                        }
+                    </optgroup>
+                }
+            }
+        </select>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Команда
+    /// </summary>
+    [Parameter, EditorRequired]
+    public CommandModelDB? CurrentCommand { get; set; }
+
+    [Parameter, EditorRequired]
+    public Action? SelectDirectHandler { get; set; }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<ScriptModelDB>? AllCsripts { get; set; }
+
+    int orign_command_id;
+    public int CurrentCommandId
+    {
+        get => CurrentCommand?.Execution ?? 0;
+        private set
+        {
+            if (CurrentCommand is null)
+                return;
+
+            CurrentCommand!.Execution = value;
+            if (value != default && orign_command_id == default)
+                orign_command_id = value;
+
+            if (SelectDirectHandler is not null)
+            {
+                SelectDirectHandler();
+            }
+        }
+    }
+}

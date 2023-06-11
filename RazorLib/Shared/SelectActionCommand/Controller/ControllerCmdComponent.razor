@@ -1,0 +1,48 @@
+﻿@using MudBlazor;
+@using SharedLib
+
+@inject ISnackbar _snackbar
+
+<div class="col-auto">
+    <div class="input-group">
+        <label class="input-group-text" for="inputGroupSelectCommandSetFirst">/?cmd</label>
+        <input @bind-value="CommandText" @bind-value:event="oninput" type="text" class="form-control" placeholder="Команда" aria-label="Команда" id="inputGroupSelectCommandSetFirst" />
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Обработчик события обновления [команды контроллера] в родителя
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Action HandlerAction { get; set; } = default!;
+
+    /// <summary>
+    /// Команда
+    /// </summary>
+    [Parameter, EditorRequired]
+    public CommandModelDB CurrentCommand { get; set; } = default!;
+
+    /// <summary>
+    /// Текст команды
+    /// </summary>
+    public string? CommandText
+    {
+        get => CurrentCommand?.CommandType switch
+        {
+            TypesCommandsEnum.Controller => CurrentCommand.ExecutionParametr,
+            _ => null
+        };
+
+        private set
+        {
+            if (CurrentCommand is null)
+                return;
+
+            bool is_upd = CurrentCommand.ExecutionParametr != value;
+            CurrentCommand.ExecutionParametr = value;
+            if (is_upd)
+                HandlerAction();
+        }
+    }
+}

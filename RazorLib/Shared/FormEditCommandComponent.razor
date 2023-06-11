@@ -1,0 +1,174 @@
+﻿@using Microsoft.AspNetCore.Components.Forms;
+@using RazorLib.Shared.SelectActionCommand;
+@using SharedLib;
+@using BlazorLib;
+@using MudBlazor;
+@using Refit;
+
+@inject ILogger<FormEditCommandComponent> _loger
+@inject IRefitService _refit
+@inject ISnackbar _snackbar
+
+@inherits BlazorBusyComponentBaseModel
+
+<EditForm @ref="form_ref" autocomplete="off" Model="@CurrentCommand">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row gy-2 gx-3 align-items-center">
+        <div class="col-auto">
+            <div class="input-group">
+                <span class="input-group-text">Имя:</span>
+                <CustomInputTextComponent @bind-Value="CurrentCommand.Name" class="form-control" id="exampleInputTitle" aria-describedby="nameHelp" />
+            </div>
+        </div>
+        <div class="col-auto" title="Ппауза перед выполнением команды">
+            <div class="input-group">
+                <span class="input-group-text">Задержка:</span>
+                <input @bind="CurrentCommand.PauseSecondsBeforeExecution" type="number" min="1" class="form-control" aria-label="Amount (to the nearest dollar)">
+                <span class="input-group-text"> сек.</span>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="form-check form-switch">
+                <InputCheckbox @bind-Value="CurrentCommand.Hidden" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                <label class="form-check-label" for="flexSwitchCheckDefault">Скрытая команда</label>
+            </div>
+        </div>
+    </div>
+
+    <MainSelectorCommandComponent AllCsripts="AllCsripts" RootSelectorHandler="MainSelectorHandler" @ref="action_selector_ref" CurrentCommand="CurrentCommand" EntriesTreeHW="EntriesTreeHW" />
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+        <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            @if (CanSaveCommand && CurrentCommand.Id > 0)
+            {
+                <button @onclick="CancelCommandHandle" class="btn btn-outline-info" type="button" title="Отменить изменения команды">Отмена</button>
+            }
+            <button @onclick="SaveCommandHandle" disabled="@(!CanSaveCommand)" class="btn btn-outline-primary" type="button" title="Сохранить изменения в БД">Сохранить</button>
+            <button @onclick="DeleteCommandHandle" class="btn btn-outline-danger" type="button" title="@(CommandInitDel ? "Подтвердить удаление команды" : "Удалить команду?")">@(CommandInitDel ? "Подтвердить удаление" : "Удалить")</button>
+        </div>
+    </div>
+    <hr />
+    <ConditionsComponent EntriesTreeHW="EntriesTreeHW" OwnerId="CurrentCommand.Id" ConditionType="ConditionsTypesEnum.Command" />
+</EditForm>
+
+<ModalWindowComponent @ref="Modal">
+    <p>@ModalBodyText</p>
+</ModalWindowComponent>
+
+@code {
+    [Parameter, EditorRequired]
+    public EntrySortingModel CommandEntry { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public double CommandSorting { get; set; }
+
+    [Parameter, EditorRequired]
+    public Action<int> DeleteCommand { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Action<CommandModelDB> UpdateCommand { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public int ScriptId { get; set; }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<ScriptModelDB> AllCsripts { get; set; } = default!;
+
+    EntryNestedModel[] EntriesTreeHW { get; set; } = Array.Empty<EntryNestedModel>();
+
+    EditCommandViewModel EditCommandOrign = new();
+    CommandModelDB CurrentCommand = new();
+    //
+    EditForm? form_ref;
+
+    MainSelectorCommandComponent? action_selector_ref;
+
+    private ModalWindowComponent? Modal { get; set; }
+    private string ModalBodyText { get; set; } = string.Empty;
+
+    bool CanSaveCommand => EditCommandOrign != CurrentCommand || CurrentCommand.Id < 1;
+
+    void MainSelectorHandler(CommandModelDB sender)
+    {
+        CurrentCommand.CommandType = sender.CommandType;
+        CurrentCommand.Execution = sender.Execution;
+        CurrentCommand.ExecutionParametr = sender.ExecutionParametr;
+        CurrentCommand.Sorting = sender.Sorting;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentCommand.Id = CommandEntry.Id;
+        CurrentCommand.Name = CommandEntry.Name;
+
+        ApiResponse<EntriesNestedResponseModel> rest_hw_tree = await _refit.GetTreeHardwaresNestedEntries();
+        if (rest_hw_tree.Content?.Entries is null)
+        {
+            _snackbar.Add("", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        EntriesTreeHW = rest_hw_tree.Content.Entries;
+
+        if (CommandEntry.Id > 0)
+            await Rest();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender && CurrentCommand.Id != CommandEntry.Id)
+        {
+            if (CommandEntry.Id < 1)
+                CurrentCommand = new() { Id = CommandEntry.Id, Name = CommandEntry.Name };
+            else
+                await Rest(true);
+        }
+    }
+
+    async Task Rest(bool upd_satte = false)
+    {
+        ApiResponse<CommandResponseModel> rest = await _refit.GetCommand(CommandEntry.Id);
+        CurrentCommand = rest.Content!.Command!;
+        CurrentCommand.ScriptId = ScriptId;
+        EditCommandOrign = (EditCommandViewModel)CurrentCommand;
+        if (upd_satte)
+            StateHasChanged();
+    }
+
+    void CancelCommandHandle() => CurrentCommand = (CommandModelDB)EditCommandOrign;
+
+    async Task SaveCommandHandle()
+    {
+        CurrentCommand.ScriptId = ScriptId;
+        CurrentCommand.Sorting = CommandSorting;
+        EditCommandOrign.Id = CurrentCommand.Id;
+        EditCommandOrign.Name = CurrentCommand.Name;
+        EditCommandOrign.Hidden = CurrentCommand.Hidden;
+        EditCommandOrign.PauseSecondsBeforeExecution = CurrentCommand.PauseSecondsBeforeExecution;
+
+        ApiResponse<ResponseBaseModel> rest = await _refit.UpdateCommand(CurrentCommand);
+
+        if (rest.Content?.IsSuccess != true)
+        {
+            Modal?.Open("Ошибка", rest.Content!.Messages);
+            return;
+        }
+
+        CurrentCommand = (CommandModelDB)EditCommandOrign;
+        UpdateCommand(CurrentCommand);
+    }
+
+    bool CommandInitDel = false;
+    async Task DeleteCommandHandle()
+    {
+        CommandInitDel = !CommandInitDel;
+        if (CommandInitDel)
+            return;
+
+        ApiResponse<ResponseBaseModel> rest = await _refit.DeleteCommand(CommandEntry.Id);
+
+        DeleteCommand(CommandEntry.Id);
+    }
+}

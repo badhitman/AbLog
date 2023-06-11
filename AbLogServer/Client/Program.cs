@@ -1,8 +1,8 @@
-using AbLogServer.Client;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components.Web;
+using ABLog;
 
-namespace AbLogServer.Client
+namespace AbLog
 {
     public class Program
     {

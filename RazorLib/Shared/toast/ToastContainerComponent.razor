@@ -1,0 +1,84 @@
+﻿@using SharedLib;
+
+<div class="toast-container">
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        @foreach (MessageThemeModel msg in Messages)
+        {
+            <ToastMessageComponent DeleteMessage="DeleteMessage" Message="msg" LifeTimeSec="LifeTimeSec" />
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Срок жизни сообщения секунд (минимум: 3 сек)
+    /// </summary>
+    [Parameter]
+    public int LifeTimeSec { get; set; }
+
+    static System.Threading.Timer? timer;
+    object lock_timer = new();
+
+    IEnumerable<MessageThemeModel> Messages { get; set; } = Enumerable.Empty<MessageThemeModel>();
+
+    /// <summary>
+    /// Отобразить сообщения в SnackBar
+    /// </summary>
+    public void ShowMessages(IEnumerable<ResultMessage> messages)
+    {
+        lock (lock_timer)
+        {
+            List<MessageThemeModel> _messages = new(Messages);
+            _messages.AddRange(messages.Select(x => { ThemeModel css = GetCss(x.TypeMessage); return new MessageThemeModel(Guid.NewGuid().ToString(), x.Text, css); }));
+            Messages = _messages.ToArray();
+            StateHasChanged();
+        }
+        timer = new Timer(new TimerCallback(CropMessages), null, 0, 100);
+    }
+
+    void CropMessages(object? obj)
+    {
+        lock (lock_timer)
+        {
+            if (!Messages.Any())
+            {
+                timer?.Dispose();
+                InvokeAsync(() => StateHasChanged());
+                return;
+            }
+            DateTime dtn = DateTime.Now;
+            Messages = Messages.Where(x => { TimeSpan dts = (dtn - x.CreatedAt); return dts.TotalSeconds <= LifeTimeSec; }).ToArray();
+        }
+
+        InvokeAsync(() => StateHasChanged());
+    }
+
+    protected override void OnInitialized()
+    {
+        if (LifeTimeSec < 3)
+            LifeTimeSec = 3;
+    }
+
+    void DeleteMessage(string msg_id)
+    {
+        Messages = Messages.Where(x => !x.Id.Equals(msg_id, StringComparison.OrdinalIgnoreCase)).ToArray();
+        StateHasChanged();
+    }
+
+    ThemeModel GetCss(ResultTypeEnum type_msg)
+    {
+        switch (type_msg)
+        {
+            case ResultTypeEnum.Success:
+                return new ThemeModel("success", "white");
+            case ResultTypeEnum.Info:
+                return new ThemeModel("primary", "white");
+            case ResultTypeEnum.Warning:
+                return new ThemeModel("warning", "dark");
+            case ResultTypeEnum.Error:
+                return new ThemeModel("danger", "white");
+            default:
+                return new ThemeModel("secondary", "white");
+        }
+    }
+}

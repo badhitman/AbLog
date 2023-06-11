@@ -1,0 +1,174 @@
+﻿@using SharedLib;
+@using BlazorLib;
+@using MudBlazor;
+@using Refit;
+
+@inject ILogger<ConditionsComponent> _loger;
+@inject IRefitService _refit;
+@inject ISnackbar _snackbar;
+
+@inherits BlazorBusyComponentBaseModel
+
+<style>
+    .create-new-condition {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+</style>
+
+@if (OwnerId < 1)
+{
+    <figure class="text-center mb-0">
+        <figcaption class="blockquote-footer mb-0 mt-1">
+            Объект не записан. <cite title="Записать данные?">Запишите команду в БД</cite>
+        </figcaption>
+    </figure>
+}
+else if (Data?.Any() != true)
+{
+    <figure class="text-center mb-0">
+        <figcaption class="blockquote-footer mb-0 mt-1">
+            Условий нет. <cite @onclick="CreateNewCondition" class="create-new-condition link-primary" title="Создать условие?">Создать?</cite>
+        </figcaption>
+    </figure>
+}
+else
+{
+    <div class="card mt-2 text-dark bg-light border-primary">
+        <div class="card-body">
+
+            <h5 class="card-title">
+                Условия
+                <sup>
+                    [<span @onclick="CreateNewCondition" class="create-new-condition link-primary">Добавить условие</span>]
+                </sup>
+            </h5>
+            <hr />
+
+            @if (IsBusyProgress)
+            {
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                int i = 0;
+                <ul class="list-group">
+                    @if (Data.Any())
+                    {
+                        @foreach (ConditionAnonimModel cond in Data.OrderBy(x => $"{x.Name}{x.Id}"))
+                        {
+                            <ConditionListRowComponent DeleteNewConditionAct="DeleteNewConditionAct" @key="@($"{cond.ConditionValueType}/{cond.Id}")" UpdateAct="UpdateAct" OwnerId="OwnerId" ConditionType="ConditionType" TreeHardwares="EntriesTreeHW" Condition="cond" SequenceNumber="@(++i)" />
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                Пусто
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public int OwnerId { get; set; }
+
+    /// <summary>
+    /// Типы условных требований: команда, тригер ...
+    /// </summary>
+    [Parameter, EditorRequired]
+    public ConditionsTypesEnum ConditionType { get; set; }
+
+    [Parameter, EditorRequired]
+    public EntryNestedModel[] EntriesTreeHW { get; set; } = default!;
+
+    List<ConditionAnonimModel> Data = new List<ConditionAnonimModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OwnerId > 0)
+            await Rest(OwnerId, ConditionType);
+    }
+
+    void DeleteNewConditionAct(int condit_id)
+    {
+        if (condit_id > 0)
+            return;
+
+        int index_item = Data.FindIndex(x => x.Id == condit_id);
+        if (index_item > -1)
+        {
+            Data.RemoveAt(index_item);
+            StateHasChanged();
+        }
+    }
+
+    void UpdateAct(IEnumerable<ConditionAnonimModel> data)
+    {
+        ConditionAnonimModel[] add = data.Where(x => !Data.Any(y => y.Id == x.Id)).ToArray();
+        if (add.Any())
+        {
+            Data.AddRange(add);
+        }
+
+        int[] del = Data.Where(x => x.Id > 0 && !data.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
+        if (del.Any())
+        {
+            Data = Data.Where(x => !del.Contains(x.Id)).ToList();
+        }
+        del = Data.Where(x => x.Id < 1 && data.Any(y => y.Name == x.Name)).Select(x => x.Id).Distinct().ToArray();
+        if (del.Any())
+        {
+            Data = Data.Where(x => !del.Contains(x.Id)).ToList();
+        }
+
+        StateHasChanged();
+    }
+
+    public async Task Rest(int owner_id, ConditionsTypesEnum condition_type)
+    {
+        if (OwnerId != owner_id || ConditionType != condition_type)
+        {
+            Data.Clear();
+            OwnerId = owner_id;
+            ConditionType = condition_type;
+        }
+
+        if (OwnerId < 1)
+            return;
+        IsBusyProgress = true;
+
+        ApiResponse<ConditionsAnonimResponseModel> rest_conditions = await _refit.GetConditions(new SharedLib.ConditionRequestModel() { Id = OwnerId, ConditionType = ConditionType });
+        if (rest_conditions.Content?.Conditions?.Any() == true)
+            UpdateAct(rest_conditions.Content.Conditions);
+
+        IsBusyProgress = false;
+        StateHasChanged();
+    }
+
+    void CreateNewCondition()
+    {
+        int id = Data.Any() ? Data.Min(x => x.Id) - 1 : -1;
+        if (id > -1)
+            id = -1;
+
+        string name = Guid.NewGuid().ToString(); ;
+        for (int i = 1; i < int.MaxValue; i++)
+        {
+            name = $"New-{i}";
+            if (!Data.Any(x => x.Name == name))
+                break;
+        }
+        Data.Add(new ConditionAnonimModel() { Id = id, Name = name });
+        StateHasChanged();
+    }
+}
