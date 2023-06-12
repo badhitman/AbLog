@@ -1,21 +1,31 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using ab.context;
 using SharedLib;
-using Microsoft.EntityFrameworkCore;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class CommandsController : ControllerBase
     {
         private readonly ILogger<CommandsController> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
         public CommandsController(ILogger<CommandsController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.BY_OWNER}/{{script_id}}")]
         public EntriesSortingResponseModel GetCommandsEntriesByScript(int script_id)
         {
@@ -34,6 +44,9 @@ namespace AbLogServer.Controllers
             return res_oe;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet("{command_id}")]
         public CommandResponseModel CommandGet(int command_id)
         {
@@ -48,6 +61,9 @@ namespace AbLogServer.Controllers
             return res_c;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
         public ResponseBaseModel CommandUpdateOrCreate(CommandModelDB command_json)
         {
@@ -164,6 +180,9 @@ namespace AbLogServer.Controllers
             return res_b;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPut($"{GlobalStatic.HttpRoutes.SORTING}")]
         public EntriesSortingResponseModel CommandSortingSet(IdsPairModel req)
         {
@@ -208,6 +227,9 @@ namespace AbLogServer.Controllers
             return res_oe;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpDelete("{id_command}")]
         public ResponseBaseModel CommandDelete(int id_command)
         {

@@ -1,15 +1,15 @@
 ﻿@page "/scripts-page"
 
-@using MudBlazor
+@using RazorLib.Shared.tabs;
 @using RazorLib.Shared;
-@using RazorLib.Shared.tabs
-@using SharedLib
-@using BlazorLib
-@using Refit
+@using MudBlazor;
+@using SharedLib;
+@using BlazorLib;
+@using Refit;
 
-@inject IRefitService _refit
-@inject ILogger<ScriptsPage> _logger
-@inject ISnackbar _snackbar
+@inject ILogger<ScriptsPage> _logger;
+@inject IRefitService _refit;
+@inject ISnackbar _snackbar;
 
 @inherits BlazorBusyComponentBaseModel
 

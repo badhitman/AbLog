@@ -5,17 +5,26 @@ using SharedLib;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class ContentionsController : ControllerBase
     {
         private readonly ILogger<ContentionsController> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ContentionsController(ILogger<ContentionsController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet("{script_id}")]
         public IdsResponseModel ContentionsGetByScript(int script_id)
         {
@@ -36,6 +45,9 @@ namespace AbLogServer.Controllers
             return res_ids;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
         public IdsResponseModel ContentionSet(UpdateContentionRequestModel contention_json)
         {

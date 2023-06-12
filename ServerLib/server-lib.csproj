@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DBContextLib\db-context.csproj" />
+	  <ProjectReference Include="..\FlashCap\FlashCap\FlashCap.csproj" />
 	</ItemGroup>
 
 </Project>

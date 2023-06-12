@@ -3,6 +3,9 @@ using SharedLib;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class StorageController : ControllerBase
@@ -10,6 +13,9 @@ namespace AbLogServer.Controllers
         private readonly ILogger<StorageController> _logger;
         private readonly IParametersStorageService _parameters_storage;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public StorageController(ILogger<StorageController> logger, IParametersStorageService parameters_storage)
         {
             _logger = logger;

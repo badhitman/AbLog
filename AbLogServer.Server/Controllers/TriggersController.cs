@@ -4,17 +4,26 @@ using SharedLib;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class TriggersController : ControllerBase
     {
         private readonly ILogger<TriggersController> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public TriggersController(ILogger<TriggersController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
         public TriggersResponseModel TriggersGetAll()
         {
@@ -28,6 +37,9 @@ namespace AbLogServer.Controllers
             return res_trigs;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
         public TriggersResponseModel TriggerUpdateOrCreate(TrigerModelDB trigger_json)
         {
@@ -94,6 +106,9 @@ namespace AbLogServer.Controllers
             return res_trigs;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpDelete("{trigger_id}")]
         public TriggersResponseModel TriggerDelete(int trigger_id)
         {

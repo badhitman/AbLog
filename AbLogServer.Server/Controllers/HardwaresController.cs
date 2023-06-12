@@ -5,17 +5,26 @@ using SharedLib;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class HardwaresController : ControllerBase
     {
         private readonly ILogger<HardwaresController> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public HardwaresController(ILogger<HardwaresController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
         public HardwaresResponseModel HardwaresGetAll()
         {
@@ -32,6 +41,9 @@ namespace AbLogServer.Controllers
             return res_hws;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.ENTRIES}")]
         public EntriesResponseModel HardwaresGetAllAsEntries()
         {
@@ -44,6 +56,9 @@ namespace AbLogServer.Controllers
             return res_hws;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.NESTED_ENTRIES}")]
         public EntriesNestedResponseModel HardwaresGetTreeNestedEntries()
         {
@@ -72,6 +87,9 @@ namespace AbLogServer.Controllers
             return res_tree_hw;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet("{hardware_id}")]
         public HardwareResponseModel HardwareGet(int hardware_id)
         {
@@ -91,6 +109,9 @@ namespace AbLogServer.Controllers
             return res_hw;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
         public PortHardwareResponseModel HardwarePortGet(int port_id)
         {

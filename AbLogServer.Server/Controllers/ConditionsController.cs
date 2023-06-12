@@ -4,17 +4,26 @@ using SharedLib;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class ConditionsController : ControllerBase
     {
         private readonly ILogger<ConditionsController> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ConditionsController(ILogger<ConditionsController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet("{owner_id}/{condition_type}")]
         public ConditionsAnonimResponseModel ConditionsGetByOwner(int owner_id, ConditionsTypesEnum condition_type)
         {
@@ -32,6 +41,9 @@ namespace AbLogServer.Controllers
             return res_ac;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPost($"/{GlobalStatic.HttpRoutes.UPDATE}")]
         public ConditionsAnonimResponseModel ConditionUpdateOrCreate(UpdateConditionRequestModel condition_request)
         {
@@ -122,6 +134,9 @@ namespace AbLogServer.Controllers
             return res_ac;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpDelete($"/{GlobalStatic.HttpRoutes.Conditions}/{{condition_id}}/{{condition_type}}")]
         public ConditionsAnonimResponseModel ConditionDelete(int condition_id, ConditionsTypesEnum condition_type)
         {

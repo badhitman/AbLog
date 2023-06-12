@@ -325,32 +325,32 @@ namespace SharedLib
             /// <summary>
             /// Запрос: HTTP команда
             /// </summary>
-            public const string REQUEST_HTTP_COMMAND = $"{REQUEST_PREFIX}http-command.json";
+            public const string REQUEST_HTTP_COMMAND = $"{REQUEST_PREFIX}http-command";
 
             /// <summary>
             /// Ответ: на HTTP команду
             /// </summary>
-            public const string RESULT_HTTP_COMMAND = $"{RESULT_PREFIX}http-command.json";
+            public const string RESULT_HTTP_COMMAND = $"{RESULT_PREFIX}http-command";
 
             /// <summary>
             /// Запрос: перечень доступных камер
             /// </summary>
-            public const string REQUEST_AVAILABLE_CAMERAS_COMMAND = $"{REQUEST_PREFIX}available-cameras.json";
+            public const string REQUEST_AVAILABLE_CAMERAS_COMMAND = $"{REQUEST_PREFIX}available-cameras";
 
             /// <summary>
             /// Ответ: перечень доступных камер
             /// </summary>
-            public const string RESULT_AVAILABLE_CAMERAS_COMMAND = $"{RESULT_PREFIX}available-cameras.json";
+            public const string RESULT_AVAILABLE_CAMERAS_COMMAND = $"{RESULT_PREFIX}available-cameras";
 
             /// <summary>
             /// Запрос: фотография с камеры
             /// </summary>
-            public const string REQUEST_SHOT_CAMERA_COMMAND = $"{REQUEST_PREFIX}one-shot-camera.json";
+            public const string REQUEST_SHOT_CAMERA_COMMAND = $"{REQUEST_PREFIX}one-shot-camera";
 
             /// <summary>
             /// Ответ: фотография с камеры
             /// </summary>
-            public const string RESULT_SHOT_CAMERA_COMMAND = $"{RESULT_PREFIX}one-shot-camera.json";
+            public const string RESULT_SHOT_CAMERA_COMMAND = $"{RESULT_PREFIX}one-shot-camera";
         }
     }
 }

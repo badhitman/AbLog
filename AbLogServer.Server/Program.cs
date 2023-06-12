@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace AbLogServer
 {
+#pragma warning disable CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
     public class Program
     {
         public static void Main(string[] args)
@@ -23,6 +24,7 @@ namespace AbLogServer
                 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
                 builder.Services.AddScoped<IParametersStorageService, ParametersStorageService>();
+                builder.Services.AddScoped<ICamerasService, FlashCamService>();
 
                 builder.Services.AddControllersWithViews()
                     .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -76,4 +78,5 @@ namespace AbLogServer
             db.ReorderScriptsCommands();
         }
     }
+#pragma warning restore CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
 }

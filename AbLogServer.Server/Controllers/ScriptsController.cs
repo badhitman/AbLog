@@ -5,17 +5,26 @@ using SharedLib;
 
 namespace AbLogServer.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class ScriptsController : ControllerBase
     {
         private readonly ILogger<ScriptsController> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ScriptsController(ILogger<ScriptsController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
         public ScriptsResponseModel ScriptsGetAll()
         {
@@ -28,6 +37,9 @@ namespace AbLogServer.Controllers
             return res_s;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpDelete("{script_id}")]
         public ScriptsResponseModel ScriptDelete(int script_id)
         {
@@ -52,6 +64,9 @@ namespace AbLogServer.Controllers
             return res_s;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
         public ScriptsResponseModel ScriptUpdateOrCreate(EntryDescriptionModel script)
         {
@@ -106,6 +121,9 @@ namespace AbLogServer.Controllers
             return res_s;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [HttpPut($"{GlobalStatic.HttpRoutes.ENABLE}/{{script_id}}")]
         public ResponseBaseModel ScriptEnableSet([FromRoute] int script_id, bool is_enable)
         {
