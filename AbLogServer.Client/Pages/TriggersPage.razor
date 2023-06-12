@@ -244,7 +244,7 @@ else
     {
         IsBusyProgress = true;
 
-        ApiResponse<ScriptsResponseModel> rest_all_scripts = await _refit.GetAllScripts();
+        ApiResponse<ScriptsResponseModel> rest_all_scripts = await _refit.ScriptsGetAll();
 
         if (rest_all_scripts.Content?.Scripts is null)
         {
@@ -254,7 +254,7 @@ else
 
         Scripts = rest_all_scripts.Content.Scripts;
 
-        ApiResponse<TriggersResponseModel> rest_all_triggers = await _refit.GetAllTriggers();
+        ApiResponse<TriggersResponseModel> rest_all_triggers = await _refit.TriggersGetAll();
         if (rest_all_triggers.Content?.Triggers is null)
         {
             _snack_bar.Add("rest_all_triggers.Content?.Triggers is null ошибка {4334BFB1-481E-460D-9E21-B8782DEA3DCA}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
@@ -264,7 +264,7 @@ else
         if (Triggers.Any())
             _curTrig = Triggers.First();
 
-        ApiResponse<EntriesNestedResponseModel> rest_hw_tree = await _refit.GetTreeHardwaresNestedEntries();
+        ApiResponse<EntriesNestedResponseModel> rest_hw_tree = await _refit.HardwaresGetTreeNestedEntries();
         if (rest_hw_tree.Content?.Entries is null)
         {
             _snack_bar.Add("rest_hw_tree.Content?.Entries is null ошибка {7A0F6B2C-8286-4CB5-84AB-7F954831FE94}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
@@ -326,7 +326,7 @@ else
         IsBusyProgress = true;
         if (CurrentTrigger.Id > 0)
         {
-            var rest = await _refit.DeleteTrigger(CurrentTrigger.Id);
+            var rest = await _refit.TriggerDelete(CurrentTrigger.Id);
             if (!rest.IsSuccessStatusCode)
             {
                 ModalBodyText = $"Ошибка: {rest.StatusCode}";
@@ -362,7 +362,7 @@ else
     async Task SaveTriggerHandle()
     {
         IsBusyProgress = true;
-        ApiResponse<TriggersResponseModel> rest = await _refit.UpdateTrigger(CurrentTrigger);
+        ApiResponse<TriggersResponseModel> rest = await _refit.TriggerUpdateOrCreate(CurrentTrigger);
 
         if (!rest.IsSuccessStatusCode)
         {

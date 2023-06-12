@@ -9,213 +9,208 @@ namespace BlazorLib
     [Headers("Content-Type: application/json")]
     public interface IRefitService
     {
-        #region HARDWARES
+        #region HARDWARE`s +PORT`s
 
         /// <summary>
         /// Получить все устройства (с портами)
         /// </summary>
         /// <returns>Все устройства (с портами)</returns>
         [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.LIST}")]
-        public Task<ApiResponse<HardwaresResponseModel>> GetAllHardwares();
+        public Task<ApiResponse<HardwaresResponseModel>> HardwaresGetAll();
 
         /// <summary>
         /// Получить все устройства (данные в лёгкой форме)
         /// </summary>
         /// <returns>Все устройства (данные в лёгкой форме)</returns>
         [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.ENTRIES}")]
-        public Task<ApiResponse<EntriesResponseModel>> GetAllHardwaresEntries();
+        public Task<ApiResponse<EntriesResponseModel>> HardwaresGetAllAsEntries();
 
         /// <summary>
         /// Получить все устройства с портами
         /// </summary>
         [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.NESTED_ENTRIES}")]
-        public Task<ApiResponse<EntriesNestedResponseModel>> GetTreeHardwaresNestedEntries();
+        public Task<ApiResponse<EntriesNestedResponseModel>> HardwaresGetTreeNestedEntries();
 
         /// <summary>
         /// Получить информацию об устройстве
         /// </summary>
         [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{{hardware_id}}")]
-        public Task<ApiResponse<HardwareResponseModel>> GetHardware(int hardware_id);
+        public Task<ApiResponse<HardwareResponseModel>> HardwareGet(int hardware_id);
 
         /// <summary>
         /// Получить порт устройства
         /// </summary>
         [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
-        public Task<ApiResponse<PortHardwareResponseModel>> GetPortHW(int port_id);
+        public Task<ApiResponse<PortHardwareResponseModel>> HardwarePortGet(int port_id);
 
         #endregion
 
-        #region SCRIPT
+        #region SCRIPT`s
 
         /// <summary>
         /// Получить все скрипты
         /// </summary>
         /// <returns>Все скрипты</returns>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_ALL_SCRIPTS}")]
-        public Task<ApiResponse<ScriptsResponseModel>> GetAllScripts();
-
-        /// <summary>
-        /// Обновить/создать скрипт
-        /// </summary>
-        /// <param name="script">Скрипт для создания</param>
-        /// <returns>Актуальный перечень скриптов (после обновления)</returns>
-        [Post($"/api/{GlobalStatic.HttpRoutes.UPDATE_SCRIPT}")]
-        public Task<ApiResponse<ScriptsResponseModel>> UpdateScript(EntryDescriptionModel script);
+        [Get($"/{GlobalStatic.HttpRoutes.Scripts}/{GlobalStatic.HttpRoutes.LIST}")]
+        public Task<ApiResponse<ScriptsResponseModel>> ScriptsGetAll();
 
         /// <summary>
         /// Удалить скрипт
         /// </summary>
         /// <param name="script_id">Идентификатор срипта</param>
         /// <returns>Актуальный перечень скриптов (после удаления)</returns>
-        [Delete($"/api/{GlobalStatic.HttpRoutes.DELETE_SCRIPT}")]
-        public Task<ApiResponse<ScriptsResponseModel>> DeleteScript(int script_id);
+        [Delete($"/{GlobalStatic.HttpRoutes.Scripts}/{{script_id}}")]
+        public Task<ApiResponse<ScriptsResponseModel>> ScriptDelete(int script_id);
+
+        /// <summary>
+        /// Обновить/создать скрипт
+        /// </summary>
+        /// <param name="script">Скрипт для создания</param>
+        /// <returns>Актуальный перечень скриптов (после обновления)</returns>
+        [Post($"/{GlobalStatic.HttpRoutes.Scripts}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<ScriptsResponseModel>> ScriptUpdateOrCreate(EntryDescriptionModel script);
 
         /// <summary>
         /// Установить скрипту признак включения/отключения
         /// </summary>
-        /// <param name="script_id">Идентификатор скрипта</param>
-        /// <param name="set_enable">Признак включения</param>
-        /// <returns></returns>
-        [Get($"/api/{GlobalStatic.HttpRoutes.SET_SCRIPT_ENABLE}")]
-        public Task<ApiResponse<ResponseBaseModel>> SetScriptEnable(int script_id, bool set_enable);
+        [Put($"/{GlobalStatic.HttpRoutes.Scripts}/{GlobalStatic.HttpRoutes.ENABLE}/{{script_id}}")]
+        public Task<ApiResponse<ResponseBaseModel>> ScriptEnableSet([AliasAs("script_id")] int script_id, bool is_enable);
 
         #endregion
 
-        #region COMMAND
+        #region COMMAND`s
 
         /// <summary>
         /// Получить команды скрипта
         /// </summary>
         /// <param name="script_id">Идентификатор скрипта</param>
         /// <returns>Команды скрипта</returns>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_COMMANDS_ENTRIES_BY_SCRIPT_ID}")]
+        [Get($"/{GlobalStatic.HttpRoutes.Commands}/{GlobalStatic.HttpRoutes.BY_OWNER}/{{script_id}}")]
         public Task<ApiResponse<EntriesSortingResponseModel>> GetCommandsEntriesByScript(int script_id);
 
         /// <summary>
         /// Получить команду
         /// </summary>
         /// <param name="command_id">Идентификатор команды</param>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_COMMAND}")]
-        public Task<ApiResponse<CommandResponseModel>> GetCommand(int command_id);
+        [Get($"/{GlobalStatic.HttpRoutes.Commands}/{{command_id}}")]
+        public Task<ApiResponse<CommandResponseModel>> CommandGet(int command_id);
 
         /// <summary>
-        /// Обновить команду
+        /// Обновитьсоздать команду
         /// </summary>
         /// <param name="command">Команда обновления</param>
-        [Post($"/api/{GlobalStatic.HttpRoutes.UPDATE_COMMAND}")]
-        public Task<ApiResponse<ResponseBaseModel>> UpdateCommand(CommandModelDB command);
+        [Post($"/{GlobalStatic.HttpRoutes.Commands}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<ResponseBaseModel>> CommandUpdateOrCreate(CommandModelDB command);
 
         /// <summary>
         /// Установить сортировку элементов путём обмена их местами между собой (объекты обмениваются значениями [sorting])
         /// </summary>
         /// <param name="commands_for_move">Идентификаторы команд, которые нужно поменять месстами в сортировке</param>
         /// <returns>Новый (актуальный) перечень команд</returns>
-        [Post($"/api/{GlobalStatic.HttpRoutes.SET_COMMAND_SORTING}")]
-        public Task<ApiResponse<EntriesSortingResponseModel>> SetCommandSorting(IdsPairModel commands_for_move);
+        [Put($"/{GlobalStatic.HttpRoutes.Commands}/{GlobalStatic.HttpRoutes.SORTING}")]
+        public Task<ApiResponse<EntriesSortingResponseModel>> CommandSortingSet(IdsPairModel commands_for_move);
 
         /// <summary>
         /// Удалить команду
         /// </summary>
         /// <param name="id_command">Идентификатор команды для удаления</param>
         /// <returns></returns>
-        [Delete($"/api/{GlobalStatic.HttpRoutes.DELETE_COMMAND}/{{id_command}}")]
-        public Task<ApiResponse<ResponseBaseModel>> DeleteCommand(int id_command);
+        [Delete($"/{GlobalStatic.HttpRoutes.Commands}/{{id_command}}")]
+        public Task<ApiResponse<ResponseBaseModel>> CommandDelete(int id_command);
 
         #endregion
 
-        #region CONDITIONS
+        #region CONDITION`s
 
         /// <summary>
-        /// Получить объект условия/ограничения
+        /// Получить условия/ограничения по владельцу (тригшер или команда)
         /// </summary>
-        /// <param name="req">Тип ограничения (триггер, скрипт и т.п.) и его идентификатор</param>
-        /// <returns>Объект ограничения/условия</returns>
-        [Patch($"/api/{GlobalStatic.HttpRoutes.GET_CONDITIONS}")]
-        public Task<ApiResponse<ConditionsAnonimResponseModel>> GetConditions(ConditionRequestModel req);
+        /// <returns>Объект ограничений/условий</returns>
+        [Get($"/{GlobalStatic.HttpRoutes.Conditions}/{{owner_id}}/{{condition_type}}")]
+        public Task<ApiResponse<ConditionsAnonimResponseModel>> ConditionsGetByOwner([AliasAs("owner_id")] int condition_id, [AliasAs("condition_type")] ConditionsTypesEnum condition_type);
 
         /// <summary>
         /// Обновить объект условия/ограничения в БД
         /// </summary>
         /// <param name="req">Объект обновления условия/ограничения</param>
         /// <returns>Полный (обновлённый) перечень условий контекстного типа (например для тригера, команды и т.п.)</returns>
-        [Post($"/api/{GlobalStatic.HttpRoutes.UPDATE_CONDITION}")]
-        public Task<ApiResponse<ConditionsAnonimResponseModel>> UpdateCondition(UpdateConditionRequestModel req);
+        [Post($"/{GlobalStatic.HttpRoutes.Conditions}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<ConditionsAnonimResponseModel>> ConditionUpdateOrCreate(UpdateConditionRequestModel req);
 
         /// <summary>
         /// Удалить объект условия/ограничения
         /// </summary>
-        /// <param name="req">Идентификатор условия (и его тип)</param>
         /// <returns>Полный (обновлённый) перечень условий (после удаления) контекстного типа (например для тригера, команды и т.п.)</returns>
-        [Post($"/api/{GlobalStatic.HttpRoutes.DELETE_CONDITION}")]
-        public Task<ApiResponse<ConditionsAnonimResponseModel>> DeleteCondition(ConditionRequestModel req);
+        [Delete($"/{GlobalStatic.HttpRoutes.Conditions}/{{condition_id}}/{{condition_type}}")]
+        public Task<ApiResponse<ConditionsAnonimResponseModel>> ConditionDelete([AliasAs("condition_id")] int condition_id, [AliasAs("condition_type")] ConditionsTypesEnum condition_type);
 
         #endregion
 
-        #region CONTENTION (конкуренция/взаимоблокировка выполнения скриптов)
+        #region CONTENTION`s (конкуренция/взаимоблокировка выполнения скриптов)
 
         /// <summary>
         /// Получить идентификаторы скриптов, которым запрещён автозапуск во время выполенния  конкурирующего скрипта script_id (ScriptMasterId)
         /// </summary>
         /// <param name="script_id">script_id/ScriptMasterId</param>
         /// <returns>Перечень Id скриптов, которым запрещён автозапуск во время выполенния конкурирующего скрипта script_id (ScriptMasterId)</returns>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_CONTENTIONS}")]
-        public Task<ApiResponse<IdsResponseModel>> GetContentions(int script_id);
+        [Get($"/{GlobalStatic.HttpRoutes.Contentions}/{{script_id}}")]
+        public Task<ApiResponse<IdsResponseModel>> ContentionsGetByScript(int script_id);
 
         /// <summary>
         /// Установить признак конкурирующей взаимоблокировки
         /// </summary>
         /// <param name="contention_upd">Запрос</param>
         /// <returns>Перечень Id скриптов, которым запрещён автозапуск во время выполенния конкурирующего скрипта ScriptMasterId</returns>
-        [Post($"/api/{GlobalStatic.HttpRoutes.UPD_CONTENTION}")]
-        public Task<ApiResponse<IdsResponseModel>> SetContention(UpdateContentionRequestModel contention_upd);
+        [Post($"/{GlobalStatic.HttpRoutes.Contentions}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<IdsResponseModel>> ContentionSet(UpdateContentionRequestModel contention_upd);
 
         #endregion
 
-        #region TRIGGERS
+        #region TRIGGER`s
 
         /// <summary>
         /// Получить все тригеры
         /// </summary>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_TRIGGERS}")]
-        public Task<ApiResponse<TriggersResponseModel>> GetAllTriggers();
+        [Get($"/{GlobalStatic.HttpRoutes.Triggers}/{GlobalStatic.HttpRoutes.LIST}")]
+        public Task<ApiResponse<TriggersResponseModel>> TriggersGetAll();
 
         /// <summary>
         /// Обновить тригер
         /// </summary>
         /// <param name="trigger">Тригер обновления</param>
         /// <returns>Все тригеры</returns>
-        [Post($"/api/{GlobalStatic.HttpRoutes.UPD_TRIGGER}")]
-        public Task<ApiResponse<TriggersResponseModel>> UpdateTrigger(TrigerModelDB trigger);
+        [Post($"/{GlobalStatic.HttpRoutes.Triggers}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<TriggersResponseModel>> TriggerUpdateOrCreate(TrigerModelDB trigger);
 
         /// <summary>
         /// Удалить тригер
         /// </summary>
         /// <param name="trigger_id">Идентификатор тригшера для удаления</param>
         /// <returns>Все тригеры</returns>
-        [Delete($"/api/{GlobalStatic.HttpRoutes.DEL_TRIGGER}")]
-        public Task<ApiResponse<TriggersResponseModel>> DeleteTrigger(int trigger_id);
+        [Delete($"/{GlobalStatic.HttpRoutes.Triggers}/{{trigger_id}}")]
+        public Task<ApiResponse<TriggersResponseModel>> TriggerDelete(int trigger_id);
 
         #endregion
 
-        #region PARAMETERS STORAGE
+        #region PARAMETER`s STORAGE
 
         /// <summary>
         /// Получить конфигурацию Email (imap+smtp)
         /// </summary>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_EMAIL_CONFIG}")]
-        public Task<ApiResponse<EmailConfigModel>> GetEmailConfig();
+        [Get($"/{GlobalStatic.HttpRoutes.GET_EMAIL_CONFIG}")]
+        public Task<ApiResponse<EmailConfigModel>> EmailConfigGet();
 
         /// <summary>
         /// Сохранить конфигурацию Email (imap+smtp)
         /// </summary>
-        [Post($"/api/{GlobalStatic.HttpRoutes.SAVE_EMAIL_CONFIG}")]
-        public Task<ApiResponse<ResponseBaseModel>> SaveEmailConfig(EmailConfigModel email_conf);
+        [Post($"/{GlobalStatic.HttpRoutes.SAVE_EMAIL_CONFIG}")]
+        public Task<ApiResponse<ResponseBaseModel>> EmailConfigSave(EmailConfigModel email_conf);
 
         /// <summary>
         /// Проверить подключение к Email (конфигурация imap+smtp)
         /// </summary>
-        [Post($"/api/{GlobalStatic.HttpRoutes.TEST_CONNECTION_EMAIL_CONFIG}")]
-        public Task<ApiResponse<ResponseBaseModel>> TestEmailConfigSmtpConnection(EmailConfigModel? email_conf);
+        [Post($"/{GlobalStatic.HttpRoutes.TEST_CONNECTION_EMAIL_CONFIG}")]
+        public Task<ApiResponse<ResponseBaseModel>> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf);
 
         #endregion
     }

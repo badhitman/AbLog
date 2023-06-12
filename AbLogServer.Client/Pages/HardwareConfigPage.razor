@@ -74,7 +74,7 @@ else
             return;
 
         IsBusyProgress = true;
-        ApiResponse<HardwareResponseModel> res = await _refit.GetHardware(Id);
+        ApiResponse<HardwareResponseModel> res = await _refit.HardwareGet(Id);
         hw = res.Content?.Hardware ?? new();
         IsBusyProgress = false;
     }

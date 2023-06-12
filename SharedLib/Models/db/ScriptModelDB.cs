@@ -24,6 +24,11 @@ namespace SharedLib
         /// </summary>
         public IEnumerable<TrigerModelDB>? Triggers { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsEnabled { get; set; }
+
         /// <inheritdoc/>
         public override string ToString() => $"[script:#{Id} '{Name}]'{(Commands?.Any() == true ? $"({Commands.Count} команд)" : "")}";
     }

@@ -147,7 +147,7 @@ else
             return;
         IsBusyProgress = true;
 
-        ApiResponse<ConditionsAnonimResponseModel> rest_conditions = await _refit.GetConditions(new SharedLib.ConditionRequestModel() { Id = OwnerId, ConditionType = ConditionType });
+        ApiResponse<ConditionsAnonimResponseModel> rest_conditions = await _refit.ConditionsGetByOwner(OwnerId, ConditionType);
         if (rest_conditions.Content?.Conditions?.Any() == true)
             UpdateAct(rest_conditions.Content.Conditions);
 

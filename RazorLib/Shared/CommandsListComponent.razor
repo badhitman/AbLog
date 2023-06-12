@@ -112,7 +112,7 @@ else
     {
         IsBusyProgress = true;
         StateHasChanged();
-        ApiResponse<EntriesSortingResponseModel> rest = await _refit.SetCommandSorting(req);
+        ApiResponse<EntriesSortingResponseModel> rest = await _refit.CommandSortingSet(req);
 
         if (rest.Content?.Entries is null)
         {

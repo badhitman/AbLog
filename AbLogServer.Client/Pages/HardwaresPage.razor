@@ -68,7 +68,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        ApiResponse<HardwaresResponseModel> res = await _refit.GetAllHardwares();
+        ApiResponse<HardwaresResponseModel> res = await _refit.HardwaresGetAll();
         hw_s = res.Content?.Hardwares;
         IsBusyProgress = false;
     }

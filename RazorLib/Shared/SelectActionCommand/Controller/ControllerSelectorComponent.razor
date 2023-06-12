@@ -110,7 +110,7 @@ else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
 
     async Task RestByPortId(int port_id)
     {
-        Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit.GetPortHW(port_id);
+        Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit.HardwarePortGet(port_id);
         CurrentPort = rest.Content?.Port;
         CurrentController = CurrentPort?.Hardware;
         await RestByControllerId(CurrentController!.Id);
@@ -118,7 +118,7 @@ else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
 
     async Task RestByControllerId(int controller_id)
     {
-        Refit.ApiResponse<HardwareResponseModel> rest = await _refit.GetHardware(controller_id);
+        Refit.ApiResponse<HardwareResponseModel> rest = await _refit.HardwareGet(controller_id);
         CurrentController = rest.Content!.Hardware;
     }
 }

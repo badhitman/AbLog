@@ -100,7 +100,7 @@ else
 
     async Task SetContention(int script_master, int script_slave, bool is_set)
     {
-        ApiResponse<IdsResponseModel> rest = await _refit.SetContention(new UpdateContentionRequestModel() { IsSet = is_set, ScriptMasterId = script_master, ScriptSlaveId = script_slave });
+        ApiResponse<IdsResponseModel> rest = await _refit.ContentionSet(new UpdateContentionRequestModel() { IsSet = is_set, ScriptMasterId = script_master, ScriptSlaveId = script_slave });
 
         if (rest.Content?.Ids is null)
         {
@@ -113,7 +113,7 @@ else
 
     public async Task Rest(int script_id)
     {
-        ApiResponse<IdsResponseModel> rest = await _refit.GetContentions(script_id);
+        ApiResponse<IdsResponseModel> rest = await _refit.ContentionsGetByScript(script_id);
         if (rest.Content?.Ids is null)
         {
             _snackbar.Add("rest.Content?.Ids is null ошибка {CC161D89-B6C7-4436-8CB6-E83ECD10A509}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);

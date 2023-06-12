@@ -18,7 +18,7 @@ namespace AbLogServer.Controllers
         }
 
         [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
-        public HardwaresResponseModel All()
+        public HardwaresResponseModel HardwaresGetAll()
         {
             HardwaresResponseModel res_hws = new();
             lock (ServerContext.DbLocker)
@@ -34,7 +34,7 @@ namespace AbLogServer.Controllers
         }
 
         [HttpGet($"{GlobalStatic.HttpRoutes.ENTRIES}")]
-        public EntriesResponseModel Entries()
+        public EntriesResponseModel HardwaresGetAllAsEntries()
         {
             EntriesResponseModel res_hws = new();
             lock (ServerContext.DbLocker)
@@ -46,7 +46,7 @@ namespace AbLogServer.Controllers
         }
 
         [HttpGet($"{GlobalStatic.HttpRoutes.NESTED_ENTRIES}")]
-        public EntriesNestedResponseModel NestedEntries()
+        public EntriesNestedResponseModel HardwaresGetTreeNestedEntries()
         {
             EntriesNestedResponseModel res_tree_hw = new();
             lock (ServerContext.DbLocker)
@@ -73,8 +73,8 @@ namespace AbLogServer.Controllers
             return res_tree_hw;
         }
 
-        [HttpGet($"{{hardware_id}}")]
-        public HardwareResponseModel GetHardware(int hardware_id)
+        [HttpGet("{hardware_id}")]
+        public HardwareResponseModel HardwareGet(int hardware_id)
         {
             HardwareResponseModel res_hw = new();
 
@@ -93,7 +93,7 @@ namespace AbLogServer.Controllers
         }
 
         [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
-        public PortHardwareResponseModel GetPort(int port_id)
+        public PortHardwareResponseModel HardwarePortGet(int port_id)
         {
             PortHardwareResponseModel res_port = new ();
             lock (ServerContext.DbLocker)

@@ -120,7 +120,7 @@
     {
         if (Condition.Id > 0)
         {
-            Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.DeleteCondition(new ConditionRequestModel() { Id = Condition.Id, ConditionType = ConditionType });
+            Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.ConditionDelete( Condition.Id, ConditionType );
             if (rest.Content?.Conditions is null)
             {
                 _snackbar.Add("rest.Content?.Conditions is null ошибка {C2303A75-FD26-4A4C-977C-DD6BE28A6A95}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
@@ -135,7 +135,7 @@
 
     async Task SaveClickHandler()
     {
-        Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.UpdateCondition(new UpdateConditionRequestModel(Condition)
+        Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.ConditionUpdateOrCreate(new UpdateConditionRequestModel(Condition)
             {
                 ConditionType = ConditionType,
                 OwnerId = OwnerId

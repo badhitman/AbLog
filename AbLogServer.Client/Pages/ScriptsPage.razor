@@ -185,7 +185,7 @@ else
         if (CurrentScript.Id > 0)
         {
             IsBusyProgress = true;
-            ApiResponse<ScriptsResponseModel> rest = await _refit.DeleteScript(CurrentScript.Id);
+            ApiResponse<ScriptsResponseModel> rest = await _refit.ScriptDelete(CurrentScript.Id);
             if (!rest.IsSuccessStatusCode)
             {
                 ModalBodyText = $"Ошибка: {rest.StatusCode}";
@@ -240,7 +240,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        ApiResponse<ScriptsResponseModel> rest_all_scripts = await _refit.GetAllScripts();
+        ApiResponse<ScriptsResponseModel> rest_all_scripts = await _refit.ScriptsGetAll();
         if (rest_all_scripts.Content?.Scripts is null)
         {
             _snackbar.Add("res.Content?.Scripts is null ошибка {45E0C870-67E6-4F33-AC1A-644C828148E9}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
@@ -276,7 +276,7 @@ else
     async Task SaveScriptHandle()
     {
         IsBusyProgress = true;
-        ApiResponse<ScriptsResponseModel> rest = await _refit.UpdateScript(new EntryDescriptionModel() { Id = CurrentScript.Id, Name = CurrentScript.Name, Description = CurrentScript.Description });
+        ApiResponse<ScriptsResponseModel> rest = await _refit.ScriptUpdateOrCreate(new EntryDescriptionModel() { Id = CurrentScript.Id, Name = CurrentScript.Name, Description = CurrentScript.Description });
         if (rest.Content?.Scripts is null)
         {
             _snackbar.Add("rest.Content?.Scripts is null ошибка {093F4C03-E89C-40F9-931D-EDB389FF56A6}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);

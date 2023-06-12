@@ -255,157 +255,35 @@ namespace SharedLib
             /// <summary>
             /// 
             /// </summary>
+            public const string SORTING = "sorting";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string ENABLE = "enable";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string DELETE = "delete";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string UPDATE = "update";
+            /// <summary>
+            /// 
+            /// </summary>
             public const string LIST = "list";
-
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string BY_OWNER = "by-owner";
             /// <summary>
             /// 
             /// </summary>
             public const string ENTRIES = "entries";
-
             /// <summary>
             /// 
             /// </summary>
             public const string NESTED_ENTRIES = "nested-entries";
-
-            #region HARDWARE
-
-            /*/// <summary>
-            /// Запрос всех устройств
-            /// </summary>
-            public const string GET_ALL_HARDWARES = "get-all-hardwares";*/
-            //
-            /// <summary>
-            /// Запрос всех устройств в виде лёгкого перечня Enumerable&gt;EntryModel&lt; {int:id, string:name}
-            /// </summary>
-            public const string GET_ALL_HARDWARES_ENTRIES = "get-all-hardwares-entries";
-
-            /// <summary>
-            /// Получить устройство
-            /// </summary>
-            public const string GET_HARDWARE = "get-hardware";
-
-            /// <summary>
-            /// Получить устройства с портами
-            /// </summary>
-            public const string GET_TREE_HARDWARES_NESTED_ENTRIES = "get-tree-hardwares-nested-entries";
-            //public const string UPDATE_HARDWARE = "update-hardware";
-            //public const string DELETE_HARDWARE = "delete-hardware";
-
-            #endregion
-
-            #region PORT
-
-            /// <summary>
-            /// Получить порт устройтва
-            /// </summary>
-            public const string GET_PORT_HARDWARE = "get-port-hardware";
-
-            #endregion
-
-            #region SCRIPT
-
-            /// <summary>
-            /// Запрос всех скриптов
-            /// </summary>
-            public const string GET_ALL_SCRIPTS = "get-all-scripts";
-
-            /// <summary>
-            /// Обновить/создать скрипт
-            /// </summary>
-            public const string UPDATE_SCRIPT = "update-script";
-
-            /// <summary>
-            /// Удалить скрипт
-            /// </summary>
-            public const string DELETE_SCRIPT = "delete-script";
-
-            /// <summary>
-            /// Включить/выключить скрипт
-            /// </summary>
-            public const string SET_SCRIPT_ENABLE = "set-script-enable";
-            //public const string GET_SCRIPT = "get-script";
-
-            #endregion
-
-            #region CONDITION
-
-            /// <summary>
-            /// Обновить условие/ограничение
-            /// </summary>
-            public const string UPDATE_CONDITION = "update-condition";
-
-            /// <summary>
-            /// Удалить условие/ограничение
-            /// </summary>
-            public const string DELETE_CONDITION = "delete-condition";
-
-            /// <summary>
-            /// Получить условия/ограничения
-            /// </summary>
-            public const string GET_CONDITIONS = "get-conditions";
-
-            #endregion
-
-            #region COMMAND
-
-            /// <summary>
-            /// Получить команду
-            /// </summary>
-            public const string GET_COMMAND = "get-command";
-
-            /// <summary>
-            /// Получить команды по ид скрипта (лёгкая модель ответа [Entry])
-            /// </summary>
-            public const string GET_COMMANDS_ENTRIES_BY_SCRIPT_ID = "get-commands-entries-by-script-id";
-
-            /// <summary>
-            /// Обновить команду
-            /// </summary>
-            public const string UPDATE_COMMAND = "update-command";
-
-            /// <summary>
-            /// Установить команде позицию в сортировке
-            /// </summary>
-            public const string SET_COMMAND_SORTING = "set-command-sorting";
-
-            /// <summary>
-            /// Удалить команду
-            /// </summary>
-            public const string DELETE_COMMAND = "delete-command";
-
-            #endregion
-
-            #region CONTENTIONS (конкуренция/взаимоблокировка выполнения скриптов)
-
-            /// <summary>
-            /// Получить настройки режима конкуренции выполнения скриптов
-            /// </summary>
-            public const string GET_CONTENTIONS = "get-contentions";
-
-            /// <summary>
-            /// Обновить объект настройки режима конкуренции выполнения скриптов
-            /// </summary>
-            public const string UPD_CONTENTION = "upd-contention";
-
-            #endregion
-
-            #region TRIGGERS
-
-            /// <summary>
-            /// Получить тригеры
-            /// </summary>
-            public const string GET_TRIGGERS = "get-triggers";
-
-            /// <summary>
-            /// Обновить тригер
-            /// </summary>
-            public const string UPD_TRIGGER = "upd-trigger";
-
-            /// <summary>
-            /// Удалить тригер
-            /// </summary>
-            public const string DEL_TRIGGER = "del-trigger";
-            #endregion
 
             #region ParametersStorage
 
