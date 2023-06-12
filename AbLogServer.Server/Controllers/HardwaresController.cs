@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using ab.context;
 using SharedLib;
-using Newtonsoft.Json;
 
 namespace AbLogServer.Controllers
 {
@@ -95,7 +94,7 @@ namespace AbLogServer.Controllers
         [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
         public PortHardwareResponseModel HardwarePortGet(int port_id)
         {
-            PortHardwareResponseModel res_port = new ();
+            PortHardwareResponseModel res_port = new();
             lock (ServerContext.DbLocker)
             {
                 using ServerContext db = new();

@@ -68,6 +68,11 @@ namespace ab.context
         /// </summary>
         public DbSet<ContentionsModelDB> Contentions { get; set; }
 
+        /// <summary>
+        /// Хранимые значения параметров (в БД)
+        /// </summary>
+        public DbSet<ParametersStorageModelDB> ParametersStorage { get; set; }
+
         /// <inheritdoc/>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -122,18 +127,12 @@ namespace ab.context
         {
             if (!Hardwares.Any() && !Ports.Any())
             {
-                Hardwares.Add(new HardwareModelDB { Name = "DEMO 2", Address = "192.168.2.114", Password = "sec", AlarmSubscriber = true, CommandsAllowed = true });
                 Hardwares.Add(new HardwareModelDB { Name = "DEMO 1", Address = "192.168.0.14", Password = "sec", AlarmSubscriber = false, CommandsAllowed = true });
                 SaveChanges();
 
                 for (int i = 1; i <= 38; i++)
-                {
                     Ports.AddRange(new PortModelDB() { HardwareId = 1, PortNumb = i });
-                }
-                for (int i = 39; i <= 38 * 2; i++)
-                {
-                    Ports.AddRange(new PortModelDB() { HardwareId = 2, PortNumb = i });
-                }
+
                 SaveChanges();
             }
             if (!Scripts.Any() && !Contentions.Any() && !Commands.Any() && !ConditionsCommands.Any())
@@ -152,6 +151,73 @@ namespace ab.context
                 ConditionsCommands.Add(new CommandConditionModelDB() { OwnerId = 1, Name = "condition #2", HardwareId = 2, PortId = 39 });
                 SaveChanges();
             }
+        }
+
+        /// <summary>
+        /// Получить значение параметра
+        /// </summary>
+        /// <typeparam name="T">Тип значения параметра</typeparam>
+        /// <param name="name">Имя параметра</param>
+        /// <param name="default_value">Значение параметра по умолчанию (если в БД его нет)</param>
+        /// <returns>Значение параметра (или значение по умолчанию, если не найден)</returns>
+        public ParametersStorageModelDB GetStoredParameter<T>(string name, T default_value)
+        {
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException("name");
+
+            string t_name = typeof(T).Name.ToLower();
+
+            ParametersStorageModelDB? dataRow;
+            lock (DbLocker)
+            {
+                dataRow = ParametersStorage.FirstOrDefault(x => x.Name.ToLower() == name.ToLower() && x.TypeName.ToLower() == t_name);
+                if (dataRow is null)
+                {
+                    dataRow = new ParametersStorageModelDB()
+                    {
+                        Name = name,
+                        TypeName = typeof(T).Name,
+                        StoredValue = default_value?.ToString() ?? string.Empty
+                    };
+                    ParametersStorage?.Add(dataRow);
+                    SaveChanges();
+                }
+            }
+            return dataRow;
+        }
+
+        /// <summary>
+        /// Сохранить значение параметра в БД
+        /// </summary>
+        /// <typeparam name="T">Тип значения параметра</typeparam>
+        /// <param name="name">Имя параметра</param>
+        /// <param name="value">Значение параметра</param>
+        public ParametersStorageModelDB SetStoredParameter<T>(string name, T value)
+        {
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException("name");
+
+            string t_name = typeof(T).Name.ToLower();
+            ParametersStorageModelDB? dataRow;
+            lock (DbLocker)
+            {
+                dataRow = ParametersStorage.FirstOrDefault(x => x.Name.ToLower() == name.ToLower() && x.TypeName.ToLower() == t_name);
+                if (dataRow is null)
+                {
+                    dataRow = new ParametersStorageModelDB() { Name = name, StoredValue = value?.ToString() ?? string.Empty, TypeName = t_name };
+                    ParametersStorage?.Add(dataRow);
+                }
+                else
+                {
+                    dataRow.StoredValue = value?.ToString() ?? string.Empty;
+                    ParametersStorage?.Update(dataRow);
+                }
+
+                SaveChanges();
+            }
+            return dataRow;
         }
     }
 }

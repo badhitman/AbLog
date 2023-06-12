@@ -1,5 +1,9 @@
 using NLog.Web;
 using NLog;
+using SharedLib;
+using ServicesLib;
+using ab.context;
+using System.Text.Json.Serialization;
 
 namespace AbLogServer
 {
@@ -7,20 +11,21 @@ namespace AbLogServer
     {
         public static void Main(string[] args)
         {
-            var logger = LogManager
+            Logger logger = LogManager
                 .Setup()
                 .LoadConfigurationFromAppSettings()
                 .GetCurrentClassLogger();
 
             logger.Warn("init main");
-
+            CheckContext();
             try
             {
-                var builder = WebApplication.CreateBuilder(args);
+                WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-                // Add services to the container.
+                builder.Services.AddScoped<IParametersStorageService, ParametersStorageService>();
 
-                builder.Services.AddControllersWithViews();
+                builder.Services.AddControllersWithViews()
+                    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
                 builder.Services.AddRazorPages();
 
                 builder.Logging.ClearProviders();
@@ -60,6 +65,15 @@ namespace AbLogServer
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
                 LogManager.Shutdown();
             }
+        }
+
+        static void CheckContext()
+        {
+            using ServerContext db = new();
+#if DEMO
+            db.DemoSeed();
+#endif
+            db.ReorderScriptsCommands();
         }
     }
 }

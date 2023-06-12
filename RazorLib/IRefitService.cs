@@ -1,5 +1,5 @@
-﻿using Refit;
-using SharedLib;
+﻿using SharedLib;
+using Refit;
 
 namespace BlazorLib
 {
@@ -197,19 +197,19 @@ namespace BlazorLib
         /// <summary>
         /// Получить конфигурацию Email (imap+smtp)
         /// </summary>
-        [Get($"/{GlobalStatic.HttpRoutes.GET_EMAIL_CONFIG}")]
+        [Get($"/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.GET_EMAIL_CONFIG}")]
         public Task<ApiResponse<EmailConfigModel>> EmailConfigGet();
 
         /// <summary>
         /// Сохранить конфигурацию Email (imap+smtp)
         /// </summary>
-        [Post($"/{GlobalStatic.HttpRoutes.SAVE_EMAIL_CONFIG}")]
+        [Post($"/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.SAVE_EMAIL_CONFIG}")]
         public Task<ApiResponse<ResponseBaseModel>> EmailConfigSave(EmailConfigModel email_conf);
 
         /// <summary>
         /// Проверить подключение к Email (конфигурация imap+smtp)
         /// </summary>
-        [Post($"/{GlobalStatic.HttpRoutes.TEST_CONNECTION_EMAIL_CONFIG}")]
+        [Post($"/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.TEST_CONNECTION_EMAIL_CONFIG}")]
         public Task<ApiResponse<ResponseBaseModel>> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf);
 
         #endregion

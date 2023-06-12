@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
-using SharedLib;
-using MimeKit;
-using MailKit.Net.Smtp;
-using System.Net.Mail;
 using ab.context;
+using SharedLib;
 
 namespace ServicesLib
 {
@@ -15,7 +12,7 @@ namespace ServicesLib
         /// <inheritdoc/>
         public Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
         {
-            using StorageParametersContext _context = new();
+            using ServerContext _context = new();
             ParametersStorageModelDB p = _context.SetStoredParameter(nameof(EmailConfigModel), JsonConvert.SerializeObject(connect_config));
             ResponseBaseModel res = new();
             res.AddSuccess($"Данные успешно записаны в БД #{p.Id}");
@@ -25,17 +22,13 @@ namespace ServicesLib
         /// <inheritdoc/>
         public Task<EmailConfigModel> GetEmailConfig()
         {
-            using StorageParametersContext _context = new();
+            using ServerContext _context = new();
             string _emailConfig = _context.GetStoredParameter(nameof(EmailConfigModel), "").StoredValue;
             if (string.IsNullOrWhiteSpace(_emailConfig))
                 return Task.FromResult(new EmailConfigModel());
 
             EmailConfigModel res = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig) ?? new();
-            /*
-             [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("android")]
-             */
+
             return Task.FromResult(res);
         }
 

@@ -45,7 +45,7 @@ else
                 {
                     <tr>
                         <th scope="row">@(++num_count)</th>
-                        <td><a href="/hardware/@(hw.Id)">@(hw.Name)/@(hw.Address)</a></td>
+                        <td><a href="/hardware-page/@(hw.Id)">@(hw.Name)/@(hw.Address)</a></td>
                         <td>
                             @if (hw.Ports?.Any() == true)
                             {
