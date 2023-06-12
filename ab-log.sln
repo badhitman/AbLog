@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.Server", "AbLogServer\Server\ab-log.Server.csproj", "{CB18AF5E-9509-4042-A90C-278FC3151DBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.Server", "AbLogServer.Server\ab-log.Server.csproj", "{CB18AF5E-9509-4042-A90C-278FC3151DBF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.Client", "AbLogServer\Client\ab-log.Client.csproj", "{44722011-B062-4321-AB85-46CADB8B40F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.Client", "AbLogServer.Client\ab-log.Client.csproj", "{44722011-B062-4321-AB85-46CADB8B40F0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shared-lib", "SharedLib\shared-lib.csproj", "{81D9FB74-124C-4FD2-997C-1D15CB3FFFB0}"
 EndProject

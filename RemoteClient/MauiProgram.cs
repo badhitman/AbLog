@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using RemoteClient.Data;
+using MudBlazor.Services;
 
 namespace RemoteClient
 {
@@ -19,8 +19,7 @@ namespace RemoteClient
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
-
-            builder.Services.AddSingleton<WeatherForecastService>();
+            builder.Services.AddMudServices();
 
             return builder.Build();
         }

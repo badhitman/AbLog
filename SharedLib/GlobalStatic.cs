@@ -249,13 +249,23 @@ namespace SharedLib
             /// 
             /// </summary>
             public const string Triggers = "triggers";
-             
+
 
 
             /// <summary>
             /// 
             /// </summary>
-            public const string ALL = "all";
+            public const string LIST = "list";
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string ENTRIES = "entries";
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string NESTED_ENTRIES = "nested-entries";
 
             #region HARDWARE
 

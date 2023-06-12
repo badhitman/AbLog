@@ -5,8 +5,8 @@
 <MudSnackbarProvider />
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
+    <div style="width: @($"{_width}px");" @onmouseover="() => { navRef?.SetModeNav(false); }" @onmouseleave="() => { navRef?.SetModeNav(true); }" class="sidebar">
+        <NavMenu ModeChangeHandle="SetModeNav" @ref="navRef" />
     </div>
 
     <main>
@@ -19,3 +19,13 @@
         </article>
     </main>
 </div>
+
+@code {
+    NavMenu? navRef;
+    int _width = 75;
+    void SetModeNav()
+    {
+        _width = navRef?.IsShort == true ? 75 : 250;
+        StateHasChanged();
+    }
+}

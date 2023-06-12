@@ -15,37 +15,32 @@ namespace BlazorLib
         /// Получить все устройства (с портами)
         /// </summary>
         /// <returns>Все устройства (с портами)</returns>
-        [Get($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.ALL}")]
+        [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.LIST}")]
         public Task<ApiResponse<HardwaresResponseModel>> GetAllHardwares();
-
-        /// <summary>
-        /// Получить информацию об устройстве
-        /// </summary>
-        /// <param name="hw_id"></param>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_HARDWARE}")]
-        public Task<ApiResponse<HardwareResponseModel>> GetHardware(int hw_id);
 
         /// <summary>
         /// Получить все устройства (данные в лёгкой форме)
         /// </summary>
         /// <returns>Все устройства (данные в лёгкой форме)</returns>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_ALL_HARDWARES_ENTRIES}")]
+        [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.ENTRIES}")]
         public Task<ApiResponse<EntriesResponseModel>> GetAllHardwaresEntries();
 
         /// <summary>
         /// Получить все устройства с портами
         /// </summary>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_TREE_HARDWARES_NESTED_ENTRIES}")]
+        [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.NESTED_ENTRIES}")]
         public Task<ApiResponse<EntriesNestedResponseModel>> GetTreeHardwaresNestedEntries();
 
-        #endregion
-
-        #region PORT (for hw)
+        /// <summary>
+        /// Получить информацию об устройстве
+        /// </summary>
+        [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{{hardware_id}}")]
+        public Task<ApiResponse<HardwareResponseModel>> GetHardware(int hardware_id);
 
         /// <summary>
         /// Получить порт устройства
         /// </summary>
-        [Get($"/api/{GlobalStatic.HttpRoutes.GET_PORT_HARDWARE}")]
+        [Get($"/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
         public Task<ApiResponse<PortHardwareResponseModel>> GetPortHW(int port_id);
 
         #endregion

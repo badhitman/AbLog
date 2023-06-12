@@ -1,0 +1,132 @@
+﻿@inject IJSRuntime _js_runtime
+
+<style>
+    #main-left-menu > div > a {
+        padding-left: 12px;
+    }
+</style>
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">@(IsShort ? "AB" : "AB-Log Srv")</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav id="main-left-menu" class="flex-column">
+        <div class="nav-item px-3" title="Home page">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> @(IsShort ? "" : "Home")
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/hardwares-page">
+                <span class="oi oi-puzzle-piece" aria-hidden="true"></span> @(IsShort ? "" : "Устройства")
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/scripts-page">
+                <span class="oi oi-script" aria-hidden="true"></span> @(IsShort ? "" : "Скрипты")
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/triggers-page">
+                <span class="oi oi-pulse" aria-hidden="true"></span> @(IsShort ? "" : "Тригеры")
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    [Parameter, EditorRequired]
+    public Action ModeChangeHandle { get; set; } = default!;
+
+    /// <summary>
+    /// блокировка таймера
+    /// </summary>
+    protected object lock_timer = new();
+    /// <summary>
+    /// Задержка (млс) перед авто-сворачиванием левого меню после потери фокуса (on mouse hover)
+    /// </summary>
+    protected int timer_timeout = 500;
+
+    /// <summary>
+    /// Интервал проверки (млс) задачи авто-сворачивания левого меню после потери фокуса (on mouse leave)
+    /// </summary>
+    protected int timer_step_update = 100;
+
+    /// <summary>
+    /// Оставшееся время до выполнения авто-сворачивания левого меню после потери фокуса (on mouse leave)
+    /// </summary>
+    protected int timer_resource;
+    /// <summary>
+    /// Таймер проверки необходимости выполнить авто-сворачивание левого меню после потери фокуса (on mouse leave)
+    /// </summary>
+    protected Timer? timer;
+
+    public bool IsShort { get; private set; } = true;
+
+    public void SetModeNav(bool mode)
+    {
+        lock (lock_timer)
+        {
+            timer?.Dispose();
+        }
+        if (mode)
+        {
+            InitTimer();
+        }
+        else
+        {
+            IsShort = false;
+            _js_runtime.InvokeVoidAsync("tooltipeHide");
+            StateHasChanged();
+            ModeChangeHandle();
+        }
+    }
+
+    void InitTimer()
+    {
+        lock (lock_timer)
+        {
+            timer?.Dispose();
+            timer_resource = timer_timeout;
+            timer = new Timer(new TimerCallback(PauseRequest), null, 0, timer_step_update);
+        }
+    }
+
+    void PauseRequest(object? obj)
+    {
+        lock (lock_timer)
+        {
+            if (timer_resource > 0)
+            {
+                timer_resource -= timer_step_update;
+            }
+            else
+            {
+                timer?.Dispose();
+                IsShort = true;
+                StateHasChanged();
+                ModeChangeHandle();
+            }
+        }
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override void OnInitialized()
+    {
+        timer_resource = timer_timeout;
+    }
+}
