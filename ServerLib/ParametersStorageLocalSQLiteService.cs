@@ -7,7 +7,7 @@ namespace ServicesLib
     /// <summary>
     /// Конфигурация подключения Email
     /// </summary>
-    public class ParametersStorageService : IParametersStorageService
+    public class ParametersStorageLocalSQLiteService : IParametersStorageService
     {
         /// <inheritdoc/>
         public Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
@@ -43,7 +43,7 @@ namespace ServicesLib
                 return res;
             }
 
-            using EmailService emailService = new();
+            using EmailLocalService emailService = new();
             res = await emailService.ConnectSmtpAsync(conf);
             ResponseBaseModel res2 = await emailService.ConnectImapAsync(conf);
             res.AddMessages(res2.Messages);

@@ -1,9 +1,11 @@
-using NLog.Web;
-using NLog;
-using SharedLib;
+using System.Text.Json.Serialization;
+using SharedLib.IServices;
 using ServicesLib;
 using ab.context;
-using System.Text.Json.Serialization;
+using SharedLib;
+using ServerLib;
+using NLog.Web;
+using NLog;
 
 namespace AbLogServer
 {
@@ -23,8 +25,9 @@ namespace AbLogServer
             {
                 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-                builder.Services.AddScoped<IParametersStorageService, ParametersStorageService>();
-                builder.Services.AddScoped<ICamerasService, FlashCamService>();
+                builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalSQLiteService>();
+                builder.Services.AddScoped<IHardwaresService, HardwaresLocalSQliteService>();
+                builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
 
                 builder.Services.AddControllersWithViews()
                     .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

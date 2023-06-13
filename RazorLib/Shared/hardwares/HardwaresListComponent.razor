@@ -1,0 +1,58 @@
+﻿@using SharedLib.IServices;
+@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject IHardwaresService _hardwares
+
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (Elements?.Any() != true)
+{
+    <div class="alert alert-danger" role="alert">
+        Устройств нет
+    </div>
+}
+else
+{
+    int num_count = 0;
+    <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsBusyProgress" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>Name/Address</MudTh>
+            <MudTh>Ports</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nr">@(++num_count)</MudTd>
+                <MudTd DataLabel="Sign"><a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/hardware-page/@(context.Id)">@(context.Name)/@(context.Address)</a></MudTd>
+            <MudTd DataLabel="Name">
+                @if (context.Ports?.Any() == true)
+                {
+                    foreach (PortHardwareModel port in context.Ports)
+                    {
+                        <span title="Номер порта" class="badge text-bg-light me-1">№@(port.PortNumb) @(port.Name)</span>
+                    }
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<HardwareModel> Elements = Enumerable.Empty<HardwareModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusyProgress = true;
+        HardwaresResponseModel res = await _hardwares.HardwaresGetAll();
+        Elements = res?.Hardwares ?? Enumerable.Empty<HardwareModel>();
+        IsBusyProgress = false;
+    }
+}

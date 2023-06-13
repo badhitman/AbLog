@@ -7,14 +7,14 @@ namespace ServicesLib
     /// <summary>
     /// 
     /// </summary>
-    public class FlashCamService : ICamerasService
+    public class FlashCamLocalService : ICamerasService
     {
-        readonly ILogger<FlashCamService> _logger;
+        readonly ILogger<FlashCamLocalService> _logger;
 
         /// <summary>
         /// 
         /// </summary>
-        public FlashCamService(ILogger<FlashCamService> logger)
+        public FlashCamLocalService(ILogger<FlashCamLocalService> logger)
         {
             _logger = logger;
         }

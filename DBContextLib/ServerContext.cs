@@ -127,11 +127,18 @@ namespace ab.context
         {
             if (!Hardwares.Any() && !Ports.Any())
             {
+                Hardwares.Add(new HardwareModelDB { Name = "DEMO 2", Address = "192.168.2.114", Password = "sec", AlarmSubscriber = true, CommandsAllowed = true });
                 Hardwares.Add(new HardwareModelDB { Name = "DEMO 1", Address = "192.168.0.14", Password = "sec", AlarmSubscriber = false, CommandsAllowed = true });
                 SaveChanges();
 
                 for (int i = 1; i <= 38; i++)
+                {
                     Ports.AddRange(new PortModelDB() { HardwareId = 1, PortNumb = i });
+                }
+                for (int i = 1; i <= 38; i++)
+                {
+                    Ports.AddRange(new PortModelDB() { HardwareId = 2, PortNumb = i });
+                }
 
                 SaveChanges();
             }

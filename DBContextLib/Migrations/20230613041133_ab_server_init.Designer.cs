@@ -11,7 +11,7 @@ using ab.context;
 namespace dbcontext.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    [Migration("20230612190131_ab_server_init")]
+    [Migration("20230613041133_ab_server_init")]
     partial class ab_server_init
     {
         /// <inheritdoc />

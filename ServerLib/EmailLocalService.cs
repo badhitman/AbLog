@@ -10,7 +10,7 @@ namespace ServicesLib
     /// <summary>
     /// Email отправка/получение
     /// </summary>
-    public class EmailService : IEmailService, IDisposable
+    public class EmailLocalService : IEmailService, IDisposable
     {
         ImapClient? client_imap = null;
         SmtpClient? client_smtp = null;

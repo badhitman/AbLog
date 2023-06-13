@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -23,6 +23,10 @@
 @code {
     NavMenu? navRef;
     int _width = 75;
+
+    private MudTheme _theme = new();
+    private bool _isDarkMode = true;
+
     void SetModeNav()
     {
         _width = navRef?.IsShort == true ? 75 : 250;

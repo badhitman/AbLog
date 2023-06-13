@@ -5,6 +5,8 @@ using BlazorLib;
 using SharedLib;
 using ABLog;
 using Refit;
+using SharedLib.IServices;
+using RazorLib;
 
 namespace AbLog
 {
@@ -20,7 +22,8 @@ namespace AbLog
             builder.Services.AddMudServices();
             builder.Services.AddRefitClient<IRefitService>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-            builder.Services.AddSingleton<IParametersStorageService, ParametersStorageServiceRefit>();
+            builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRefitService>();
+            builder.Services.AddSingleton<IHardwaresService, HardwaresRefitService>();
 
             await builder.Build().RunAsync();
         }

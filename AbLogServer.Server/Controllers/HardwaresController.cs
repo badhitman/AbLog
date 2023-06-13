@@ -1,134 +1,56 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using ab.context;
+using SharedLib.IServices;
 using SharedLib;
 
 namespace AbLogServer.Controllers
 {
     /// <summary>
-    /// 
+    /// ”правл€ющие блоки
     /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class HardwaresController : ControllerBase
     {
-        private readonly ILogger<HardwaresController> _logger;
+        readonly ILogger<HardwaresController> _logger;
+        readonly IHardwaresService _hardwares_service;
 
         /// <summary>
-        /// 
+        /// ”правл€ющие блоки
         /// </summary>
-        public HardwaresController(ILogger<HardwaresController> logger)
+        public HardwaresController(ILogger<HardwaresController> logger, IHardwaresService hardwares_service)
         {
             _logger = logger;
+            _hardwares_service = hardwares_service;
         }
 
         /// <summary>
-        /// 
+        /// ”стройства (все)
         /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
-        public HardwaresResponseModel HardwaresGetAll()
-        {
-            HardwaresResponseModel res_hws = new();
-            lock (ServerContext.DbLocker)
-            {
-                using ServerContext db = new();
-                res_hws.Hardwares = db.Hardwares
-                    .Include(x => x.Ports)
-                    .ToArray()
-                    .Select(x => new HardwareModel(x))
-                    .ToArray();
-            }
-            return res_hws;
-        }
+        public async Task<HardwaresResponseModel> HardwaresGetAll() => await _hardwares_service.HardwaresGetAll();
 
         /// <summary>
-        /// 
+        /// ”стройства (все) в виде Entries[]
         /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.ENTRIES}")]
-        public EntriesResponseModel HardwaresGetAllAsEntries()
-        {
-            EntriesResponseModel res_hws = new();
-            lock (ServerContext.DbLocker)
-            {
-                using ServerContext db = new();
-                res_hws.Entries = db.Hardwares.Select(x => new EntryModel() { Id = x.Id, Name = x.Name }).ToArray();
-            }
-            return res_hws;
-        }
+        public async Task<EntriesResponseModel> HardwaresGetAllAsEntries() => await _hardwares_service.HardwaresGetAllAsEntries();
 
         /// <summary>
-        /// 
+        /// ”стройства (все) в виде Entries[] вместе с портами
         /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.NESTED_ENTRIES}")]
-        public EntriesNestedResponseModel HardwaresGetTreeNestedEntries()
-        {
-            EntriesNestedResponseModel res_tree_hw = new();
-            lock (ServerContext.DbLocker)
-            {
-                using ServerContext db = new();
-
-                res_tree_hw.Entries = db.Ports.Include(x => x.Hardware)
-                    .Select(x => new { port_id = x.Id, port_num = x.PortNumb, hw_id = x.HardwareId, hw_name = x.Hardware!.Name, hw_address = x.Hardware.Address })
-                    .AsEnumerable()
-                    .GroupBy(x => x.hw_id)
-                    .Select(x =>
-                    {
-                        var curr_hw = x.First();
-
-                        return new EntryNestedModel()
-                        {
-                            Id = curr_hw.hw_id,
-                            Name = $"{curr_hw.hw_name}/{curr_hw.hw_address}",
-                            Childs = x.Select(y => new EntryModel() { Id = y.port_id, Name = $"{y.port_id}#{y.port_num}" }).ToArray()
-                        };
-                    })
-                    .ToArray();
-            }
-            return res_tree_hw;
-        }
+        public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries() => await _hardwares_service.HardwaresGetTreeNestedEntries();
 
         /// <summary>
-        /// 
+        /// ”стройство (управл€ющий блок/контроллер)
         /// </summary>
         [HttpGet("{hardware_id}")]
-        public HardwareResponseModel HardwareGet(int hardware_id)
-        {
-            HardwareResponseModel res_hw = new();
-
-            lock (ServerContext.DbLocker)
-            {
-                using ServerContext db = new();
-                HardwareModelDB? db_hw = db.Hardwares.Include(x => x.Ports).FirstOrDefault(x => x.Id == hardware_id);
-                if (db_hw is null)
-                {
-                    res_hw.AddError("ќшибка выполнени€ запроса: {771C7F32-36A7-4EC8-9F6C-7ED48D6FA99B}");
-                    return res_hw;
-                }
-                res_hw.Hardware = new(db_hw);
-            }
-            return res_hw;
-        }
+        public async Task<HardwareResponseModel> HardwareGet(int hardware_id) => await _hardwares_service.HardwareGet(hardware_id);
 
         /// <summary>
-        /// 
+        /// ѕорт контроллера
         /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
-        public PortHardwareResponseModel HardwarePortGet(int port_id)
-        {
-            PortHardwareResponseModel res_port = new();
-            lock (ServerContext.DbLocker)
-            {
-                using ServerContext db = new();
-                PortModelDB? db_port = db.Ports.Include(x => x.Hardware).FirstOrDefault(x => x.Id == port_id);
-                if (db_port is null)
-                {
-                    res_port.AddError("ќшибка выполнени€ запроса: {5AD81739-6A9B-4753-A47C-C278CD64705B}");
-                    return res_port;
-                }
-                res_port.Port = new PortHardwareModel(db_port);
-            }
-
-            return res_port;
-        }
+        public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id) => await _hardwares_service.HardwarePortGet(port_id);
     }
 }

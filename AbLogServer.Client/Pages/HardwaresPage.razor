@@ -1,11 +1,11 @@
 ﻿@page "/hardwares-page"
 
+@using RazorLib.Shared.hardwares
 @using BlazorLib
-@using Refit
 @using SharedLib
 
-@inject IRefitService _refit
 @inject ILogger<HardwaresPage> _loger
+@inject IRefitService _refit
 
 @inherits BlazorBusyComponentBaseModel
 
@@ -13,63 +13,4 @@
 
 <h1>Устройства</h1>
 
-@if (IsBusyProgress)
-{
-    <div class="text-center">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Загрузка...</span>
-        </div>
-    </div>
-}
-else if (hw_s?.Any() != true)
-{
-    <div class="alert alert-danger" role="alert">
-        Устройств нет
-    </div>
-}
-else
-{
-    int num_count = 0;
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name/Address</th>
-                <th scope="col">Ports</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (hw_s?.Any() == true)
-            {
-                foreach (HardwareModel hw in hw_s)
-                {
-                    <tr>
-                        <th scope="row">@(++num_count)</th>
-                        <td><a href="/hardware-page/@(hw.Id)">@(hw.Name)/@(hw.Address)</a></td>
-                        <td>
-                            @if (hw.Ports?.Any() == true)
-                            {
-                                foreach (PortHardwareModel port in hw.Ports)
-                                {
-                                    <span title="Номер порта" class="badge bg-info me-1">№@(port.PortNumb) @(port.Name)</span>
-                                }
-                            }
-                        </td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
-}
-
-@code {
-    IEnumerable<HardwareModel>? hw_s = null;
-
-    protected override async Task OnInitializedAsync()
-    {
-        IsBusyProgress = true;
-        ApiResponse<HardwaresResponseModel> res = await _refit.HardwaresGetAll();
-        hw_s = res.Content?.Hardwares;
-        IsBusyProgress = false;
-    }
-}
+<HardwaresListComponent />
