@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorWasmApp.UIInterfaces
 {
     /// <summary>
     /// Интерфейс вкладки
     /// </summary>
-    public interface ITab
+    public interface INav
     {
         /// <summary>
         /// Содержимое вкладки

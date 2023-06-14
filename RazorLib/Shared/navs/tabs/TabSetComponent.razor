@@ -18,9 +18,9 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    public ITab? ActiveTab { get; private set; }
+    public INav? ActiveTab { get; private set; }
 
-    public void AddTab(ITab tab)
+    public void AddTab(INav tab)
     {
         if (ActiveTab is null)
         {
@@ -28,7 +28,7 @@
         }
     }
 
-    public void SetActiveTab(ITab tab)
+    public void SetActiveTab(INav tab)
     {
         if (ActiveTab != tab)
         {

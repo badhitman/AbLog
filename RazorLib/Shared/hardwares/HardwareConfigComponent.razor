@@ -1,0 +1,85 @@
+﻿@using SharedLib.IServices;
+@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject IHardwaresService _hardwares
+@inject ISnackbar _snackbar
+
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (hw is null)
+{
+    <MudAlert Severity="Severity.Error">Устройство не загружено из службы!</MudAlert>
+}
+else
+{
+    <form>
+        <div class="mb-3">
+            <label for="exampleInputName" class="form-label">Имя</label>
+            <input @bind-value="hw.Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp">
+            <div id="nameHelp" class="form-text">Пользовательское название</div>
+        </div>
+
+        <label for="exampleInputAddress" class="form-label">IP</label>
+        <div class="input-group">
+            <input @bind-value="hw.Address" type="text" class="form-control" id="exampleInputAddress" aria-describedby="addresHelp">
+            <a title="Открыть устройство на новой вкладке" target="_blank" href="@($"http://{hw.Address}/{hw.Password}")" class="btn btn-outline-primary" role="button">Открыть</a>
+        </div>
+        <div id="addresHelp" class="form-text mb-3">Сетевой адрес.</div>
+
+        <label for="exampleInputPassword" class="form-label">Пароль</label>
+        <div class="input-group">
+            <input @bind-value="hw.Password" type="@(ShowPass ? "text" : "password")" class="form-control" id="exampleInputPassword" aria-describedby="passwordHelp">
+            <button @onclick="() => { ShowPass = !ShowPass; }" class="btn btn@(ShowPass ? "" : "-outline")-secondary" type="button">@(ShowPass ? "Скрыть" : "Показать пароль")</button>
+        </div>
+        <div id="passwordHelp" class="form-text mb-3">Пароль доступа к устройству</div>
+
+        <div class="mb-3">
+            <div title="Оповещения. Устройство может генерировать рассылку уведомлений/оповещений" class="form-check form-check-inline form-switch">
+                <input @bind-value="hw.AlarmSubscriber" class="form-check-input" type="checkbox" id="inlineCheckboxAlarmSubscriber">
+                <label class="form-check-label" for="inlineCheckboxAlarmSubscriber">Уведомления</label>
+            </div>
+            <div title="Поддержка удалённых команд (удалённое управление)" class="form-check form-check-inline form-switch">
+                <input @bind-value="hw.CommandsAllowed" class="form-check-input" type="checkbox" id="inlineCheckboxCommandsAllowed">
+                <label class="form-check-label" for="inlineCheckboxCommandsAllowed">Команды</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+}
+<ShowMessagesComponent @ref="showMessages" />
+@code {
+    [Parameter, EditorRequired]
+    public int Id { get; set; }
+
+    bool ShowPass = false;
+
+    HardwareModel? hw;
+    ShowMessagesComponent? showMessages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id <= 0)
+            return;
+
+        IsBusyProgress = true;
+        HardwareResponseModel rest = await _hardwares.HardwareGet(Id);
+
+        if (!rest.IsSuccess)
+        {
+            showMessages?.ShowMessages(rest.Messages);
+            return;
+        }
+
+        hw = rest.Hardware;
+        IsBusyProgress = false;
+    }
+}

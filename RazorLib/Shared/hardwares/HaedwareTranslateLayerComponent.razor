@@ -1,0 +1,18 @@
+﻿@using RazorLib.Shared.navs.pills
+
+<PillsSetComponent>
+    <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
+        <span>pill 1</span>
+    </PillComponent>
+    <PillComponent Tooltip="Дерево" Title="Дерево">
+        <span>pill 2</span>
+    </PillComponent>
+    <PillComponent Tooltip="HTML" Title="HTML">
+        <span>pill 3</span>
+    </PillComponent>
+</PillsSetComponent>
+
+@code {
+    [Parameter, EditorRequired]
+    public int Id { get; set; }
+}

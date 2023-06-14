@@ -1,0 +1,39 @@
+﻿@using BlazorWasmApp.UIInterfaces
+
+<!-- Display the tab headers -->
+
+<CascadingValue Value="this">
+    <nav class="nav nav-pills flex-column flex-sm-row">
+        @ChildContent
+    </nav>
+</CascadingValue>
+
+<!-- Display body for only the active tab -->
+
+<div class="nav-tabs-body p-1">
+    @ActiveTab?.ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public INav? ActiveTab { get; private set; }
+
+    public void AddTab(INav tab)
+    {
+        if (ActiveTab is null)
+        {
+            SetActiveTab(tab);
+        }
+    }
+
+    public void SetActiveTab(INav tab)
+    {
+        if (ActiveTab != tab)
+        {
+            ActiveTab = tab;
+            StateHasChanged();
+        }
+    }
+}
