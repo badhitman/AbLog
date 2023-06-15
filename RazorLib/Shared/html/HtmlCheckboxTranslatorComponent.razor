@@ -1,0 +1,35 @@
+﻿@using RazorLib.Shared.hardwares
+@using Newtonsoft.Json;
+@using MudBlazor;
+@using SharedLib;
+
+@inject ISnackbar _snackbar
+
+<input type="checkbox" value="@InputValue" name="@InputName" @onchange="CheckboxChange" class="form-check-input" />
+
+@code {
+    [Parameter, EditorRequired]
+    public string InputName { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string? InputValue { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public bool IsChecked { get; set; }
+
+    [CascadingParameter]
+    public FormContextModel? FormContext { get; set; }
+
+    [CascadingParameter]
+    public Action? ReloadPageHandle { get; set; }
+
+    void CheckboxChange(ChangeEventArgs _ea)
+    {
+        _snackbar.Add($"checkbox: {_ea.Value}", Severity.Normal, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}

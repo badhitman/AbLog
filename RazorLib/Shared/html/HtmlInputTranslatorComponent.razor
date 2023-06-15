@@ -1,0 +1,121 @@
+﻿@using RazorLib.Shared.hardwares
+@using Newtonsoft.Json;
+@using MudBlazor;
+@using SharedLib;
+
+@inject ISnackbar _snackbar
+
+@switch (NodeData.NodeName)
+{
+    case "input":
+        switch (InputFormType)
+        {
+            case InputFormTypesEnum.Submit:
+                <button @onclick="SendForm" type="button" class="btn btn-warning">@InputValue</button>
+                break;
+            case InputFormTypesEnum.Checkbox:
+                bool is_checked = NodeData.Attributes?.Any(x => x.Key.Equals("checked", StringComparison.OrdinalIgnoreCase)) == true;
+                <HtmlCheckboxTranslatorComponent IsChecked="is_checked" InputName="InputName" InputValue="InputValue" />
+                break;
+            default:
+                string _size = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("size", StringComparison.OrdinalIgnoreCase)).Value ?? "20";
+                string? _maxlength = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("maxlength", StringComparison.OrdinalIgnoreCase)).Value;
+
+                if (string.IsNullOrWhiteSpace(_maxlength))
+                {
+                    <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" />
+                }
+                else
+                {
+                    <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" maxlength="@_maxlength" />
+                }
+
+                break;
+        }
+
+        break;
+    case "select":
+        <select @bind="InputValue" name="@InputName" class="form-select">
+            @if (NodeData.TreeItems?.Any() == true)
+            {
+                foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
+                {
+                    <HtmlSelectOptionsTranslatorComponent NodeData="opt_node" />
+                }
+            }
+        </select>
+        break;
+    default:
+        <HtmlNodeTranslatorComponent NodeData="NodeData" />
+        break;
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public TreeItemDataModel NodeData { get; set; } = default!;
+
+    [CascadingParameter]
+    public FormContextModel? FormContext { get; set; }
+
+    [CascadingParameter]
+    public Action? ReloadPageHandle { get; set; }
+
+    public InputFormTypesEnum InputFormType { get; private set; } = InputFormTypesEnum.Text;
+
+    public string? InputName { get; private set; }
+    public string? InputValue { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        InputName = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("name", StringComparison.OrdinalIgnoreCase)).Value;
+
+        InputValue = FormContext?.DataContext.Any(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)) == true
+        ? FormContext?.DataContext.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value.ToString()
+        : NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
+
+        string _type = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("type", StringComparison.OrdinalIgnoreCase)).Value ?? "text";
+        if (Enum.TryParse(_type.UpperFirstChar(), out InputFormTypesEnum myType))
+            InputFormType = myType;
+        else if (!string.IsNullOrWhiteSpace(_type))
+            _snackbar.Add($"INPUT [InputName:{InputName}][InputValue:{InputValue}] не определён тип: [InputType: {_type}] (код ошибки: {{7B99966D-145C-4506-9F13-BA70B5DC0B11}})", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+
+        if (InputFormType != InputFormTypesEnum.Checkbox)
+            SetInputValue(InputValue, InputName);
+
+        base.OnInitialized();
+    }
+
+    void SetInputValue(object? val, string? input_name)
+    {
+        if (string.IsNullOrWhiteSpace(input_name))
+            return;
+
+        input_name = input_name.ToLower();
+
+        if (val is null && FormContext?.DataContext.ContainsKey(input_name) == true)
+        {
+            FormContext.DataContext.Remove(input_name);
+            return;
+        }
+
+        if (val is not null)
+        {
+            if (FormContext?.DataContext.ContainsKey(input_name) == true)
+                FormContext.DataContext[input_name] = val;
+            else if (FormContext is not null)
+                FormContext.DataContext.Add(input_name, val);
+        }
+    }
+
+    void SendForm()
+    {
+        string json = JsonConvert.SerializeObject(FormContext?.DataContext);
+        _snackbar.Add($"{FormContext?.FormAction} > {json}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+
+        if (ReloadPageHandle is not null)
+        {
+            FormContext?.DataContext.Clear();
+            ReloadPageHandle();
+        }
+    }
+}

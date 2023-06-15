@@ -28,7 +28,7 @@
 
     HtmlRootTranslatorComponent? ref1;
 
-    protected override async Task OnInitializedAsync()
+    async Task GetData()
     {
         if (Id <= 0)
             return;
@@ -47,4 +47,6 @@
 
         ref1?.StateHasChangedCall(html);
     }
+
+    protected override async Task OnInitializedAsync() => await GetData();
 }

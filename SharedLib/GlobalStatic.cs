@@ -210,6 +210,16 @@ namespace SharedLib
             return (T)serializer.Deserialize(ms)!;
         }
 
+        /// <summary>
+        /// С заглавной буквы
+        /// </summary>
+        public static string UpperFirstChar(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            return $"{char.ToUpper(input[0])}{input[1..]}";
+        }
 
         /// <summary>
         /// 

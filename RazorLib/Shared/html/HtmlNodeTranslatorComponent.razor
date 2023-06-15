@@ -1,15 +1,15 @@
-﻿@using Newtonsoft.Json;
-@using RazorLib.Shared.hardwares
+﻿@using RazorLib.Shared.hardwares
+@using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
 
 @inject ISnackbar _snackbar
 
-@switch (NodeData.NodeName.ToLower())
+@switch (NodeData.NodeName)
 {
     case "a":
-        string? href = NodeData.Attributes?.FirstOrDefault(x => x.Name.Equals("href", StringComparison.OrdinalIgnoreCase))?.Value;
-        if (Uri.TryCreate(href, UriKind.Relative, out Uri? _uri) && !NodeData.Text?.Equals("Back", StringComparison.OrdinalIgnoreCase) == true)
+        string? href = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
+        if (Uri.TryCreate(href, UriKind.Relative, out Uri? _uri) && NodeData.Text?.Equals("Back", StringComparison.OrdinalIgnoreCase) != true)
         {
             <HardwareNavButtonComponent NavHref="@href" Text="@NodeData.Text" />
         }
@@ -17,59 +17,18 @@
     case "br":
         <br />
         break;
-    case "option":
-        <option>
-            @NodeData.Title
-        </option>
-        break;
-    case "select":
-        <select class="form-select">
-            @if (NodeData.TreeItems?.Any() == true)
-            {
-                foreach (TreeItemDataModel node in NodeData.TreeItems)
-                {
-                    <HtmlNodeTranslatorComponent NodeData="node" />
-                }
-            }
-        </select>
-        break;
-    case "input":
-        string? _class = null;
-        string? _type = NodeData.Attributes?.FirstOrDefault(x => x.Name.Equals("type", StringComparison.OrdinalIgnoreCase))?.Value;
-        string? _name = NodeData.Attributes?.FirstOrDefault(x => x.Name.Equals("name", StringComparison.OrdinalIgnoreCase))?.Value;
-        string? _val = NodeData.Attributes?.FirstOrDefault(x => x.Name.Equals("value", StringComparison.OrdinalIgnoreCase))?.Value;
-
-        if (_type?.Equals("submit", StringComparison.OrdinalIgnoreCase) == true)
-        {
-            _class = "btn btn-primary";
-        }
-        else if (_type?.Equals("checkbox", StringComparison.OrdinalIgnoreCase) == true)
-        {
-            _class = "form-check-input";
-        }
-        else
-        {
-            _class = "form-control";
-        }
-
-
-        if (_type?.Equals("submit", StringComparison.OrdinalIgnoreCase) == true)
-        {
-            <button @onclick="SendForm" type="button" class="btn btn-warning">@_val</button>
-        }
-        else
-        {
-            SetInputValue(_name, _val);
-            InputValue = _val;
-            <input type="@_type" value="@InputValue" name="@_name" @onchange="@((ChangeEventArgs __e) => SetInputValue(_name,__e.Value?.ToString()))" class="@_class" />
-        }
-        break;
     case "form":
-        string? _action = NodeData.Attributes?.FirstOrDefault(x => x.Name.Equals("action", StringComparison.OrdinalIgnoreCase))?.Value;
-        FormContextModel _context = new FormContextModel() { FormAction = new(_action ?? "") };
-        <CascadingValue Value="@_context">
-            <form>
-                <h4>@NodeData.Text</h4>
+        <HtmlFormTranslatorComponent NodeData="NodeData" />
+        break;
+    default:
+        if (input_tags.Contains(NodeData.NodeName))
+        {
+            <HtmlInputTranslatorComponent NodeData="NodeData" />
+        }
+        else
+        {
+            <div title="Не опознанный тип узла DOM (код ошибки: {6055A7E3-A10D-4CAF-84DF-AD944B7CD98D})" class="badge text-bg-warning">
+                @NodeData.Title
                 @if (NodeData.TreeItems?.Any() == true)
                 {
                     foreach (TreeItemDataModel node in NodeData.TreeItems)
@@ -77,11 +36,8 @@
                         <HtmlNodeTranslatorComponent NodeData="node" />
                     }
                 }
-            </form>
-        </CascadingValue>
-        break;
-    default:
-        <text>@NodeData.Text</text>
+            </div>
+        }
         break;
 }
 
@@ -89,39 +45,5 @@
     [Parameter, EditorRequired]
     public TreeItemDataModel NodeData { get; set; } = default!;
 
-    [CascadingParameter]
-    protected FormContextModel? FormContext { get; set; }
-
-    string? InputValue { get; set; }
-
-    void SetInputValue(string? input_name, string? val)
-    {
-        if (string.IsNullOrWhiteSpace(input_name))
-            return;
-
-        if (InputValue?.Equals(val, StringComparison.OrdinalIgnoreCase) != true)
-            InputValue = val;
-
-        input_name = input_name.ToLower();
-
-        if (string.IsNullOrEmpty(InputValue) && FormContext?.DataContext.ContainsKey(input_name) == true)
-        {
-            FormContext.DataContext.Remove(input_name);
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(InputValue))
-        {
-            if (FormContext?.DataContext.ContainsKey(input_name) == true)
-                FormContext.DataContext[input_name] = InputValue;
-            else if (FormContext is not null)
-                FormContext.DataContext.Add(input_name, InputValue);
-        }
-        //StateHasChanged();
-    }
-
-    void SendForm()
-    {
-        _snackbar.Add($"{FormContext?.FormAction} > {JsonConvert.SerializeObject(FormContext?.DataContext)}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-    }
+    static string[] input_tags = new string[] { "input", "select" };
 }

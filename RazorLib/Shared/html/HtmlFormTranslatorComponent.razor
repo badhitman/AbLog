@@ -1,0 +1,30 @@
+﻿@using RazorLib.Shared.hardwares
+@using Newtonsoft.Json;
+@using MudBlazor;
+@using SharedLib;
+
+@inject ISnackbar _snackbar
+@{
+    string? _action = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("action", StringComparison.OrdinalIgnoreCase)).Value;
+    FormContext = new FormContextModel() { FormAction = new(_action ?? "") };
+}
+
+<CascadingValue Value="@FormContext">
+    <form>
+        <h4>@NodeData.Text</h4>
+        @if (NodeData.TreeItems?.Any() == true)
+        {
+            foreach (TreeItemDataModel node in NodeData.TreeItems)
+            {
+                <HtmlNodeTranslatorComponent NodeData="node" />
+            }
+        }
+    </form>
+</CascadingValue>
+
+@code {
+    [Parameter, EditorRequired]
+    public TreeItemDataModel NodeData { get; set; } = default!;
+
+    public FormContextModel? FormContext;
+}

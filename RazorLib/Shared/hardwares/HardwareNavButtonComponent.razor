@@ -1,5 +1,5 @@
-﻿@using RazorLib.Shared.html;
-@using RazorLib.Shared.navs.pills
+﻿@using RazorLib.Shared.navs.pills;
+@using RazorLib.Shared.html;
 @using SharedLib.IServices;
 @using SharedLib;
 
@@ -14,10 +14,12 @@
 else if (IsExpand)
 {
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <p class="mb-0">@($"{Text} // {NavHref}")</p>
+        <p class="mb-0">@($"{Text} >> {NavHref}")</p>
         <PillsSetComponent>
             <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
-                <HtmlRootTranslatorComponent @ref="ref1" Html="@html" />
+                <CascadingValue Value="@ReloadPage">
+                    <HtmlRootTranslatorComponent @ref="ref1" Html="@html" />
+                </CascadingValue>
             </PillComponent>
             <PillComponent Tooltip="Парсинг исходного HTML в DOM" Title="Дерево">
                 <HtmlTreeComponent Html="@html" />
@@ -33,7 +35,9 @@ else
 {
     <button title="@NavHref" @onclick="Expand" type="button" class="btn btn-primary">@Text</button>
 }
+
 <ShowMessagesComponent @ref="showMessages" />
+
 @code {
     [Parameter, EditorRequired]
     public string NavHref { get; set; } = default!;
@@ -49,12 +53,16 @@ else
     string? html;
     HtmlRootTranslatorComponent? ref1;
 
-    async Task Expand()
+    void ReloadPage()
     {
-        IsExpand = !IsExpand;
         if (!IsExpand)
             return;
 
+        InvokeAsync(async () => await GetData());
+    }
+
+    async Task GetData()
+    {
         if (Id <= 0)
             return;
 
@@ -68,7 +76,16 @@ else
         }
 
         html = rest.TextPayload;
-        ref1?.StateHasChangedCall(html);
         IsBusyProgress = false;
+        ref1?.StateHasChangedCall(html);
+    }
+
+    async Task Expand()
+    {
+        IsExpand = !IsExpand;
+        if (!IsExpand)
+            return;
+
+        await GetData();
     }
 }

@@ -1,0 +1,105 @@
+﻿@using RazorLib.Shared.hardwares
+@using Newtonsoft.Json;
+@using MudBlazor;
+@using SharedLib;
+
+@inject ISnackbar _snackbar
+
+@switch (NodeData.NodeName)
+{
+    case "optgroup":
+        string? label = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("label", StringComparison.OrdinalIgnoreCase)).Value;
+        <optgroup label="@label">
+            @if (NodeData.TreeItems?.Any() == true)
+            {
+                foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
+                {
+                    <HtmlSelectOptionsTranslatorComponent NodeData="opt_node" />
+                }
+            }
+        </optgroup>
+        break;
+    case "option":
+        string? opt_val = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
+        bool IsSelected = NodeData.Attributes?.Any(x => x.Key.Equals("selected", StringComparison.OrdinalIgnoreCase)) == true;
+        if (IsSelected)
+        {
+            <option selected value="@opt_val">
+                @NodeData.Text
+            </option>
+        }
+        else
+        {
+            <option value="@opt_val">
+                @NodeData.Text
+            </option>
+        }
+        break;
+    default:
+        <HtmlNodeTranslatorComponent NodeData="NodeData" />
+        break;
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public TreeItemDataModel NodeData { get; set; } = default!;
+
+    [CascadingParameter]
+    public FormContextModel? FormContext { get; set; }
+
+    [CascadingParameter]
+    public Action? ReloadPageHandle { get; set; }
+
+    string? InputName;
+    string? InputValue;
+    InputFormTypesEnum InputFormType = InputFormTypesEnum.Text;
+
+    protected override void OnInitialized()
+    {
+        string _type = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("type", StringComparison.OrdinalIgnoreCase)).Value ?? "text";
+        if (!string.IsNullOrWhiteSpace(_type) && Enum.TryParse(_type.UpperFirstChar(), out InputFormTypesEnum myType))
+            InputFormType = myType;
+
+        InputName = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("name", StringComparison.OrdinalIgnoreCase)).Value;
+
+        InputValue = FormContext?.DataContext.Any(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)) == true
+        ? FormContext?.DataContext.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value.ToString()
+        : NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
+
+        base.OnInitialized();
+    }
+
+    void SetInputValue(object? val, string? input_name, InputFormTypesEnum input_type)
+    {
+        if (string.IsNullOrWhiteSpace(input_name))
+            return;
+
+        input_name = input_name.ToLower();
+
+        if (val is null && FormContext?.DataContext.ContainsKey(input_name) == true)
+        {
+            FormContext.DataContext.Remove(input_name);
+            return;
+        }
+
+        if (val is not null)
+        {
+            if (FormContext?.DataContext.ContainsKey(input_name) == true)
+                FormContext.DataContext[input_name] = val;
+            else if (FormContext is not null)
+                FormContext.DataContext.Add(input_name, val);
+        }
+    }
+
+    void SendForm()
+    {
+        string json = JsonConvert.SerializeObject(FormContext?.DataContext);
+        _snackbar.Add($"{FormContext?.FormAction} > {json}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+
+        if (ReloadPageHandle is not null)
+        {
+            FormContext?.DataContext.Clear();
+            ReloadPageHandle();
+        }
+    }
+}

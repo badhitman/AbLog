@@ -50,6 +50,7 @@ namespace RazorLib
 
         async Task Parse()
         {
+            TreeItems.Clear();
             IsBusyProgress = false;
             Html = Regex.Replace(Html ?? "", @"\s+", " ");
             HtmlParser parser = new();
@@ -57,12 +58,8 @@ namespace RazorLib
             if (Document.Body is not null)
                 foreach (INode cn in Document.Body.ChildNodes)
                 {
-                    if ((cn is IText tn && cn.Text().Trim().Equals("|")) || cn is IHtmlBreakRowElement)
+                    if ((cn is IText && cn.Text().Trim().Equals("|")) || cn is IHtmlBreakRowElement)
                         continue;
-
-                    #region
-                    var _t = cn.Text();
-                    #endregion
 
                     TreeItemDataModel t = new(cn);
 
@@ -84,12 +81,8 @@ namespace RazorLib
         {
             foreach (INode cn in nls)
             {
-                if ((cn is IText tn && cn.Text().Trim().Equals("|")) || cn is IHtmlBreakRowElement)
+                if ((cn is IText && cn.Text().Trim().Equals("|")) || cn is IHtmlBreakRowElement)
                     continue;
-
-                #region
-                var _t = cn.Text();
-                #endregion
 
                 TreeItemDataModel t = new(cn);
                 if (cn.ChildNodes.Any())

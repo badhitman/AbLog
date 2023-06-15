@@ -1,8 +1,5 @@
-﻿using AngleSharp.Common;
+﻿using AngleSharp.Html.Dom;
 using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
-using Newtonsoft.Json;
-using static MudBlazor.FilterOperator;
 
 namespace RazorLib.Shared.html
 {
@@ -20,12 +17,13 @@ namespace RazorLib.Shared.html
             {
                 string _t = $"{Text} <{NodeName}/>"; ;
 
-                //foreach (IAttr at in Attributes)
-                //{
-                //    _t += $" [{at.Name}:{at.Value}];";
-                //}
+                if (Attributes?.Any() == true)
+                    foreach (KeyValuePair<string, string?> at in Attributes)
+                    {
+                        _t += $" [{at.Key}:{at.Value}];";
+                    }
 
-                return _t;
+                return _t.Trim();
             }
         }
 
@@ -42,7 +40,7 @@ namespace RazorLib.Shared.html
         /// <summary>
         /// Attributes (DOM HTML)
         /// </summary>
-        public INamedNodeMap? Attributes { get; set; }
+        public KeyValuePair<string, string?>[]? Attributes { get; set; }
 
         /// <summary>
         /// 
@@ -64,38 +62,43 @@ namespace RazorLib.Shared.html
         /// </summary>
         public TreeItemDataModel(INode cn)
         {
-            NodeName = cn.NodeName;
+            NodeName = cn.NodeName.ToLower();
+
             if (cn is IText tn)
             {
                 Text = tn.Text();
             }
             else if (cn is IHtmlOptionElement oe)
             {
-                Attributes = oe.Attributes;
+                Attributes = oe.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name, x.Value)).ToArray();
                 Text = oe.Text();
             }
             else if (cn is IHtmlSelectElement se)
             {
-                Attributes = se.Attributes;
+                Attributes = se.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name, x.Value)).ToArray();
             }
             else if (cn is IHtmlInputElement ie)
             {
-                Attributes = ie.Attributes;
+                Attributes = ie.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name, x.Value)).ToArray();
             }
             else if (cn is IHtmlFormElement fe)
             {
-                Attributes = fe.Attributes;
+                Attributes = fe.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name, x.Value)).ToArray();
                 Number = fe.ChildElementCount;
             }
             else if (cn is IHtmlAnchorElement ae)
             {
-                Attributes = ae.Attributes;
+                Attributes = ae.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name, x.Value)).ToArray();
                 Number = ae.ChildElementCount;
                 Text = Number > 0 ? "" : cn.Text();
             }
             else if (cn is IHtmlBreakRowElement)
             {
 
+            }
+            else
+            {
+                throw new Exception(cn.GetType().FullName);
             }
         }
     }
