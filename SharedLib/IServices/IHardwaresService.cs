@@ -29,5 +29,10 @@
         /// Порт контроллера
         /// </summary>
         public Task<PortHardwareResponseModel> HardwarePortGet(int port_id);
+
+        /// <summary>
+        /// Получить HTML основной страницы управляющего блока (прим: http://192.168.0.14/sec)
+        /// </summary>
+        public Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req);
     }
 }

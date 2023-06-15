@@ -8,7 +8,7 @@ namespace ABLog.Controllers
     /// <summary>
     /// 
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("/api/[controller]")]
     [ApiController]
     public class CamerasController : ControllerBase
     {

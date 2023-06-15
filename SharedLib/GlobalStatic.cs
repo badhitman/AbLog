@@ -285,6 +285,16 @@ namespace SharedLib
             /// </summary>
             public const string NESTED_ENTRIES = "nested-entries";
 
+            /// <summary>
+            /// html
+            /// </summary>
+            public const string HTML = "html";
+
+            /// <summary>
+            /// main
+            /// </summary>
+            public const string MAIN = "main";
+
             #region ParametersStorage
 
             /// <summary>

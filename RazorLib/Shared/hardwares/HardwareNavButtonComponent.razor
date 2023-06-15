@@ -1,0 +1,74 @@
+﻿@using RazorLib.Shared.html;
+@using RazorLib.Shared.navs.pills
+@using SharedLib.IServices;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject IHardwaresService _hardwares
+
+@if (IsBusyProgress)
+{
+    <span>Получение данных ...</span>
+}
+else if (IsExpand)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <p class="mb-0">@($"{Text} // {NavHref}")</p>
+        <PillsSetComponent>
+            <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
+                <HtmlRootTranslatorComponent @ref="ref1" Html="@html" />
+            </PillComponent>
+            <PillComponent Tooltip="Парсинг исходного HTML в DOM" Title="Дерево">
+                <HtmlTreeComponent Html="@html" />
+            </PillComponent>
+            <PillComponent Tooltip="Исходный HTML" Title="Исходники">
+                <HtmlShowComponent Html="@html" />
+            </PillComponent>
+        </PillsSetComponent>
+        <button @onclick="Expand" type="button" class="btn-close" aria-label="Close"></button>
+    </div>
+}
+else
+{
+    <button title="@NavHref" @onclick="Expand" type="button" class="btn btn-primary">@Text</button>
+}
+<ShowMessagesComponent @ref="showMessages" />
+@code {
+    [Parameter, EditorRequired]
+    public string NavHref { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = default!;
+
+    [CascadingParameter, EditorRequired]
+    public int Id { get; set; }
+
+    bool IsExpand = false;
+    ShowMessagesComponent? showMessages;
+    string? html;
+    HtmlRootTranslatorComponent? ref1;
+
+    async Task Expand()
+    {
+        IsExpand = !IsExpand;
+        if (!IsExpand)
+            return;
+
+        if (Id <= 0)
+            return;
+
+        IsBusyProgress = true;
+        HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardvareGetRequestModel() { HardwareId = Id, Path = NavHref });
+
+        if (!rest.IsSuccess)
+        {
+            showMessages?.ShowMessages(rest.Messages);
+            return;
+        }
+
+        html = rest.TextPayload;
+        ref1?.StateHasChangedCall(html);
+        IsBusyProgress = false;
+    }
+}

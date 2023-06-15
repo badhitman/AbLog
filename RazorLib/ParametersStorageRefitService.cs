@@ -7,12 +7,12 @@ namespace BlazorLib
     /// </summary>
     public class ParametersStorageRefitService : IParametersStorageService
     {
-        readonly IRefitService _refit;
+        readonly IRefitStorageService _refit;
 
         /// <summary>
         /// Конфигурация подключения Email (Refit)
         /// </summary>
-        public ParametersStorageRefitService(IRefitService set_refit)
+        public ParametersStorageRefitService(IRefitStorageService set_refit)
         {
             _refit = set_refit;
         }

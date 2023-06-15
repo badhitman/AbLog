@@ -2,14 +2,57 @@
 using SharedLib.IServices;
 using ab.context;
 using SharedLib;
+using System.Net;
 
 namespace ServerLib
 {
     /// <summary>
     /// Устройства
     /// </summary>
-    public class HardwaresLocalSQLiteService : IHardwaresService
+    public class HardwaresLocalService : IHardwaresService
     {
+        /// <inheritdoc/>
+        public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req)
+        {
+            HardwareModelDB? db_hw;
+            lock (ServerContext.DbLocker)
+            {
+                using ServerContext db = new();
+                db_hw = db.Hardwares.FirstOrDefault(x => x.Id == req.HardwareId);
+                if (db_hw is null)
+                    return (HttpResponseModel)ResponseBaseModel.CreateError("db.Hardwares.FirstOrDefault(x => x.Id == hardware_id) IS NULL: {98F67202-25A2-4D64-918B-72E651D63D15}");
+            }
+
+            if (string.IsNullOrWhiteSpace(db_hw.Address) || string.IsNullOrWhiteSpace(db_hw.Password))
+                return (HttpResponseModel)ResponseBaseModel.CreateError("string.IsNullOrWhiteSpace(db_hw.Address) || string.IsNullOrWhiteSpace(db_hw.Password): {40003ADA-6DB8-48DD-88F8-EC1E05EF2CB1}");
+
+            if (!db_hw.Address.EndsWith("/"))
+                db_hw.Address += "/";
+
+            if (!db_hw.Address.StartsWith("http"))
+                db_hw.Address = $"http://{db_hw.Address}";
+
+            try
+            {
+                using HttpClient client = new();
+                client.BaseAddress = new Uri(db_hw.Address);
+                HttpResponseMessage response = await client.GetAsync(string.IsNullOrWhiteSpace(req.Path) ? db_hw.Password : req.Path);
+                return new()
+                {
+                    StatusCode = response.StatusCode,
+                    TextPayload = await response.Content.ReadAsStringAsync()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Error, Text = ex.Message } }
+                };
+            }
+        }
+
         /// <inheritdoc/>
         public Task<HardwareResponseModel> HardwareGet(int hardware_id)
         {

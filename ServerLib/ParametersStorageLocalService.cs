@@ -7,7 +7,7 @@ namespace ServicesLib
     /// <summary>
     /// Конфигурация подключения Email
     /// </summary>
-    public class ParametersStorageLocalSQLiteService : IParametersStorageService
+    public class ParametersStorageLocalService : IParametersStorageService
     {
         /// <inheritdoc/>
         public Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)

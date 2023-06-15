@@ -9,14 +9,25 @@ namespace RazorLib
     /// </summary>
     public class HardwaresRefitService : IHardwaresService
     {
-        readonly IRefitService _refit_hardwares;
+        readonly IRefitHardwaresService _refit_hardwares;
 
         /// <summary>
         /// Устройства
         /// </summary>
-        public HardwaresRefitService(IRefitService refit_hardwares)
+        public HardwaresRefitService(IRefitHardwaresService refit_hardwares)
         {
             _refit_hardwares = refit_hardwares;
+        }
+
+        /// <inheritdoc/>
+        public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req)
+        {
+            Refit.ApiResponse<HttpResponseModel> rest = await _refit_hardwares.GetHardwareHtmlPage(req);
+
+            if (rest.Content is null)
+                return new HttpResponseModel(ResponseBaseModel.CreateError("rest.Content is null // error {26ABE035-F428-4433-9BA6-9D8937051942}"));
+
+            return rest.Content;
         }
 
         /// <inheritdoc/>

@@ -5,7 +5,6 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject IHardwaresService _hardwares
-@inject ISnackbar _snackbar
 
 @if (IsBusyProgress)
 {
@@ -31,7 +30,7 @@ else
         <label for="exampleInputAddress" class="form-label">IP</label>
         <div class="input-group">
             <input @bind-value="hw.Address" type="text" class="form-control" id="exampleInputAddress" aria-describedby="addresHelp">
-            <a title="Открыть устройство на новой вкладке" target="_blank" href="@($"http://{hw.Address}/{hw.Password}")" class="btn btn-outline-primary" role="button">Открыть</a>
+            <a title="Открыть устройство на новой вкладке" target="_blank" href="@($"{hw.Address}/{hw.Password}")" class="btn btn-outline-primary" role="button">Открыть</a>
         </div>
         <div id="addresHelp" class="form-text mb-3">Сетевой адрес.</div>
 
@@ -57,7 +56,7 @@ else
 }
 <ShowMessagesComponent @ref="showMessages" />
 @code {
-    [Parameter, EditorRequired]
+    [CascadingParameter, EditorRequired]
     public int Id { get; set; }
 
     bool ShowPass = false;

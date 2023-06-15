@@ -8,7 +8,7 @@ namespace AbLogServer.Controllers
     /// 
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/[controller]")]
     public class ConditionsController : ControllerBase
     {
         private readonly ILogger<ConditionsController> _logger;

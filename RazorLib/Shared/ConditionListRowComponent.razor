@@ -3,7 +3,7 @@
 @using MudBlazor;
 
 @inject ILogger<ConditionListRowComponent> _loger
-@inject IRefitService _refit
+@inject IRefitConditionsService _refit
 @inject ISnackbar _snackbar
 
 @inherits BlazorBusyComponentBaseModel
@@ -167,6 +167,4 @@
         if (rest.Content?.Conditions?.Any() == true)
             UpdateAct(rest.Content.Conditions);
     }
-
-    void StateHasChangedCall() => StateHasChanged();
 }

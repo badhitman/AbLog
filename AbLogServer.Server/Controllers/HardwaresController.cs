@@ -8,7 +8,7 @@ namespace AbLogServer.Controllers
     /// Управляющие блоки
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/[controller]")]
     public class HardwaresController : ControllerBase
     {
         readonly ILogger<HardwaresController> _logger;
@@ -52,5 +52,11 @@ namespace AbLogServer.Controllers
         /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
         public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id) => await _hardwares_service.HardwarePortGet(port_id);
+
+        /// <summary>
+        /// Получить HTML основной страницы устройства
+        /// </summary>
+        [HttpPost($"{GlobalStatic.HttpRoutes.HTML}/{GlobalStatic.HttpRoutes.MAIN}")]
+        public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req) => await _hardwares_service.GetHardwareHtmlPage(req);
     }
 }

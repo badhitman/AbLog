@@ -64,3 +64,47 @@ window.onBlazorReady = () => {
 window.tooltipeHide = () => {
     $("div.ui-tooltip").hide();
 };
+window.clipboardCopy = {
+    copyText: function (text) {
+        parent.navigator.clipboard.writeText(text).then(function () {
+            //alert("Copied to clipboard!");
+        })
+            .catch(function (error) {
+                alert(error);
+            });
+    }
+}
+
+window.highlightAll = () => {
+    $('pre code').each(function (index_element, object_element) {
+        let t = object_element.textContent;
+        if (t.substring(0, 1) === '{') {
+            object_element.textContent = JSON.stringify(JSON.parse(t), null, 2);
+        }
+        hljs.highlightBlock(object_element);
+    });
+}
+
+window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+    const arrayBuffer = await contentStreamReference.arrayBuffer();
+    const blob = new Blob([arrayBuffer]);
+    const url = URL.createObjectURL(blob);
+    triggerFileDownload(fileName, url);
+    URL.revokeObjectURL(url);
+}
+
+window.triggerFileDownload = (fileName, url) => {
+    const anchorElement = document.createElement('a');
+    anchorElement.href = url;
+    anchorElement.download = fileName ?? '';
+    anchorElement.click();
+    anchorElement.remove();
+}
+
+window.GetElementHeight = (_id_element) => {
+    return document.getElementById(_id_element).offsetHeight;
+}
+
+window.GetElementWidth = (_id_element) => {
+    return document.getElementById(_id_element).offsetWidth;
+}

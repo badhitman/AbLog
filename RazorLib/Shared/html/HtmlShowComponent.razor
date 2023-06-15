@@ -1,0 +1,35 @@
+﻿@using AngleSharp.Html.Dom;
+@using System.Text.RegularExpressions;
+@using AngleSharp.Html.Parser;
+@using Microsoft.JSInterop;
+
+<div class="card text-bg-secondary">
+    <div class="card-body">
+        <pre>@GetHtml()</pre>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string? Html { get; set; }
+
+    MarkupString RawResult => new MarkupString(Html ?? "");
+    IHtmlDocument? Document;
+
+    string GetHtml()
+    {
+        StringWriter sw = new();
+        Document?.ToHtml(sw, new AngleSharp.Html.PrettyMarkupFormatter());
+
+        var indentedHtml = sw.ToString();
+        return indentedHtml;
+    }
+
+    protected override void OnInitialized()
+    {
+        Html = Regex.Replace(Html ?? "", @"\s+", " ");
+        HtmlParser parser = new();
+        Document = parser.ParseDocument(Html);
+        base.OnInitialized();
+    }
+}

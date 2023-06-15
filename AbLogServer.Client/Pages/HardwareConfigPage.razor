@@ -17,14 +17,16 @@
 
 <h1>Настройка управляющего блока</h1>
 
-<TabSetComponent>
-    <TabComponent Tooltip="Управляющий блок" Title="Управляющий блок">
-        <HardwareConfigComponent Id="Id" />
-    </TabComponent>
-    <TabComponent Tooltip="Ретранслятор" Title="Ретранслятор">
-        <HaedwareTranslateLayerComponent Id="Id" />
-    </TabComponent>
-</TabSetComponent>
+<CascadingValue Value="@Id">
+    <TabSetComponent>
+        <TabComponent Tooltip="Управляющий блок" Title="Управляющий блок">
+            <HardwareConfigComponent />
+        </TabComponent>
+        <TabComponent Tooltip="Ретранслятор" Title="Ретранслятор">
+            <HaedwareTranslateLayerComponent />
+        </TabComponent>
+    </TabSetComponent>
+</CascadingValue>
 
 @code {
     [Parameter, EditorRequired]

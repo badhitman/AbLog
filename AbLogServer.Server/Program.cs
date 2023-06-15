@@ -25,8 +25,8 @@ namespace AbLogServer
             {
                 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-                builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalSQLiteService>();
-                builder.Services.AddScoped<IHardwaresService, HardwaresLocalSQLiteService>();
+                builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
+                builder.Services.AddScoped<IHardwaresService, HardwaresLocalService>();
                 builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
 
                 builder.Services.AddControllersWithViews()

@@ -9,7 +9,7 @@ namespace AbLogServer.Controllers
     /// 
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/[controller]")]
     public class CommandsController : ControllerBase
     {
         private readonly ILogger<CommandsController> _logger;

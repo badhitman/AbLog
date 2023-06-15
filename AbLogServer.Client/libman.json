@@ -11,7 +11,6 @@
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "provider": "cdnjs",
       "library": "open-iconic@1.1.1",
       "destination": "wwwroot/lib/open-iconic/"
     },
@@ -19,6 +18,10 @@
       "provider": "unpkg",
       "library": "jquery-ui@1.13.2",
       "destination": "wwwroot/lib/jquery-ui/"
+    },
+    {
+      "library": "highlight.js@11.8.0",
+      "destination": "wwwroot/lib/highlight.js/"
     }
   ]
 }

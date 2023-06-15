@@ -17,5 +17,14 @@ namespace RazorLib
         /// Текущий стиль кнопки в зависимости от состояния: "занят" или "готов"
         /// </summary>
         public string ButtonStyle => $"padding:0;margin:0;text-decoration:{(IsBusyProgress ? "none" : "underline")};cursor:{(IsBusyProgress ? "none" : "pointer")};";
+
+        /// <summary>
+        /// Notifies the component that its state has changed. When applicable, this will
+        /// cause the component to be re-rendered.
+        /// </summary>
+        public virtual void StateHasChangedCall()
+        {
+            StateHasChanged();
+        }
     }
 }
