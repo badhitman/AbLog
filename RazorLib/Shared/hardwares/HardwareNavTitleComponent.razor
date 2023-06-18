@@ -1,0 +1,50 @@
+﻿@using SharedLib;
+@using System.Text.RegularExpressions;
+
+@inject ClientConfigModel _conf
+
+<p class="mb-0">
+    @($"{TitleText} >> {PagePath}")
+    @if (_conf.MetadataPage.ContainsKey(PageInfoKey) && !IsExpand)
+    {
+        <a title="Открыть окно справки" @onclick="() => IsExpand = true" @onclick:preventDefault href="#" class="link-info ms-4">Информация</a>
+    }
+</p>
+@if (_conf.MetadataPage.ContainsKey(PageInfoKey) && IsExpand)
+{
+    <div style="max-height: 350px; overflow-y: scroll;" class="alert alert-light" role="alert">
+        @foreach (string p in _conf.MetadataPage[PageInfoKey])
+        {
+            <text>@((MarkupString)p)</text>
+        }
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button @onclick="() => IsExpand = false" class="btn btn-outline-light btn-sm" type="button">Закрыть справку</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string TitleText { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string PagePath { get; set; } = default!;
+
+    string? _pik;
+    string PageInfoKey
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_pik))
+                _pik = PagePath[(PagePath.IndexOf("?") + 1)..];
+            if (rx_pt.IsMatch(_pik))
+                _pik = "port-config";
+
+            return _pik;
+        }
+    }
+
+    bool IsExpand = false;
+
+    static Regex rx_pt = new Regex(@"^pt=\d$", RegexOptions.Compiled);
+}

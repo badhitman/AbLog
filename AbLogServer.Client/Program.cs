@@ -7,6 +7,7 @@ using ABLog;
 using Refit;
 using SharedLib.IServices;
 using RazorLib;
+using Newtonsoft.Json;
 
 namespace AbLog
 {
@@ -18,7 +19,20 @@ namespace AbLog
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            var http = new HttpClient()
+            {
+                BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+            };
+            builder.Services.AddScoped(sp => http);
+
+            using var conf_response = await http.GetAsync("conf.json");
+            using var conf_stream = await conf_response.Content.ReadAsStreamAsync();
+            builder.Configuration.AddJsonStream(conf_stream);
+
+            ClientConfigModel settings = new ();
+            builder.Configuration.Bind(settings);
+            builder.Services.AddSingleton(settings);
+
             builder.Services.AddMudServices();
 
             builder.Services.AddRefitClient<IRefitHardwaresService>()

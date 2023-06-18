@@ -24,7 +24,7 @@
     public int Id { get; set; }
 
     [CascadingParameter]
-    public Action ReloadPageHandle { get; set; } = default!;
+    public Action ReloadPage { get; set; } = default!;
 
     ShowMessagesComponent? showMessages;
 
@@ -43,6 +43,6 @@
 
         IsBusyProgress = false;
 
-        ReloadPageHandle();
+        ReloadPage();
     }
 }

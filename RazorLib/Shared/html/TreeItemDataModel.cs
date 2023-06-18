@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using AngleSharp.Dom;
+using AngleSharp;
 
 namespace RazorLib.Shared.html
 {
@@ -33,6 +34,16 @@ namespace RazorLib.Shared.html
         public string NodeName { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public string NodeHtml { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public TreeItemDataModel? Parent { get; set; }
+
+        /// <summary>
         /// Text content (HTML)
         /// </summary>
         public string? Text { get; set; }
@@ -63,6 +74,7 @@ namespace RazorLib.Shared.html
         public TreeItemDataModel(INode cn)
         {
             NodeName = cn.NodeName.ToLower();
+            NodeHtml = cn.ToHtml();
 
             if (cn is IText tn)
             {

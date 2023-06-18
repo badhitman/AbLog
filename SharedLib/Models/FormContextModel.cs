@@ -13,6 +13,6 @@
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, object> DataContext { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, string> DataContext { get; set; } = new ();
     }
 }

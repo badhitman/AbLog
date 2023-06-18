@@ -1,0 +1,26 @@
+﻿@using RazorLib.Shared.navs.pills
+@using RazorLib.Shared.html
+
+<PillsSetComponent>
+    <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
+        <CascadingValue Value="@ReloadPage">
+            <HtmlRootTranslatorComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" />
+        </CascadingValue>
+    </PillComponent>
+    <PillComponent Tooltip="Парсинг исходного HTML в DOM" Title="Дерево">
+        <HtmlTreeDomComponent HtmlSource="@HtmlSource" />
+    </PillComponent>
+    <PillComponent Tooltip="Исходный HTML" Title="Исходники">
+        <HtmlShowComponent Html="@HtmlSource" />
+    </PillComponent>
+</PillsSetComponent>
+
+@code {
+    [Parameter, EditorRequired]
+    public Action ReloadPage { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string? HtmlSource { get; set; }
+
+    public HtmlRootTranslatorComponent? refHtmlRoot;
+}

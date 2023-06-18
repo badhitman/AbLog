@@ -1,33 +1,104 @@
 ﻿@using RazorLib.Shared.hardwares
+@using SharedLib.IServices;
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
+@using System.Web;
 
+@inherits BlazorBusyComponentBaseModel
+
+@inject IHardwaresService _hardwares
 @inject ISnackbar _snackbar
 
 <CascadingValue Value="@FormContext">
-    <form class="alert alert-info m-3" role="alert">
-        <h4>@NodeData.Text</h4>
-        @if (NodeData.TreeItems?.Any() == true)
-        {
-            foreach (TreeItemDataModel node in NodeData.TreeItems)
+    <CascadingValue Value="@SendForm">
+        <form class="alert alert-info m-3" role="alert">
+            <h4>@NodeData.Text</h4>
+            @if (NodeData.TreeItems?.Any() == true)
             {
-                <HtmlNodeTranslatorComponent NodeData="node" />
+                foreach (TreeItemDataModel node in NodeData.TreeItems)
+                {
+                    <HtmlNodeTranslatorComponent NodeData="node" />
+                }
             }
-        }
-    </form>
+        </form>
+    </CascadingValue>
 </CascadingValue>
-
+<ShowMessagesComponent @ref="showMessages" />
 @code {
     [Parameter, EditorRequired]
     public TreeItemDataModel NodeData { get; set; } = default!;
 
+    [CascadingParameter]
+    public int? Id { get; set; }
+
+    [CascadingParameter]
+    public Action? ReloadPageHandle { get; set; }
+
     public FormContextModel? FormContext;
+    ShowMessagesComponent? showMessages;
 
     protected override void OnInitialized()
     {
         string? _action = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("action", StringComparison.OrdinalIgnoreCase)).Value;
         FormContext = new FormContextModel() { FormAction = new(_action ?? "") };
         base.OnInitialized();
+    }
+
+    void SendForm(string? ext_input_name, string? ext_input_value)
+    {
+        if (FormContext is null)
+        {
+            _snackbar.Add("FormContext is null. Ошибка {54E46BC9-830E-477B-9EFB-9D03B69C0E3F}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(ext_input_name))
+        {
+            if (FormContext.DataContext.ContainsKey(ext_input_name))
+            {
+                if (!string.IsNullOrWhiteSpace(ext_input_value))
+                    FormContext.DataContext[ext_input_name] = ext_input_value;
+                else
+                    FormContext.DataContext.Remove(ext_input_name);
+            }
+            else if (!string.IsNullOrWhiteSpace(ext_input_value))
+            {
+                FormContext.DataContext.Add(ext_input_name, ext_input_value);
+            }
+        }
+        string json = JsonConvert.SerializeObject(FormContext.DataContext);
+        _snackbar.Add($"{FormContext.FormAction} > {json}", Severity.Normal, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        if (Id <= 0)
+            return;
+
+        InvokeAsync(async () =>
+        {
+            if (Id.HasValue)
+            {
+                IsBusyProgress = true;
+                string path_query = string.Join("&", FormContext.DataContext.Select(x => $"{x.Key}={x.Value.ToString()}"));
+                HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardvareGetRequestModel() { HardwareId = Id.Value, Path = $"?{path_query}" });
+                if (!rest.IsSuccess)
+                {
+                    showMessages?.ShowMessages(rest.Messages);
+                    return;
+                }
+
+                if (ReloadPageHandle is not null)
+                {
+                    FormContext?.DataContext.Clear();
+                    ReloadPageHandle();
+                }
+
+                IsBusyProgress = false;
+            }
+        });
+
+        //if (ReloadPageHandle is not null)
+        //{
+        //    FormContext?.DataContext.Clear();
+        //    ReloadPageHandle();
+        //}
     }
 }

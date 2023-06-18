@@ -14,17 +14,9 @@ namespace RazorLib
         public bool IsBusyProgress { get; protected set; } = false;
 
         /// <summary>
-        /// Текущий стиль кнопки в зависимости от состояния: "занят" или "готов"
+        /// Уведомляет компонент об изменении его состояния.
+        /// Когда применимо, это вызовет повторную визуализацию компонента.
         /// </summary>
-        public string ButtonStyle => $"padding:0;margin:0;text-decoration:{(IsBusyProgress ? "none" : "underline")};cursor:{(IsBusyProgress ? "none" : "pointer")};";
-
-        /// <summary>
-        /// Notifies the component that its state has changed. When applicable, this will
-        /// cause the component to be re-rendered.
-        /// </summary>
-        public virtual void StateHasChangedCall()
-        {
-            StateHasChanged();
-        }
+        public virtual void StateHasChangedCall() => StateHasChanged();
     }
 }

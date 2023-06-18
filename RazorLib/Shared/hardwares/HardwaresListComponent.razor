@@ -30,9 +30,15 @@ else
             <MudTh>Ports</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Nr">@(++num_count)</MudTd>
-                <MudTd DataLabel="Sign"><a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/hardware-page/@(context.Id)">@(context.Name)/@(context.Address)</a></MudTd>
-            <MudTd DataLabel="Name">
+            <MudTd DataLabel="#">
+                @(++num_count)
+            </MudTd>
+            <MudTd DataLabel="Name/Address">
+                <a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/hardware-page/@(context.Id)">
+                    @(context.Name) >> @(context.Address)
+                </a>
+            </MudTd>
+            <MudTd DataLabel="Ports">
                 @if (context.Ports?.Any() == true)
                 {
                     foreach (PortHardwareModel port in context.Ports)

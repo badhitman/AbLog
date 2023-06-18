@@ -22,7 +22,7 @@ namespace RazorLib
         /// 
         /// </summary>
         [Parameter, EditorRequired]
-        public string? Html { get; set; }
+        public string? HtmlSource { get; set; }
 
         /// <summary>
         /// 
@@ -34,10 +34,12 @@ namespace RazorLib
         /// </summary>
         protected HashSet<TreeItemDataModel> TreeItems { get; set; } = new HashSet<TreeItemDataModel>();
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Обновляет код разметки, парсит данные (AngleHtml) и вызывает StateHasChanged.
+        /// </summary>
         public void StateHasChangedCall(string? html)
         {
-            Html = html;
+            HtmlSource = html;
             InvokeAsync(async () => await Parse());
             base.StateHasChangedCall();
         }
@@ -52,13 +54,13 @@ namespace RazorLib
         {
             TreeItems.Clear();
             IsBusyProgress = false;
-            Html = Regex.Replace(Html ?? "", @"\s+", " ");
+            HtmlSource = Regex.Replace(HtmlSource ?? "", @"\s+", " ");
             HtmlParser parser = new();
-            Document = await parser.ParseDocumentAsync(Html);
+            Document = await parser.ParseDocumentAsync(HtmlSource);
             if (Document.Body is not null)
                 foreach (INode cn in Document.Body.ChildNodes)
                 {
-                    if ((cn is IText && cn.Text().Trim().Equals("|")) || cn is IHtmlBreakRowElement)
+                    if ((cn is IText && cn.Text().Trim().Equals("|")))
                         continue;
 
                     TreeItemDataModel t = new(cn);
@@ -74,17 +76,14 @@ namespace RazorLib
             IsBusyProgress = false;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected void InjectChilds(ref TreeItemDataModel nd, INodeList nls)
+        void InjectChilds(ref TreeItemDataModel nd, INodeList nls)
         {
             foreach (INode cn in nls)
             {
-                if ((cn is IText && cn.Text().Trim().Equals("|")) || cn is IHtmlBreakRowElement)
+                if ((cn is IText && cn.Text().Trim().Equals("|")))
                     continue;
 
-                TreeItemDataModel t = new(cn);
+                TreeItemDataModel t = new(cn) { Parent = nd };
                 if (cn.ChildNodes.Any())
                 {
                     t.TreeItems = new HashSet<TreeItemDataModel>();

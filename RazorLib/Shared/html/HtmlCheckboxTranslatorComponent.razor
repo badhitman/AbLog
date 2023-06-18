@@ -28,7 +28,7 @@
     }
 
     [Parameter, EditorRequired]
-    public Action<object?, string?> SetValueHandler { get; set; } = default!;
+    public Action<string?, string?> SetValueHandler { get; set; } = default!;
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }

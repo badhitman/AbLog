@@ -1,8 +1,11 @@
 ﻿@using RazorLib.Shared.hardwares
+@using SharedLib.IServices;
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
 
+@inject ClientConfigModel _conf
+@inject IHardwaresService _hardwares
 @inject ISnackbar _snackbar
 
 @switch (NodeData.NodeName)
@@ -23,11 +26,14 @@
 
                 if (string.IsNullOrWhiteSpace(_maxlength))
                 {
-                    <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" />
+                    <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" aria-describedby="@($"{InputName}Help")" />
+                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
+
                 }
                 else
                 {
-                    <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" maxlength="@_maxlength" />
+                    <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" maxlength="@_maxlength" aria-describedby="@($"{InputName}Help")" />
+                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
                 }
 
                 break;
@@ -35,19 +41,22 @@
 
         break;
     case "select":
-        <select @bind="InputValue" name="@InputName" class="form-select">
-            <CascadingValue Value="SetInputValue">
+        <select @bind="InputValue" name="@InputName" class="form-select" aria-describedby="@($"{InputName}Help")">
+            @if (NodeData.TreeItems?.Any() == true)
+            {
+                if (!string.IsNullOrWhiteSpace(InputName) && FormContext?.DataContext.ContainsKey(InputName) != true)
+                    InputValue = GetSelectedOption(NodeData.TreeItems);
                 <CascadingValue Value="InputName" Name="InputName">
-                    @if (NodeData.TreeItems?.Any() == true)
-                    {
-                        foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
+                    <CascadingValue Value="InputValue" Name="InputValue">
+                        @foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
                         {
                             <HtmlSelectOptionsTranslatorComponent NodeData="opt_node" />
                         }
-                    }
+                    </CascadingValue>
                 </CascadingValue>
-            </CascadingValue>
+            }
         </select>
+        <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
         break;
     default:
         <HtmlNodeTranslatorComponent NodeData="NodeData" />
@@ -62,7 +71,13 @@
     public FormContextModel? FormContext { get; set; }
 
     [CascadingParameter]
+    public int? Id { get; set; }
+
+    [CascadingParameter]
     public Action? ReloadPageHandle { get; set; }
+
+    [CascadingParameter]
+    public Action<string?, string?> SendForm { get; set; } = default!;
 
     public InputFormTypesEnum InputFormType { get; private set; } = InputFormTypesEnum.Text;
 
@@ -120,7 +135,27 @@
         base.OnAfterRender(firstRender);
     }
 
-    void SetInputValue(object? val, string? input_name)
+    string? GetSelectedOption(HashSet<TreeItemDataModel> options_or_optgroups)
+    {
+        string? res = "";
+
+        foreach (TreeItemDataModel el in options_or_optgroups)
+        {
+            if (el.Attributes?.Any(x => x.Key.Equals("selected")) == true)
+                return el.Attributes?.FirstOrDefault().Value;
+
+            if (el.TreeItems?.Any() == true)
+            {
+                res = GetSelectedOption(el.TreeItems);
+                if (!string.IsNullOrEmpty(res))
+                    return res;
+            }
+        }
+
+        return res;
+    }
+
+    void SetInputValue(string? val, string? input_name)
     {
         //_snackbar.Add($"[{input_name}={val}]", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         if (string.IsNullOrWhiteSpace(input_name))
@@ -141,39 +176,6 @@
                 FormContext.DataContext[input_name] = val;
             else if (FormContext is not null)
                 FormContext.DataContext.Add(input_name, val);
-        }
-    }
-
-    void SendForm(string? ext_input_name, string? ext_input_value)
-    {
-        if (FormContext is null)
-        {
-            _snackbar.Add("FormContext is null. Ошибка {54E46BC9-830E-477B-9EFB-9D03B69C0E3F}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-            return;
-        }
-
-        if (!string.IsNullOrWhiteSpace(ext_input_name))
-        {
-            if (FormContext.DataContext.ContainsKey(ext_input_name))
-            {
-                if (!string.IsNullOrWhiteSpace(ext_input_value))
-                    FormContext.DataContext[ext_input_name] = ext_input_value;
-                else
-                    FormContext.DataContext.Remove(ext_input_name);
-            }
-            else if (!string.IsNullOrWhiteSpace(ext_input_value))
-            {
-                FormContext.DataContext.Add(ext_input_name, ext_input_value);
-            }
-        }
-
-        string json = JsonConvert.SerializeObject(FormContext.DataContext);
-        _snackbar.Add($"{FormContext.FormAction} > {json}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-
-        if (ReloadPageHandle is not null)
-        {
-            FormContext?.DataContext.Clear();
-            ReloadPageHandle();
         }
     }
 }
