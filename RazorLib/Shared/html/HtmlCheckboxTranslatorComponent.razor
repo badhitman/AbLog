@@ -5,7 +5,7 @@
 
 @inject ISnackbar _snackbar
 
-<input type="checkbox" value="@InputValue" name="@InputName" @onchange="CheckboxChange" class="form-check-input" />
+<input type="checkbox" @bind="IsChecked" class="form-check-input" />
 
 @code {
     [Parameter, EditorRequired]
@@ -15,21 +15,21 @@
     public string? InputValue { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public bool IsChecked { get; set; }
+    public bool IsChecked
+    {
+        set
+        {
+            SetValueHandler((value ? InputValue : null), InputName);
+        }
+        get
+        {
+            return FormContext?.DataContext.ContainsKey(InputName) == true;
+        }
+    }
+
+    [Parameter, EditorRequired]
+    public Action<object?, string?> SetValueHandler { get; set; } = default!;
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }
-
-    [CascadingParameter]
-    public Action? ReloadPageHandle { get; set; }
-
-    void CheckboxChange(ChangeEventArgs _ea)
-    {
-        _snackbar.Add($"checkbox: {_ea.Value}", Severity.Normal, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-    }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
 }

@@ -32,11 +32,21 @@ namespace ServerLib
             if (!db_hw.Address.StartsWith("http"))
                 db_hw.Address = $"http://{db_hw.Address}";
 
+            if (req.Path?.StartsWith("/") == true)
+                req.Path = req.Path[1..];
+
             try
             {
                 using HttpClient client = new();
                 client.BaseAddress = new Uri(db_hw.Address);
-                HttpResponseMessage response = await client.GetAsync(string.IsNullOrWhiteSpace(req.Path) ? db_hw.Password : req.Path);
+                string uri_path = string.IsNullOrWhiteSpace(req.Path)
+                    ? db_hw.Password
+                    : req.Path;
+
+                if (!uri_path.StartsWith(db_hw.Password))
+                    uri_path = $"{db_hw.Password}/{uri_path}";
+
+                HttpResponseMessage response = await client.GetAsync(uri_path);
                 return new()
                 {
                     StatusCode = response.StatusCode,

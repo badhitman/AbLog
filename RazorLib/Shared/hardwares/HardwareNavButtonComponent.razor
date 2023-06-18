@@ -48,6 +48,9 @@ else
     [CascadingParameter, EditorRequired]
     public int Id { get; set; }
 
+    [CascadingParameter]
+    public FormContextModel? FormContext { get; set; }
+
     bool IsExpand = false;
     ShowMessagesComponent? showMessages;
     string? html;

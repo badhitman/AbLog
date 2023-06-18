@@ -1,4 +1,5 @@
-﻿@using RazorLib.Shared.hardwares
+﻿@using System.Text.RegularExpressions;
+@using RazorLib.Shared.hardwares
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
@@ -8,10 +9,39 @@
 @switch (NodeData.NodeName)
 {
     case "a":
-        string? href = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
-        if (Uri.TryCreate(href, UriKind.Relative, out Uri? _uri) && NodeData.Text?.Equals("Back", StringComparison.OrdinalIgnoreCase) != true)
+        if (NodeData.Text?.Equals("Back", StringComparison.OrdinalIgnoreCase) != true)
         {
-            <HardwareNavButtonComponent NavHref="@href" Text="@NodeData.Text" />
+            string? href = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
+            if (Uri.TryCreate(href, UriKind.Relative, out Uri? _uri))
+            {
+                string ext_href = href.Contains("?")
+                    ? href[(href.IndexOf("?") + 1)..].ToLower()
+                    : href.ToLower();
+                System.Collections.Specialized.NameValueCollection parsed_url = System.Web.HttpUtility.ParseQueryString(ext_href);
+                string? cmd = parsed_url.Get("cmd");
+                if (!string.IsNullOrEmpty(cmd))
+                {
+                    Match match_cmd = cmd_on_off.Match(cmd);
+                    if (match_cmd.Success)
+                    {
+                        <HardwarePortToggleComponent BtnText="@NodeData.Text" PortNum="@(byte.Parse(match_cmd.Groups["port_num"].Value))" PortState="@(byte.Parse(match_cmd.Groups["port_state"].Value))" />
+                    }
+                    else
+                    {
+                        <HardwareNavButtonComponent NavHref="@(_uri.OriginalString)" Text="@NodeData.Text" />
+                    }
+                }
+                else
+                {
+                    <HardwareNavButtonComponent NavHref="@(_uri.OriginalString)" Text="@NodeData.Text" />
+                }
+
+            }
+            else if (Uri.TryCreate(href, UriKind.Absolute, out _uri))
+            {
+                System.Collections.Specialized.NameValueCollection parsed_url = System.Web.HttpUtility.ParseQueryString(href);
+                <a target="_blank" class="link-body-emphasis text-center" href="@href">@NodeData.Text</a>
+            }
         }
         break;
     case "br":
@@ -20,6 +50,9 @@
     case "form":
         <HtmlFormTranslatorComponent NodeData="NodeData" />
         break;
+    case "#text":
+        <span class="text-center">@(NodeData.Text)</span>
+        break;
     default:
         if (input_tags.Contains(NodeData.NodeName))
         {
@@ -27,7 +60,7 @@
         }
         else
         {
-            <div title="Не опознанный тип узла DOM (код ошибки: {6055A7E3-A10D-4CAF-84DF-AD944B7CD98D})" class="badge text-bg-warning">
+            <div title="Не опознанный тип узла DOM @(NodeData.NodeName) (код ошибки: {6055A7E3-A10D-4CAF-84DF-AD944B7CD98D})" class="badge text-bg-warning">
                 @NodeData.Title
                 @if (NodeData.TreeItems?.Any() == true)
                 {
@@ -46,4 +79,6 @@
     public TreeItemDataModel NodeData { get; set; } = default!;
 
     static string[] input_tags = new string[] { "input", "select" };
+
+    static Regex cmd_on_off = new Regex(@"(?<port_num>\d+):(?<port_state>\d+)", RegexOptions.Compiled);
 }

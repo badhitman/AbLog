@@ -4,13 +4,9 @@
 @using SharedLib;
 
 @inject ISnackbar _snackbar
-@{
-    string? _action = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("action", StringComparison.OrdinalIgnoreCase)).Value;
-    FormContext = new FormContextModel() { FormAction = new(_action ?? "") };
-}
 
 <CascadingValue Value="@FormContext">
-    <form>
+    <form class="alert alert-info m-3" role="alert">
         <h4>@NodeData.Text</h4>
         @if (NodeData.TreeItems?.Any() == true)
         {
@@ -27,4 +23,11 @@
     public TreeItemDataModel NodeData { get; set; } = default!;
 
     public FormContextModel? FormContext;
+
+    protected override void OnInitialized()
+    {
+        string? _action = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("action", StringComparison.OrdinalIgnoreCase)).Value;
+        FormContext = new FormContextModel() { FormAction = new(_action ?? "") };
+        base.OnInitialized();
+    }
 }

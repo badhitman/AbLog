@@ -23,6 +23,11 @@
         /// <summary>
         /// 
         /// </summary>
-        Submit
+        Submit,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Password
     }
 }
