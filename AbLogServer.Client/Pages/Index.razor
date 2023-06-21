@@ -1,9 +1,24 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@using RazorLib.Shared.settings
 
-<h1>Hello, world!</h1>
+<PageTitle>Настройки</PageTitle>
 
-Welcome to your new app.
+<h1>Настройка приложения</h1>
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="MQTT">
+        <MqttConfigComponent />
+    </MudTabPanel>
+    <MudTabPanel Text="Email">
+        <EmailConfigComponent />
+    </MudTabPanel>
+    <MudTabPanel Text="Telegram bot">
+        <TelegramBotConfigComponent />
+    </MudTabPanel>
+    <MudTabPanel Text="About">
+        <span>Разное ...</span>
+    </MudTabPanel>
+</MudTabs>
 
 

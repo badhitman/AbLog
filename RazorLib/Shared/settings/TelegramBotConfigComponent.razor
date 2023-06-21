@@ -1,0 +1,82 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Интерактивный доступ</h5>
+        <hr />
+        <form>
+            <div class="mb-3">
+                <label for="exampleInputToken" class="form-label">Сервер</label>
+                <input type="text" class="form-control" id="exampleInputToken" aria-describedby="tokenHelp">
+                <div id="tokenHelp" class="form-text">Токен TelegramBot</div>
+            </div>
+            <MudTable ServerData="@(new Func<TableState, Task<TableData<TelegramUserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Пользователи Telegram</MudText>
+                    <MudSpacer />
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Id</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>UserName</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Id">@context.Id</MudTd>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="UserName">@context.UserName</MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>No matching records found</MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Loading...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
+                    <button type="button" class="btn btn-outline-primary">Сохранить</button>
+                    <button type="button" class="btn btn-outline-primary">Отмена</button>
+                </div>
+                @*<button class="btn btn-primary me-md-2" type="button">Button</button>*@
+                <button class="btn btn-primary" type="button">Проверка токена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<TelegramUserModelDB>? pagedData;
+    private MudTable<TelegramUserModelDB>? table;
+
+    private int totalItems;
+    private string? searchString = null;
+
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private async Task<TableData<TelegramUserModelDB>> ServerReload(TableState state)
+    {
+        IEnumerable<TelegramUserModelDB> data = new List<TelegramUserModelDB>()
+                    {
+                        new TelegramUserModelDB() { Id=1, Name="user 1", UserName="UserName_1" },
+                        new TelegramUserModelDB() { Id=2, Name="user 2", UserName="UserName_2" },
+                        new TelegramUserModelDB() { Id=3, Name="user 3", UserName="UserName_3" }
+                    };
+
+        totalItems = data.Count();
+
+        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<TelegramUserModelDB>() { TotalItems = totalItems, Items = pagedData };
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table?.ReloadServerData();
+    }
+}

@@ -1,0 +1,34 @@
+﻿<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Исходящая почта для отправки системных уведомлений клиенту</h5>
+        <hr />
+        <form>
+            <div class="mb-3">
+                <label for="exampleInputServer" class="form-label">Сервер</label>
+                <input type="text" class="form-control" id="exampleInputServer" aria-describedby="serverHelp">
+                <div id="serverHelp" class="form-text">Адрес сервера SMTP</div>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputLogin" class="form-label">Логин</label>
+                <input type="text" class="form-control" id="exampleInputLogin" aria-describedby="loginHelp">
+                <div id="loginHelp" class="form-text">Имя пользователя для авторизации на сервере SMTP.</div>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword" class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="exampleInputPassword">
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
+                    <button type="button" class="btn btn-outline-primary">Сохранить</button>
+                    <button type="button" class="btn btn-outline-primary">Отмена</button>
+                </div>
+                @*<button class="btn btn-primary me-md-2" type="button">Button</button>*@
+                <button class="btn btn-primary" type="button">Тест подключения</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@code {
+
+}

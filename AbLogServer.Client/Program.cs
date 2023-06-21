@@ -24,8 +24,8 @@ namespace AbLog
             };
             builder.Services.AddScoped(sp => http);
 
-            using var conf_response = await http.GetAsync("conf.json");
-            using var conf_stream = await conf_response.Content.ReadAsStreamAsync();
+            using HttpResponseMessage conf_response = await http.GetAsync("conf.json");
+            using Stream conf_stream = await conf_response.Content.ReadAsStreamAsync();
             builder.Configuration.AddJsonStream(conf_stream);
 
             ClientConfigModel settings = new();

@@ -8,7 +8,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">@(IsShort ? "AB" : "AB-Log RC")</a>
+        <a class="navbar-brand" href="">@(IsShort ? "AB" : "AB-Log Srv")</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -17,24 +17,19 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav id="main-left-menu" class="flex-column">
-        <div class="nav-item px-3">
+        <div class="nav-item px-3" title="Home page">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> @(IsShort ? "" : "Home")
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/hardwares">
+            <NavLink class="nav-link" href="/hardwares-page">
                 <span class="oi oi-puzzle-piece" aria-hidden="true"></span> @(IsShort ? "" : "Устройства")
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/scripts">
-                <span class="oi oi-script" aria-hidden="true"></span> @(IsShort ? "" : "Скрипты")
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/triggers">
-                <span class="oi oi-pulse" aria-hidden="true"></span> @(IsShort ? "" : "Тригеры")
+            <NavLink class="nav-link" href="/cameras-page">
+                <span class="oi oi-camera-slr" aria-hidden="true"></span> @(IsShort ? "" : "Камеры")
             </NavLink>
         </div>
     </nav>
@@ -87,8 +82,11 @@
         {
             IsShort = false;
             _js_runtime.InvokeVoidAsync("tooltipeHide");
-            StateHasChanged();
-            ModeChangeHandle();
+            InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                    ModeChangeHandle();
+                });
         }
     }
 
@@ -114,8 +112,11 @@
             {
                 timer?.Dispose();
                 IsShort = true;
-                StateHasChanged();
-                ModeChangeHandle();
+                InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                    ModeChangeHandle();
+                });
             }
         }
     }
