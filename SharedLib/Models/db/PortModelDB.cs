@@ -25,11 +25,11 @@ namespace SharedLib
             string port_name;
             if (string.IsNullOrWhiteSpace(Name))
             {
-                port_name = $"P{PortNumb}";
+                port_name = $"P{PortNum}";
             }
             else
             {
-                port_name = $"{Name} (P{PortNumb})";
+                port_name = $"{Name} (P{PortNum})";
             }
             return port_name;
         }

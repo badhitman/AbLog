@@ -22,5 +22,5 @@
     [Parameter, EditorRequired]
     public string? HtmlSource { get; set; }
 
-    public HtmlRootTranslatorComponent? refHtmlRoot;
+    public HtmlRootTranslatorComponent? refHtmlRoot { get; private set; }
 }

@@ -10,6 +10,23 @@ namespace SharedLib
     public class HardwareModelDB : HardwareBaseModel
     {
         /// <summary>
+        /// Управляющий блок (устройство)
+        /// </summary>
+        public HardwareModelDB() { }
+
+        /// <summary>
+        /// Управляющий блок (устройство)
+        /// </summary>
+        public HardwareModelDB(HardwareBaseModel hardware)
+        {
+            Name = hardware.Name;
+            Address = hardware.Address;
+            Password = hardware.Password;
+            AlarmSubscriber = hardware.AlarmSubscriber;
+            CommandsAllowed = hardware.CommandsAllowed;
+        }
+
+        /// <summary>
         /// Порты устройства
         /// </summary>
         public List<PortModelDB>? Ports { get; set; }

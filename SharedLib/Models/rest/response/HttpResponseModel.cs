@@ -10,16 +10,14 @@ namespace SharedLib
         /// <summary>
         /// Ответ/результат на HTTP запрос
         /// </summary>
-        public HttpResponseModel(ResponseBaseModel responseBaseModel)
-        {
-            Messages = responseBaseModel.Messages;
-        }
+        public HttpResponseModel() { }
 
         /// <summary>
         /// Ответ/результат на HTTP запрос
         /// </summary>
-        public HttpResponseModel()
+        public HttpResponseModel(ResponseBaseModel responseBaseModel)
         {
+            Messages = responseBaseModel.Messages;
         }
 
         /// <inheritdoc/>

@@ -133,11 +133,11 @@ namespace ab.context
 
                 for (int i = 1; i <= 38; i++)
                 {
-                    Ports.AddRange(new PortModelDB() { HardwareId = 1, PortNumb = i });
+                    Ports.AddRange(new PortModelDB() { HardwareId = 1, PortNum = i });
                 }
                 for (int i = 1; i <= 38; i++)
                 {
-                    Ports.AddRange(new PortModelDB() { HardwareId = 2, PortNumb = i });
+                    Ports.AddRange(new PortModelDB() { HardwareId = 2, PortNum = i });
                 }
 
                 SaveChanges();

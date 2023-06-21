@@ -48,6 +48,18 @@ namespace AbLogServer.Controllers
         public async Task<HardwareResponseModel> HardwareGet(int hardware_id) => await _hardwares_service.HardwareGet(hardware_id);
 
         /// <summary>
+        /// Удалить устройство
+        /// </summary>
+        [HttpDelete("{hardware_id}")]
+        public async Task<ResponseBaseModel> HardwareDelete(int hardware_id) => await _hardwares_service.HardwareDelete(hardware_id);
+
+        /// <summary>
+        /// Обновить/создать устройство (управляющий блок/контроллер)
+        /// </summary>
+        [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
+        public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware) => await _hardwares_service.HardwareUpdate(hardware);
+
+        /// <summary>
         /// Порт контроллера
         /// </summary>
         [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
@@ -58,5 +70,17 @@ namespace AbLogServer.Controllers
         /// </summary>
         [HttpPost($"{GlobalStatic.HttpRoutes.HTML}/{GlobalStatic.HttpRoutes.MAIN}")]
         public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req) => await _hardwares_service.GetHardwareHtmlPage(req);
+
+        /// <summary>
+        /// Запрос/проверка порта устройства
+        /// </summary>
+        [HttpPost($"{GlobalStatic.HttpRoutes.Ports}/{GlobalStatic.HttpRoutes.CHECK}")]
+        public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req) => await _hardwares_service.CheckPortHardware(req);
+
+        /// <summary>
+        /// Установить имя порта
+        /// </summary>
+        [HttpPost($"{GlobalStatic.HttpRoutes.Ports}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name) => await _hardwares_service.SetNamePort(port_id_name);
     }
 }

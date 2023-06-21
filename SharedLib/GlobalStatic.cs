@@ -230,7 +230,10 @@ namespace SharedLib
             /// 
             /// </summary>
             public const string Hardwares = "hardwares";
-
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string Cameras = "cameras";
             /// <summary>
             /// 
             /// </summary>
@@ -304,6 +307,11 @@ namespace SharedLib
             /// main
             /// </summary>
             public const string MAIN = "main";
+
+            /// <summary>
+            /// check
+            /// </summary>
+            public const string CHECK = "check";
 
             #region ParametersStorage
 

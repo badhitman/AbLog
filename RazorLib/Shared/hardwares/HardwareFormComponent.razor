@@ -5,6 +5,7 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject IHardwaresService _hardwares
+@inject NavigationManager _nav
 
 @if (IsBusyProgress)
 {
@@ -20,7 +21,10 @@ else if (hw is null)
 }
 else
 {
-    <form>
+    <EditForm Model="hw" OnValidSubmit="OnValidSubmitHandle">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
         <div class="mb-3">
             <label for="exampleInputName" class="form-label">Имя</label>
             <input @bind-value="hw.Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp">
@@ -51,18 +55,72 @@ else
                 <label class="form-check-label" for="inlineCheckboxCommandsAllowed">Команды</label>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-    </form>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            @if (hw.Id > 0)
+            {
+                <div class="btn-group me-md-2" role="group" aria-label="Basic example">
+                    <button @onclick="InitDeleteAsync" class="btn btn-@(InitDelete?"":"outline-")danger" type="button">@(InitDelete ? "Подтвердить удаление" : "Удалить")</button>
+                    @if (InitDelete)
+                    {
+                        <button @onclick="() => InitDelete = false" class="btn btn-outline-warning" type="button">Отменить удаление</button>
+                    }
+                </div>
+            }
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+    </EditForm>
 }
 <ShowMessagesComponent @ref="showMessages" />
 @code {
-    [CascadingParameter, EditorRequired]
+    [CascadingParameter]
     public int Id { get; set; }
+
+    [Parameter]
+    public Action? UpdateFormEvent { get; set; }
+
+    async Task InitDeleteAsync()
+    {
+        if (!InitDelete)
+        {
+            InitDelete = true;
+            return;
+        }
+
+        IsBusyProgress = true;
+        ResponseBaseModel rest = await _hardwares.HardwareDelete(Id);
+        if (!rest.IsSuccess)
+        {
+            showMessages?.ShowMessages(rest.Messages);
+            IsBusyProgress = false;
+            return;
+        }
+
+        _nav.NavigateTo("/hardwares-page");
+    }
+
+    bool InitDelete = false;
 
     bool ShowPass = false;
 
-    HardwareModel? hw;
+    HardwareBaseModel hw = new();
     ShowMessagesComponent? showMessages;
+
+    async Task OnValidSubmitHandle()
+    {
+        IsBusyProgress = true;
+        HardwareResponseModel rest = await _hardwares.HardwareUpdate(hw);
+        if (!rest.IsSuccess || rest.Hardware is null)
+        {
+            showMessages?.ShowMessages(rest.Messages);
+            IsBusyProgress = false;
+            return;
+        }
+
+        hw = rest.Hardware;
+        IsBusyProgress = false;
+        if (UpdateFormEvent is not null)
+            UpdateFormEvent();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,7 +130,7 @@ else
         IsBusyProgress = true;
         HardwareResponseModel rest = await _hardwares.HardwareGet(Id);
 
-        if (!rest.IsSuccess)
+        if (!rest.IsSuccess || rest.Hardware is null)
         {
             showMessages?.ShowMessages(rest.Messages);
             return;

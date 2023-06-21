@@ -25,7 +25,7 @@ namespace SharedLib
             AlarmSubscriber = v.AlarmSubscriber;
             CommandsAllowed = v.CommandsAllowed;
             Password = v.Password;
-            Ports = v.Ports?.Select(p => new PortHardwareModel(p)).ToList();
+            Ports = v.Ports?.Select(p => new PortHardwareModel(p)).OrderBy(x => x.PortNum).ToList();
         }
 
         /// <summary>

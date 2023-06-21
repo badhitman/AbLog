@@ -12,6 +12,6 @@ namespace SharedLib
         /// <summary>
         /// Номер порта
         /// </summary>
-        public int PortNumb { get; set; }
+        public int PortNum { get; set; }
     }
 }

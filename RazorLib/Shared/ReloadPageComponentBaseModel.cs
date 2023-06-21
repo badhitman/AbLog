@@ -3,6 +3,7 @@ using RazorLib.Shared.hardwares;
 using SharedLib.IServices;
 using RazorLib.Shared;
 using SharedLib;
+using MudBlazor;
 
 namespace RazorLib
 {
@@ -16,6 +17,12 @@ namespace RazorLib
         /// </summary>
         [Inject]
         protected IHardwaresService _hardwares { get; set; } = default!;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Inject]
+        protected ISnackbar _snackbar { get; set; } = default!;
 
         /// <summary>
         /// 
@@ -69,6 +76,8 @@ namespace RazorLib
             if (!rest.IsSuccess)
             {
                 showMessages?.ShowMessages(rest.Messages);
+                IsBusyProgress = false;
+                StateHasChanged();
                 return;
             }
 

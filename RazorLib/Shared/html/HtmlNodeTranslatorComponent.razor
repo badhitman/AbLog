@@ -3,45 +3,45 @@
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
+@using System.Web;
 
 @inject ISnackbar _snackbar
 
 @switch (NodeData.NodeName)
 {
     case "a":
-        if (NodeData.Text?.Equals("Back", StringComparison.OrdinalIgnoreCase) != true)
+        if (NodeData.Text?.Equals("Back", StringComparison.OrdinalIgnoreCase) == true)
+            break;
+
+        string? href = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
+        if (Uri.TryCreate(href, UriKind.Relative, out Uri? _uri))
         {
-            string? href = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
-            if (Uri.TryCreate(href, UriKind.Relative, out Uri? _uri))
+            string ext_href = href.Contains("?")
+                ? href[(href.IndexOf("?") + 1)..].ToLower()
+                : href.ToLower();
+            System.Collections.Specialized.NameValueCollection parsed_url = HttpUtility.ParseQueryString(ext_href);
+            string? cmd = parsed_url.Get("cmd");
+            if (!string.IsNullOrEmpty(cmd))
             {
-                string ext_href = href.Contains("?")
-                    ? href[(href.IndexOf("?") + 1)..].ToLower()
-                    : href.ToLower();
-                System.Collections.Specialized.NameValueCollection parsed_url = System.Web.HttpUtility.ParseQueryString(ext_href);
-                string? cmd = parsed_url.Get("cmd");
-                if (!string.IsNullOrEmpty(cmd))
+                Match match_cmd = cmd_on_off.Match(cmd);
+                if (match_cmd.Success)
                 {
-                    Match match_cmd = cmd_on_off.Match(cmd);
-                    if (match_cmd.Success)
-                    {
-                        <HardwarePortToggleComponent BtnText="@NodeData.Text" PortNum="@(byte.Parse(match_cmd.Groups["port_num"].Value))" PortState="@(byte.Parse(match_cmd.Groups["port_state"].Value))" />
-                    }
-                    else
-                    {
-                        <HardwareNavButtonComponent PagePath="@(_uri.OriginalString)" Text="@NodeData.Text" />
-                    }
+                    <HardwarePortToggleComponent BtnText="@NodeData.Text" PortNum="@(byte.Parse(match_cmd.Groups["port_num"].Value))" PortState="@(byte.Parse(match_cmd.Groups["port_state"].Value))" />
                 }
                 else
                 {
                     <HardwareNavButtonComponent PagePath="@(_uri.OriginalString)" Text="@NodeData.Text" />
                 }
-
             }
-            else if (Uri.TryCreate(href, UriKind.Absolute, out _uri))
+            else
             {
-                System.Collections.Specialized.NameValueCollection parsed_url = System.Web.HttpUtility.ParseQueryString(href);
-                <a target="_blank" class="link-body-emphasis text-center" href="@href">@NodeData.Text</a>
+                <HardwareNavButtonComponent PagePath="@(_uri.OriginalString)" Text="@NodeData.Text" />
             }
+        }
+        else if (Uri.TryCreate(href, UriKind.Absolute, out _uri))
+        {
+            System.Collections.Specialized.NameValueCollection parsed_url = HttpUtility.ParseQueryString(href);
+            <a target="_blank" class="link-body-emphasis text-center" href="@href">@NodeData.Text</a>
         }
         break;
     case "br":

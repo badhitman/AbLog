@@ -3,6 +3,7 @@ using SharedLib.IServices;
 using ab.context;
 using SharedLib;
 using System.Net;
+using Org.BouncyCastle.Ocsp;
 
 namespace ServerLib
 {
@@ -45,12 +46,24 @@ namespace ServerLib
 
                 if (!uri_path.StartsWith(db_hw.Password))
                     uri_path = $"{db_hw.Password}/{uri_path}";
-
-                HttpResponseMessage response = await client.GetAsync(uri_path);
+                CancellationToken ct = new CancellationTokenSource(2000).Token;
+                HttpResponseMessage response = await client.GetAsync(uri_path, ct);
                 return new()
                 {
                     StatusCode = response.StatusCode,
                     TextPayload = await response.Content.ReadAsStringAsync()
+                };
+            }
+            catch (TaskCanceledException tcex)
+            {
+                return new()
+                {
+                    StatusCode = HttpStatusCode.RequestTimeout,
+                    Messages = new List<ResultMessage>()
+                    {
+                        new ResultMessage() { TypeMessage = ResultTypeEnum.Warning, Text = $"Контроллер [{db_hw.Address}] недоступен" },
+                        new ResultMessage() { TypeMessage = ResultTypeEnum.Error, Text = tcex.Message }
+                    }
                 };
             }
             catch (Exception ex)
@@ -71,7 +84,7 @@ namespace ServerLib
             lock (ServerContext.DbLocker)
             {
                 using ServerContext db = new();
-                HardwareModelDB? db_hw = db.Hardwares.Include(x => x.Ports).FirstOrDefault(x => x.Id == hardware_id);
+                HardwareModelDB? db_hw = db.Hardwares.FirstOrDefault(x => x.Id == hardware_id);
                 if (db_hw is null)
                 {
                     res_hw.AddError("Ошибка выполнения запроса: {771C7F32-36A7-4EC8-9F6C-7ED48D6FA99B}");
@@ -138,7 +151,7 @@ namespace ServerLib
                 using ServerContext db = new();
 
                 res_tree_hw.Entries = db.Ports.Include(x => x.Hardware)
-                    .Select(x => new { port_id = x.Id, port_num = x.PortNumb, hw_id = x.HardwareId, hw_name = x.Hardware!.Name, hw_address = x.Hardware.Address })
+                    .Select(x => new { port_id = x.Id, port_num = x.PortNum, hw_id = x.HardwareId, hw_name = x.Hardware!.Name, hw_address = x.Hardware.Address })
                     .AsEnumerable()
                     .GroupBy(x => x.hw_id)
                     .Select(x =>
@@ -155,6 +168,143 @@ namespace ServerLib
                     .ToArray();
             }
             return Task.FromResult(res_tree_hw);
+        }
+
+        /// <inheritdoc/>
+        public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req)
+        {
+            EntriyResponseModel res = new();
+            if (req.HardwareId <= 0 || req.PortNum < 0)
+            {
+                res.AddError("Ошибка запроса. req.HardwareId <= 0 || req.PortNum < 0. error: {C36DDFD8-4E87-4780-9F1F-0693FBD82F00}");
+                return Task.FromResult(res);
+            }
+            PortModelDB? port_db;
+            lock (ServerContext.DbLocker)
+            {
+                using ServerContext db = new();
+                port_db = db.Ports.FirstOrDefault(x => x.HardwareId == req.HardwareId && x.PortNum == req.PortNum);
+                if (port_db is null)
+                {
+                    if (!req.CreatePortIfNoptExist)
+                    {
+                        res.AddError("Ошибка. port_db is null && !req.CreatePortIfNoptExist. error: {0CBA4187-D799-481F-BAD9-D06E3D20E068}");
+                        return Task.FromResult(res);
+                    }
+                    port_db = new PortModelDB() { HardwareId = req.HardwareId, PortNum = req.PortNum, Name = $"№ {req.PortNum}" };
+                    db.Add(port_db);
+                    db.SaveChanges();
+                    res.AddInfo("Порт создан");
+                }
+                res.Entry = new EntryModel() { Id = port_db.Id, Name = port_db.Name };
+            }
+            return Task.FromResult(res);
+        }
+
+        /// <inheritdoc/>
+        public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware)
+        {
+            HardwareResponseModel res = new();
+
+            if (string.IsNullOrWhiteSpace(hardware.Address) || string.IsNullOrWhiteSpace(hardware.Password))
+            {
+                res.AddError("string.IsNullOrWhiteSpace(hardware.Name) || string.IsNullOrWhiteSpace(hardware.Address) || string.IsNullOrWhiteSpace(hardware.Password). error {2417D629-D6E5-4499-80DA-F4B7AEF79F77}");
+                return Task.FromResult(res);
+            }
+
+            hardware.Name = hardware.Name.Trim();
+
+            hardware.Address = hardware.Address.Trim();
+            hardware.Password = hardware.Password.Trim();
+
+            HardwareModelDB? db_hw;
+            lock (ServerContext.DbLocker)
+            {
+                using ServerContext db = new();
+
+                db_hw = db.Hardwares.FirstOrDefault(x => x.Id != hardware.Id && x.Address == hardware.Address);
+                if (db_hw is not null)
+                {
+                    res.AddError("устройство с таким адресом уже существует. error {1389FAB4-76E4-4BC9-A5B3-569CD5068388}");
+                    return Task.FromResult(res);
+                }
+
+                if (hardware.Id > 0)
+                {
+                    db_hw = db.Hardwares.FirstOrDefault(x => x.Id == hardware.Id);
+                    if (db_hw is null)
+                    {
+                        res.AddError("db_hw is null. error {08810FA6-75F3-4C85-90D2-F0205ED40053}");
+                        return Task.FromResult(res);
+                    }
+
+                    db_hw.Name = hardware.Name;
+                    db_hw.Address = hardware.Address;
+                    db_hw.Password = hardware.Password;
+                    db_hw.AlarmSubscriber = hardware.AlarmSubscriber;
+                    db_hw.CommandsAllowed = hardware.CommandsAllowed;
+                    db.Update(db_hw);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    db_hw = new(hardware);
+                    db.Add(db_hw);
+                    db.SaveChanges();
+                }
+            }
+            res.Hardware = new(db_hw!);
+
+            return Task.FromResult(res);
+        }
+
+        /// <inheritdoc/>
+        public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name)
+        {
+            ResponseBaseModel res = new();
+            if (port_id_name.Id < 0 || string.IsNullOrWhiteSpace(port_id_name.Name))
+            {
+                res.AddError("Ошибка запроса. port_id_name.Id < 0 || string.IsNullOrWhiteSpace(port_id_name.Name). error: {FCA9D7C3-10E5-4DEC-B43E-E252B88CBB77}");
+                return Task.FromResult(res);
+            }
+            PortModelDB? port_db;
+            lock (ServerContext.DbLocker)
+            {
+                using ServerContext db = new();
+                port_db = db.Ports.FirstOrDefault(x => x.Id == port_id_name.Id);
+                if (port_db is null)
+                {
+                    res.AddError("Порт не найден. error: {8EDBCFD6-1FDD-4D1A-B411-4D0968F60515}");
+                    return Task.FromResult(res);
+                }
+                port_db.Name = port_id_name.Name;
+                db.Update(port_db);
+                db.SaveChanges();
+                res.AddSuccess("Порт обновлён");
+            }
+            return Task.FromResult(res);
+        }
+
+        /// <inheritdoc/>
+        public Task<ResponseBaseModel> HardwareDelete(int hardware_id)
+        {
+            ResponseBaseModel res = new();
+            HardwareModelDB? hw_db;
+            lock (ServerContext.DbLocker)
+            {
+                using ServerContext db = new();
+                hw_db = db.Hardwares.FirstOrDefault(x => x.Id == hardware_id);
+                if (hw_db is null)
+                {
+                    res.AddError("Устройство не найдено. error: {FC7CDDB7-6669-4FAE-A3B8-8793FECE83F3}");
+                    return Task.FromResult(res);
+                }
+
+                db.Remove(hw_db);
+                db.SaveChanges();
+                res.AddSuccess("Устройство удалено");
+            }
+            return Task.FromResult(res);
         }
     }
 }

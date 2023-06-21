@@ -20,7 +20,7 @@ namespace SharedLib
         public PortHardwareModel(PortModelDB db_port)
         {
             Id = db_port.Id;
-            PortNumb = db_port.PortNumb;
+            PortNum = db_port.PortNum;
             Name = db_port.Name;
             Hardware = new EntryModel() { Id = db_port.Hardware!.Id, Name = db_port.Hardware.Name };
         }

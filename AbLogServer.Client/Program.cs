@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.Web;
+using SharedLib.IServices;
 using MudBlazor.Services;
 using BlazorLib;
 using SharedLib;
+using RazorLib;
 using ABLog;
 using Refit;
-using SharedLib.IServices;
-using RazorLib;
-using Newtonsoft.Json;
 
 namespace AbLog
 {
@@ -29,7 +28,7 @@ namespace AbLog
             using var conf_stream = await conf_response.Content.ReadAsStreamAsync();
             builder.Configuration.AddJsonStream(conf_stream);
 
-            ClientConfigModel settings = new ();
+            ClientConfigModel settings = new();
             builder.Configuration.Bind(settings);
             builder.Services.AddSingleton(settings);
 
@@ -48,6 +47,8 @@ namespace AbLog
             builder.Services.AddRefitClient<IRefitStorageService>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
             builder.Services.AddRefitClient<IRefitTriggersService>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitCamerasService>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
             builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRefitService>();

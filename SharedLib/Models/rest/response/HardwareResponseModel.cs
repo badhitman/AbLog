@@ -8,6 +8,6 @@
         /// <summary>
         /// Устройство
         /// </summary>
-        public HardwareModel? Hardware { get; set; }
+        public HardwareBaseModel? Hardware { get; set; }
     }
 }

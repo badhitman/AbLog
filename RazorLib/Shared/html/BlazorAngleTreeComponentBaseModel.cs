@@ -60,7 +60,7 @@ namespace RazorLib
             if (Document.Body is not null)
                 foreach (INode cn in Document.Body.ChildNodes)
                 {
-                    if ((cn is IText && cn.Text().Trim().Equals("|")))
+                    if ((cn is IText && cn.Text().Trim().Equals("|")) || (cn is IHtmlAnchorElement && cn.Text().Trim().Equals("Back", StringComparison.OrdinalIgnoreCase)))
                         continue;
 
                     TreeItemDataModel t = new(cn);
@@ -73,6 +73,10 @@ namespace RazorLib
 
                     TreeItems.Add(t);
                 }
+
+            while (TreeItems.FirstOrDefault()?.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
+                TreeItems.Remove(TreeItems.First());
+
             IsBusyProgress = false;
         }
 
@@ -80,7 +84,7 @@ namespace RazorLib
         {
             foreach (INode cn in nls)
             {
-                if ((cn is IText && cn.Text().Trim().Equals("|")))
+                if ((cn is IText && cn.Text().Trim().Equals("|")) || (cn is IHtmlAnchorElement && cn.Text().Trim().Equals("Back", StringComparison.OrdinalIgnoreCase)))
                     continue;
 
                 TreeItemDataModel t = new(cn) { Parent = nd };
@@ -91,6 +95,8 @@ namespace RazorLib
                 }
                 nd.TreeItems!.Add(t);
             }
+            while (nd.TreeItems?.FirstOrDefault()?.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
+                nd.TreeItems.Remove(nd.TreeItems.First());
         }
     }
 }

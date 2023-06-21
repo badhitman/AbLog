@@ -36,6 +36,18 @@ namespace BlazorLib
         public Task<ApiResponse<HardwareResponseModel>> HardwareGet(int hardware_id);
 
         /// <summary>
+        /// Удалить устройство
+        /// </summary>
+        [Delete($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{{hardware_id}}")]
+        public Task<ApiResponse<ResponseBaseModel>> HardwareDelete(int hardware_id);
+
+        /// <summary>
+        /// Обновить/создать устройство (управляющий блок/контроллер)
+        /// </summary>
+        [Post($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<HardwareResponseModel>> HardwareUpdate(HardwareBaseModel hardware);
+
+        /// <summary>
         /// Получить порт устройства
         /// </summary>
         [Get($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
@@ -46,5 +58,17 @@ namespace BlazorLib
         /// </summary>
         [Post($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.HTML}/{GlobalStatic.HttpRoutes.MAIN}")]
         public Task<ApiResponse<HttpResponseModel>> GetHardwareHtmlPage(HardvareGetRequestModel req);
+
+        /// <summary>
+        /// Запрос/проверка порта устройства
+        /// </summary>
+        [Post($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.Ports}/{GlobalStatic.HttpRoutes.CHECK}")]
+        public Task<ApiResponse<EntriyResponseModel>> CheckPortHardware(PortHardwareCheckRequestModel req);
+
+        /// <summary>
+        /// Установить имя порта
+        /// </summary>
+        [Post($"/api/{GlobalStatic.HttpRoutes.Hardwares}/{GlobalStatic.HttpRoutes.Ports}/{GlobalStatic.HttpRoutes.UPDATE}")]
+        public Task<ApiResponse<ResponseBaseModel>> SetNamePort(EntryModel port_id_name);
     }
 }

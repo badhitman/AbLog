@@ -35,17 +35,27 @@ else
             </MudTd>
             <MudTd DataLabel="Name/Address">
                 <a class="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/hardware-page/@(context.Id)">
-                    @(context.Name) >> @(context.Address)
+                    @(string.IsNullOrWhiteSpace(context.Name) ? "" : $"{context.Name} >> ")@(context.Address)
                 </a>
             </MudTd>
             <MudTd DataLabel="Ports">
-                @if (context.Ports?.Any() == true)
-                {
-                    foreach (PortHardwareModel port in context.Ports)
-                    {
-                        <span title="Номер порта" class="badge text-bg-light me-1">№@(port.PortNumb) @(port.Name)</span>
-                    }
-                }
+                <CascadingValue Value="@context.Id">
+                    <CascadingValue Value="ReloadHardwares">
+                        @if (context.Ports?.Any() == true)
+                        {
+                            @foreach (PortHardwareModel port in context.Ports)
+                            {
+                                <PortViewHardwareComponent Port="port" />
+                            }
+                        }
+                        else
+                        {
+                            <MudTooltip Text="Для инициализации откройте контролер на вкладке ретранслятора и разверните узлы портов XP1 и XP2.">
+                                <MudAlert Severity="Severity.Info">Устройство не инициализировано</MudAlert>
+                            </MudTooltip>
+                        }
+                    </CascadingValue>
+                </CascadingValue>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -56,9 +66,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await UpdateList();
+    }
+
+    async Task UpdateList()
+    {
         IsBusyProgress = true;
         HardwaresResponseModel res = await _hardwares.HardwaresGetAll();
         Elements = res?.Hardwares ?? Enumerable.Empty<HardwareModel>();
         IsBusyProgress = false;
+    }
+
+    public void ReloadHardwares()
+    {
+        InvokeAsync(async () => { IsBusyProgress = true; StateHasChanged(); await UpdateList(); StateHasChanged(); });
     }
 }

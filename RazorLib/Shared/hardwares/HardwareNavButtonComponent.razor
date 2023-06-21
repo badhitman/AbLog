@@ -1,9 +1,13 @@
-﻿@using RazorLib.Shared.navs.pills;
+﻿@using System.Text.RegularExpressions;
+@using System.Collections.Specialized;
+@using RazorLib.Shared.navs.pills;
 @using RazorLib.Shared.html;
 @using SharedLib.IServices;
+@using System.Web;
 @using SharedLib;
 
 @inherits ReloadPageComponentBaseModel
+
 @inject ClientConfigModel _conf
 
 @if (IsBusyProgress)
@@ -17,14 +21,22 @@
 else if (IsExpand)
 {
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="input-group mb-3">
+            <input @bind-value="PortEntry.Name" @bind-value:event="oninput" type="text" class="form-control" placeholder="Имя порта" aria-label="Имя порта">
+            <button disabled="@(string.IsNullOrWhiteSpace(PortEntry.Name))" @onclick="UpdatePortName" class="btn btn-outline-secondary" type="button" id="button-addon2">Сохранить</button>
+        </div>
+
         <HardwareNavTitleComponent PagePath="@PagePath" TitleText="@Text" />
         <HardwaresNavPillsComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" ReloadPage="@ReloadPage" />
-        <button @onclick="Expand" type="button" class="btn-close" aria-label="Close"></button>
+        @if (!AutoLoadAndExpand)
+        {
+            <button @onclick="Expand" type="button" class="btn-close" aria-label="Close"></button>
+        }
     </div>
 }
 else
 {
-    <button title="@PagePath" @onclick="Expand" type="button" class="btn btn-primary">@Text</button>
+    <button title="@PagePath" @onclick="Expand" type="button" class="btn btn-primary">@($"{(string.IsNullOrEmpty(PortEntry?.Name) ? "" : $"[{PortEntry.Name}] ")}{Text}")</button>
 }
 
 <ShowMessagesComponent @ref="showMessages" />
@@ -33,14 +45,53 @@ else
     [Parameter, EditorRequired]
     public string Text { get; set; } = default!;
 
+    /// <summary>
+    /// Автоматически раскрыть/загрузить данные
+    /// </summary>
+    [Parameter]
+    public bool AutoLoadAndExpand { get; set; } = false;
+
     bool IsExpand = false;
 
-    async Task Expand()
+    EntryModel PortEntry = new();
+
+    public async Task Expand()
     {
         IsExpand = !IsExpand;
         if (!IsExpand)
             return;
 
         await GetData();
+    }
+
+    static Regex port_num = new(@"^\d+$", RegexOptions.Compiled);
+
+    async Task UpdatePortName()
+    {
+        ResponseBaseModel rest = await _hardwares.SetNamePort(PortEntry);
+
+        showMessages?.ShowMessages(rest.Messages);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string ext_path = PagePath[(PagePath.IndexOf("?") + 1)..];
+        NameValueCollection path_parameters = HttpUtility.ParseQueryString(ext_path);
+        if (path_parameters.Count == 1 && port_num.IsMatch(path_parameters.Get("pt") ?? ""))
+        {
+            IsBusyProgress = true;
+            EntriyResponseModel rest = await _hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = int.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true });
+
+            showMessages?.ShowMessages(rest.Messages);
+            if (!rest.IsSuccess)
+                return;
+
+            PortEntry = rest.Entry ?? new();
+
+            if (AutoLoadAndExpand)
+                await Expand();
+
+            IsBusyProgress = false;
+        }
     }
 }
