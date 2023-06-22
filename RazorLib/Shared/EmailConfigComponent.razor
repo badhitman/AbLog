@@ -155,7 +155,16 @@
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        connect_config_orign = await _con_service.GetEmailConfig();
+        EmailConfigResponseModel res = await _con_service.GetEmailConfig();
+
+        _messages_ref?.ShowMessages(res.Messages);
+        if (!res.IsSuccess || res.Conf is null)
+        {
+            IsBusyProgress = false;
+            return;
+        }
+
+        connect_config_orign = res.Conf;
         connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign);
         IsBusyProgress = false;
     }

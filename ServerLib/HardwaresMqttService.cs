@@ -1,13 +1,26 @@
 ﻿using SharedLib.IServices;
 using SharedLib;
+using MQTTnet.Client;
 
-namespace RazorLib
+namespace ServicesLib
 {
     /// <summary>
     /// Устройства
     /// </summary>
     public class HardwaresMqttService : IHardwaresService
     {
+        readonly IMqttClient _mqtt;
+
+        /// <summary>
+        /// Устройства IMqttClient
+        /// </summary>
+        public HardwaresMqttService(IMqttClient mqtt)
+        {
+            _mqtt = mqtt;
+            
+        }
+
+
         /// <inheritdoc/>
         public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req)
         {
@@ -68,5 +81,4 @@ namespace RazorLib
             throw new NotImplementedException();
         }
     }
-
 }

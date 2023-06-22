@@ -9,5 +9,5 @@
         /// Порт устройства
         /// </summary>
         public PortHardwareModel? Port { get; set; }
-    }    
+    }
 }

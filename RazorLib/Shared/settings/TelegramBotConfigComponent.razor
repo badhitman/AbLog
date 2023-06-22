@@ -1,13 +1,15 @@
 ﻿@using MudBlazor;
 @using SharedLib;
 
+@inject IParametersStorageService _storage
+
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Интерактивный доступ</h5>
         <hr />
         <form>
             <div class="mb-3">
-                <label for="exampleInputToken" class="form-label">Сервер</label>
+                <label for="exampleInputToken" class="form-label">Ключ бота</label>
                 <input type="text" class="form-control" id="exampleInputToken" aria-describedby="tokenHelp">
                 <div id="tokenHelp" class="form-text">Токен TelegramBot</div>
             </div>

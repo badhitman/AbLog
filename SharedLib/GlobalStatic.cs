@@ -263,7 +263,15 @@ namespace SharedLib
             /// </summary>
             public const string Triggers = "triggers";
 
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string Email = "email";
 
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string Mqtt = "mqtt";
 
             /// <summary>
             /// 
@@ -313,24 +321,10 @@ namespace SharedLib
             /// </summary>
             public const string CHECK = "check";
 
-            #region ParametersStorage
-
             /// <summary>
-            /// Получить конфигурацию Email (imap+smtp)
+            /// check
             /// </summary>
-            public const string GET_EMAIL_CONFIG = "get-email-config";
-
-            /// <summary>
-            /// Сохранить конфигурацию Email (imap+smtp)
-            /// </summary>
-            public const string SAVE_EMAIL_CONFIG = "save-email-config";
-
-            /// <summary>
-            /// Проверить подключение к Email (конфигурация imap+smtp)
-            /// </summary>
-            public const string TEST_CONNECTION_EMAIL_CONFIG = "test-email-connection-config";
-
-            #endregion
+            public const string GET = "get";
         }
 
         /// <summary>
