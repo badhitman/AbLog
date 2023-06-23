@@ -1,19 +1,21 @@
-﻿@using SharedLib;
+﻿@using MudBlazor;
+@using SharedLib;
 
 @inherits BlazorBusyComponentBaseModel
 
 @inject IParametersStorageService _storage
+@inject ISnackbar _snackbar
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Удалённый доступ клиента к системе</h5>
         <hr />
-        <EditForm Model="conf" OnInvalidSubmit="SaveConfMqtt">
+        <EditForm EditContext="editContext" OnSubmit="SaveConfMqtt">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="row g-3 mb-3">
-                <div class="col-md-10">
+                <div class="col-md-6">
                     <label for="exampleInputServer" class="form-label">Сервер</label>
                     <input @bind-value="conf.Server" @bind-value:event="oninput" type="text" class="form-control" id="exampleInputServer" aria-describedby="serverHelp">
                     <div id="serverHelp" class="form-text">Адрес сервера MQTT</div>
@@ -21,12 +23,17 @@
                 <div class="col-sm">
                     <label for="exampleInputPort" class="form-label">Порт</label>
                     <input @bind-value="conf.Port" @bind-value:event="oninput" type="number" class="form-control" id="exampleInputPort" aria-describedby="portHelp">
-                    <div id="portHelp" class="form-text">Порт сервера MQTT</div>
+                    <div id="portHelp" class="form-text">MQTT</div>
                 </div>
                 <div class="col-sm">
-                    <label for="exampleInputMaxSize" class="form-label">Max bytes</label>
+                    <label for="exampleInputTopic" class="form-label">Топик</label>
+                    <input @bind-value="conf.Topic" @bind-value:event="oninput" type="text" class="form-control" id="exampleInputTopic" aria-describedby="topicHelp">
+                    <div id="topicHelp" class="form-text">Имя топика</div>
+                </div>
+                <div class="col-sm">
+                    <label for="exampleInputMaxSize" class="form-label">Размер пакета</label>
                     <input @bind-value="conf.MessageMaxSizeBytes" @bind-value:event="oninput" type="number" class="form-control" id="exampleInputMaxSize" aria-describedby="maxSizeHelp">
-                    <div id="maxSizeHelp" class="form-text">Размер пакета</div>
+                    <div id="maxSizeHelp" class="form-text">bytes max.</div>
                 </div>
             </div>
             <div class="row g-3 mb-3">
@@ -37,7 +44,10 @@
                 </div>
                 <div class="col">
                     <label for="exampleInputPassword" class="form-label">Пароль</label>
-                    <input @bind-value="conf.Password" @bind-value:event="oninput" type="password" class="form-control" id="exampleInputPassword" aria-describedby="passwordHelp">
+                    <div class="input-group mb-3">
+                        <input @bind-value="conf.Password" @bind-value:event="oninput" type="@(ShowPassword ? "text" : "password")" class="form-control" id="exampleInputPassword" aria-describedby="passwordHelp">
+                        <button @onclick="() => { ShowPassword = !ShowPassword; }" class="btn btn@(ShowPassword ? "" : "-outline")-secondary" type="button">@(ShowPassword ? "Скрыть" : "Показать")</button>
+                    </div>
                     <div id="passwordHelp" class="form-text">Пароль доступа для авторизации на сервере MQTT.</div>
                 </div>
                 <div class="col">
@@ -46,14 +56,28 @@
                     <div id="clientIdHelp" class="form-text">Имя клиента (не логин).</div>
                 </div>
             </div>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch mb-3">
                 <input checked="@conf.AutoStart" @bind-value="conf.AutoStart" @bind-value:event="oninput" class="form-check-input" type="checkbox" role="switch" id="exampleCheckAutostart">
                 <label class="form-check-label" for="exampleCheckAutostart">Постоянное подключение (автоподключение при старте)</label>
             </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    Шифрование
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Secret</span>
+                            <input @bind-value="conf.Secret" @bind-value:event="oninput" type="@(ShowSecret ? "text" : "password")" class="form-control" id="exampleInputSecret" aria-describedby="secretHelp">
+                            <button @onclick="() => { ShowSecret = !ShowSecret; }" class="btn btn@(ShowSecret ? "" : "-outline")-secondary" type="button">@(ShowSecret ? "Скрыть" : "Показать")</button>
+                        </div>
+                        <div id="secretHelp" class="form-text">Парольная фраза для защиты трафика MQTT сообщений</div>
+                    </div>
+                </div>
+            </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-
                 <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
-                    <button disabled="@(!IsEdit)" @onclick="SaveConfMqtt" type="submit" class="btn btn-@(IsEdit ? "primary" : "outline-secondary")">Сохранить</button>
+                    <button disabled="@(!IsEdit)" type="submit" class="btn btn-@(IsEdit ? "primary" : "outline-secondary")">Сохранить</button>
                     @if (IsEdit)
                     {
                         <button @onclick="() => conf = GlobalStatic.CreateDeepCopy(conf_self)" type="button" class="btn btn-outline-light">Отмена</button>
@@ -65,16 +89,20 @@
     </div>
 </div>
 <ShowMessagesComponent @ref="showMessages" />
+
 @code {
     MqttConfigModel conf = new();
     MqttConfigModel conf_self = new();
-
+    private EditContext? editContext;
     bool IsEdit => conf != conf_self;
+    bool ShowSecret = false;
+    bool ShowPassword = false;
 
     ShowMessagesComponent? showMessages;
 
     protected override async Task OnInitializedAsync()
     {
+        editContext = new(conf);
         IsBusyProgress = true;
         MqttConfigResponseModel res = await _storage.GetMqttConfig();
         if (!res.IsSuccess || res.Conf is null)
@@ -84,15 +112,19 @@
             return;
         }
         conf = res.Conf;
+        editContext = new(conf);
         conf_self = GlobalStatic.CreateDeepCopy(conf);
         IsBusyProgress = false;
     }
 
     async Task SaveConfMqtt()
     {
+        bool? validate = editContext?.Validate();
+        if (validate != true)
+            return;
+
         IsBusyProgress = true;
         ResponseBaseModel res = await _storage.SaveMqttConfig(conf);
-
         showMessages?.ShowMessages(res.Messages);
 
         if (res.IsSuccess)

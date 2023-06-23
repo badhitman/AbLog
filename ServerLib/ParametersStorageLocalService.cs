@@ -52,7 +52,7 @@ namespace ServicesLib
         {
             ResponseBaseModel res = new();
             conf ??= (await GetEmailConfig()).Conf;
-            if (!conf.IsConfigured)
+            if (!conf!.IsConfigured)
             {
                 res.AddError("Конфигурация не установлена");
                 return res;
@@ -118,7 +118,7 @@ namespace ServicesLib
                 res.AddError(connect_res.ResultCode.ToString());
             else
             {
-                res.AddSuccess("Подключение успешно");
+                res.AddSuccess($"Подключение успешно: {connect_res.ResultCode}");
                 await _mqtt.TryDisconnectAsync();
                 _mqtt.Dispose();
             }

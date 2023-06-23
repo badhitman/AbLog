@@ -61,7 +61,7 @@
     /// <summary>
     /// Here we simulate getting the paged, filtered and ordered data from the server
     /// </summary>
-    private async Task<TableData<TelegramUserModelDB>> ServerReload(TableState state)
+    private Task<TableData<TelegramUserModelDB>> ServerReload(TableState state)
     {
         IEnumerable<TelegramUserModelDB> data = new List<TelegramUserModelDB>()
                     {
@@ -73,7 +73,7 @@
         totalItems = data.Count();
 
         pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-        return new TableData<TelegramUserModelDB>() { TotalItems = totalItems, Items = pagedData };
+        return Task.FromResult(new TableData<TelegramUserModelDB>() { TotalItems = totalItems, Items = pagedData });
     }
 
     private void OnSearch(string text)

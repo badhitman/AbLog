@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using SharedLib.IServices;
 using SharedLib;
 
 namespace AbLogServer.Controllers

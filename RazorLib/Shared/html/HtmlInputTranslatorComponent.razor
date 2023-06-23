@@ -1,5 +1,4 @@
 ﻿@using RazorLib.Shared.hardwares
-@using SharedLib.IServices;
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
@@ -28,7 +27,6 @@
                 {
                     <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" aria-describedby="@($"{InputName}Help")" />
                     <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
-
                 }
                 else
                 {

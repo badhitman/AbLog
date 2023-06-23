@@ -1,6 +1,5 @@
-﻿using SharedLib.IServices;
+﻿using MQTTnet.Client;
 using SharedLib;
-using MQTTnet.Client;
 
 namespace ServicesLib
 {
@@ -17,9 +16,13 @@ namespace ServicesLib
         public HardwaresMqttService(IMqttClient mqtt)
         {
             _mqtt = mqtt;
-            
         }
 
+        /// <inheritdoc/>
+        public Task<HardwaresResponseModel> HardwaresGetAll()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <inheritdoc/>
         public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req)
@@ -47,12 +50,6 @@ namespace ServicesLib
 
         /// <inheritdoc/>
         public Task<PortHardwareResponseModel> HardwarePortGet(int port_id)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public Task<HardwaresResponseModel> HardwaresGetAll()
         {
             throw new NotImplementedException();
         }

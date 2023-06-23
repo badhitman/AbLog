@@ -56,7 +56,10 @@ namespace AbLogServer.Controllers
         /// Сохранить конфигурацию Mqtt (imap+smtp)
         /// </summary>
         [HttpPost($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.UPDATE}")]
-        public async Task<ResponseBaseModel> MqttConfigSave(MqttConfigModel e_conf) => await _parameters_storage.SaveMqttConfig(e_conf);
+        public async Task<ResponseBaseModel> MqttConfigSave(MqttConfigModel e_conf)
+        {
+            return await _parameters_storage.SaveMqttConfig(e_conf);
+        }
 
         /// <summary>
         /// Проверить подключение к Mqtt
