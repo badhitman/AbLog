@@ -1,6 +1,4 @@
-﻿using SharedLib;
-
-namespace ServicesLib;
+﻿namespace SharedLib;
 
 /// <summary>
 /// FlashCap service

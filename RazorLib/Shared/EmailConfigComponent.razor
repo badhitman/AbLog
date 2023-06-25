@@ -3,8 +3,9 @@
 
 @inherits BlazorBusyComponentBaseModel
 
-@inject ISnackbar _snackbar
 @inject IParametersStorageService _con_service
+@inject ISnackbar _snackbar
+@inject IToolsService _tools;
 
 <div class="card">
     <div class="card-body">
@@ -147,7 +148,7 @@
     async Task TectConfigConnect()
     {
         TestConnectProcess = true;
-        ResponseBaseModel rest = await _con_service.TestEmailConnect(connect_config);
+        ResponseBaseModel rest = await _tools.TestEmailConnect(connect_config);
         _messages_ref?.ShowMessages(rest.Messages);
         TestConnectProcess = false;
     }

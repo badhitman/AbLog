@@ -23,7 +23,7 @@ namespace SharedLib
         /// 
         /// </summary>
         [Required]
-        public long MessageMaxSizeBytes { get; set; }
+        public uint MessageMaxSizeBytes { get; set; } = 1000000;
 
         /// <summary>
         /// 

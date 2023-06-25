@@ -11,7 +11,7 @@ using ab.context;
 namespace dbcontext.Migrations
 {
     [DbContext(typeof(ServerContext))]
-    [Migration("20230613041133_ab_server_init")]
+    [Migration("20230627173551_ab_server_init")]
     partial class ab_server_init
     {
         /// <inheritdoc />
@@ -130,6 +130,7 @@ namespace dbcontext.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("AlarmSubscriber")
@@ -143,6 +144,7 @@ namespace dbcontext.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -153,29 +155,6 @@ namespace dbcontext.Migrations
                     b.HasIndex("AlarmSubscriber", "CommandsAllowed");
 
                     b.ToTable("Hardwares");
-                });
-
-            modelBuilder.Entity("SharedLib.ParametersStorageModelDB", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("StoredValue")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TypeName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ParametersStorage");
                 });
 
             modelBuilder.Entity("SharedLib.PortModelDB", b =>
@@ -191,7 +170,7 @@ namespace dbcontext.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PortNumb")
+                    b.Property<int>("PortNum")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

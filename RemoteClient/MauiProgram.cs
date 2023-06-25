@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
+using Newtonsoft.Json;
 using MQTTnet.Client;
-using ServicesLib;
-using BlazorLib;
+using ab.context;
 using SharedLib;
+using ServerLib;
+using MQTTnet;
 
 namespace RemoteClient
 {
@@ -11,6 +13,7 @@ namespace RemoteClient
     {
         public static MauiApp CreateMauiApp()
         {
+            GlobalStatic.PefixDbFile = "-client";
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
@@ -34,12 +37,31 @@ namespace RemoteClient
             builder.Configuration.Bind(settings);
             builder.Services.AddSingleton(settings);
 
-            builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRefitService>();
+            builder.Services.AddSingleton<IParametersStorageService, ParametersStorageLocalService>();
             builder.Services.AddSingleton<IHardwaresService, HardwaresMqttService>();
 
-            builder.Services.AddScoped<IMqttClient, MqttClient>();
+            using ParametersContext _context = new();
+            string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
+            MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
+            builder.Services.AddSingleton(x => mqtt_settings);
 
-            return builder.Build();
+            MqttFactory mqttFactory = new();
+            builder.Services.AddTransient(x => mqttFactory);
+            IMqttClient mqttClient = mqttFactory.CreateMqttClient();
+            builder.Services.AddSingleton(x => mqttClient);
+
+            builder.Services.AddScoped<IToolsService, ToolsLocalService>();
+            builder.Services.AddSingleton<IMqttBaseService, MqttClientService>();
+
+            MauiApp maui_app = builder.Build();
+
+            if (mqtt_settings.AutoStart && mqtt_settings.IsConfigured)
+            {
+                IMqttBaseService _mqtt_cli_srv = maui_app.Services.GetRequiredService<IMqttBaseService>();
+                Task.Run(async () => { await _mqtt_cli_srv.StartService(); });
+            }
+
+            return maui_app;
         }
     }
 }

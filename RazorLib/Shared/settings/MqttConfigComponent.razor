@@ -4,6 +4,7 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject IParametersStorageService _storage
+@inject IToolsService _tools
 @inject ISnackbar _snackbar
 
 <div class="card">
@@ -83,6 +84,17 @@
                         <button @onclick="() => conf = GlobalStatic.CreateDeepCopy(conf_self)" type="button" class="btn btn-outline-light">Отмена</button>
                     }
                 </div>
+                @if (ServiceIsRunning)
+                {
+                    <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
+                        <button @onclick="StopService" class="btn btn-outline-warning" type="button">Остановить службу</button>
+                        <button disabled="@IsEdit" @onclick="RestartService" class="btn btn-outline-info" type="button">Перезапустить</button>
+                    </div>
+                }
+                else
+                {
+                    <button disabled="@IsEdit" @onclick="RestartService" class="btn btn-outline-secondary" type="button">Запустить</button>
+                }
                 <button @onclick="TestConnect" class="btn btn-primary" type="button">Тест</button>
             </div>
         </EditForm>
@@ -98,6 +110,8 @@
     bool ShowSecret = false;
     bool ShowPassword = false;
 
+    bool ServiceIsRunning = false;
+
     ShowMessagesComponent? showMessages;
 
     protected override async Task OnInitializedAsync()
@@ -105,15 +119,43 @@
         editContext = new(conf);
         IsBusyProgress = true;
         MqttConfigResponseModel res = await _storage.GetMqttConfig();
+        showMessages?.ShowMessages(res.Messages);
         if (!res.IsSuccess || res.Conf is null)
         {
-            showMessages?.ShowMessages(res.Messages);
             IsBusyProgress = false;
             return;
         }
         conf = res.Conf;
         editContext = new(conf);
         conf_self = GlobalStatic.CreateDeepCopy(conf);
+
+        await GetStatusService();
+
+        IsBusyProgress = false;
+    }
+
+    async Task GetStatusService()
+    {
+        BoolResponseModel status = await _tools.StatusMqtt();
+        ServiceIsRunning = status.Response;
+        showMessages?.ShowMessages(status.Messages);
+    }
+
+    async Task StopService()
+    {
+        IsBusyProgress = true;
+        ResponseBaseModel stop_res = await _tools.StopMqtt();
+        showMessages?.ShowMessages(stop_res.Messages);
+        await GetStatusService();
+        IsBusyProgress = false;
+    }
+
+    async Task RestartService()
+    {
+        IsBusyProgress = true;
+        ResponseBaseModel start_res = await _tools.StartMqtt();
+        showMessages?.ShowMessages(start_res.Messages);
+        await GetStatusService();
         IsBusyProgress = false;
     }
 
@@ -136,7 +178,7 @@
     async Task TestConnect()
     {
         IsBusyProgress = true;
-        ResponseBaseModel res = await _storage.TestMqttConnect(conf);
+        ResponseBaseModel res = await _tools.TestMqttConnect(conf);
         showMessages?.ShowMessages(res.Messages);
         IsBusyProgress = false;
     }

@@ -1,0 +1,55 @@
+using Microsoft.AspNetCore.Mvc;
+using SharedLib;
+
+namespace ABLog;
+
+/// <summary>
+/// Tools
+/// </summary>
+[ApiController]
+[Route("/api/[controller]")]
+public class ToolsController : ControllerBase
+{
+    readonly ILogger<ToolsController> _logger;
+    readonly IToolsService _toolss_service;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public ToolsController(ILogger<ToolsController> logger, IToolsService tools_service)
+    {
+        _logger = logger;
+        _toolss_service = tools_service;
+    }
+
+    /// <summary>
+    /// Запустить MQTT службу
+    /// </summary>
+    [HttpGet($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.START}")]
+    public async Task<ResponseBaseModel> StartMqtt() => await _toolss_service.StartMqtt();
+
+    /// <summary>
+    /// Остановить MQTT службу
+    /// </summary>
+    [HttpGet($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.STOP}")]
+    public async Task<ResponseBaseModel> StopMqtt() => await _toolss_service.StopMqtt();
+
+    /// <summary>
+    /// Получить статус MQTT службы
+    /// </summary>
+    [HttpGet($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.STATUS}")]
+    public async Task<BoolResponseModel> StatusMqtt() => await _toolss_service.StatusMqtt();
+
+    /// <summary>
+    /// Проверить подключение к Email (конфигурация imap+smtp)
+    /// </summary>
+    [HttpPost($"{GlobalStatic.HttpRoutes.Email}/{GlobalStatic.HttpRoutes.CHECK}")]
+    public async Task<ResponseBaseModel> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf) => await _toolss_service.TestEmailConnect(email_conf);
+
+    /// <summary>
+    /// Проверить подключение к Mqtt
+    /// </summary>
+    [HttpPost($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.CHECK}")]
+    public async Task<ResponseBaseModel> MqttConfigTestConnection(MqttConfigModel? mqtt_conf) => await _toolss_service.TestMqttConnect(mqtt_conf);
+
+}

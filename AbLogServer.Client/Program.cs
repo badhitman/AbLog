@@ -12,7 +12,7 @@ namespace AbLog
     public class Program
     {
         public static async Task Main(string[] args)
-        {
+        {            
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -49,9 +49,12 @@ namespace AbLog
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
             builder.Services.AddRefitClient<IRefitCamerasService>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitToolsService>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
             builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRefitService>();
             builder.Services.AddSingleton<IHardwaresService, HardwaresRefitService>();
+            builder.Services.AddSingleton<IToolsService, ToolsRefitService>();
 
             await builder.Build().RunAsync();
         }

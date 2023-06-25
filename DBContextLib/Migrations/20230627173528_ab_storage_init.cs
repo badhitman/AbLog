@@ -1,18 +1,17 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace dbcontext.Migrations
 {
     /// <inheritdoc />
-    public partial class ab_server_init : Migration
+    public partial class ab_storage_init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Hardwares",
+                name: "HardwareModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -20,12 +19,12 @@ namespace dbcontext.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     AlarmSubscriber = table.Column<bool>(type: "INTEGER", nullable: false),
                     CommandsAllowed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: true),
-                    Password = table.Column<string>(type: "TEXT", nullable: true)
+                    Address = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hardwares", x => x.Id);
+                    table.PrimaryKey("PK_HardwareModelDB", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,7 +43,7 @@ namespace dbcontext.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Scripts",
+                name: "ScriptModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -55,32 +54,32 @@ namespace dbcontext.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scripts", x => x.Id);
+                    table.PrimaryKey("PK_ScriptModelDB", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Ports",
+                name: "PortModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     HardwareId = table.Column<int>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    PortNumb = table.Column<int>(type: "INTEGER", nullable: false)
+                    PortNum = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Ports", x => x.Id);
+                    table.PrimaryKey("PK_PortModelDB", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Ports_Hardwares_HardwareId",
+                        name: "FK_PortModelDB_HardwareModelDB_HardwareId",
                         column: x => x.HardwareId,
-                        principalTable: "Hardwares",
+                        principalTable: "HardwareModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Commands",
+                name: "CommandModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -96,17 +95,17 @@ namespace dbcontext.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Commands", x => x.Id);
+                    table.PrimaryKey("PK_CommandModelDB", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Commands_Scripts_ScriptId",
+                        name: "FK_CommandModelDB_ScriptModelDB_ScriptId",
                         column: x => x.ScriptId,
-                        principalTable: "Scripts",
+                        principalTable: "ScriptModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Contentions",
+                name: "ContentionsModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -116,48 +115,23 @@ namespace dbcontext.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contentions", x => x.Id);
+                    table.PrimaryKey("PK_ContentionsModelDB", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Contentions_Scripts_MasterScriptId",
+                        name: "FK_ContentionsModelDB_ScriptModelDB_MasterScriptId",
                         column: x => x.MasterScriptId,
-                        principalTable: "Scripts",
+                        principalTable: "ScriptModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Contentions_Scripts_SlaveScriptId",
+                        name: "FK_ContentionsModelDB_ScriptModelDB_SlaveScriptId",
                         column: x => x.SlaveScriptId,
-                        principalTable: "Scripts",
+                        principalTable: "ScriptModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tasks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    TaskInitiatorType = table.Column<int>(type: "INTEGER", nullable: false),
-                    TaskInitiatorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ScriptId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ReportId = table.Column<int>(type: "INTEGER", nullable: true),
-                    FinishedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tasks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Tasks_Scripts_ScriptId",
-                        column: x => x.ScriptId,
-                        principalTable: "Scripts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Trigers",
+                name: "TrigerModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -169,17 +143,17 @@ namespace dbcontext.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Trigers", x => x.Id);
+                    table.PrimaryKey("PK_TrigerModelDB", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Trigers_Scripts_ScriptId",
+                        name: "FK_TrigerModelDB_ScriptModelDB_ScriptId",
                         column: x => x.ScriptId,
-                        principalTable: "Scripts",
+                        principalTable: "ScriptModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConditionsCommands",
+                name: "CommandConditionModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -194,51 +168,29 @@ namespace dbcontext.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConditionsCommands", x => x.Id);
+                    table.PrimaryKey("PK_CommandConditionModelDB", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConditionsCommands_Commands_OwnerId",
+                        name: "FK_CommandConditionModelDB_CommandModelDB_OwnerId",
                         column: x => x.OwnerId,
-                        principalTable: "Commands",
+                        principalTable: "CommandModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ConditionsCommands_Hardwares_HardwareId",
+                        name: "FK_CommandConditionModelDB_HardwareModelDB_HardwareId",
                         column: x => x.HardwareId,
-                        principalTable: "Hardwares",
+                        principalTable: "HardwareModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ConditionsCommands_Ports_PortId",
+                        name: "FK_CommandConditionModelDB_PortModelDB_PortId",
                         column: x => x.PortId,
-                        principalTable: "Ports",
+                        principalTable: "PortModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reports",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    OwnerTaskId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Success = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reports", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reports_Tasks_OwnerTaskId",
-                        column: x => x.OwnerTaskId,
-                        principalTable: "Tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TrigersConditions",
+                name: "TrigerConditionModelDB",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -253,147 +205,131 @@ namespace dbcontext.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrigersConditions", x => x.Id);
+                    table.PrimaryKey("PK_TrigerConditionModelDB", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrigersConditions_Hardwares_HardwareId",
+                        name: "FK_TrigerConditionModelDB_HardwareModelDB_HardwareId",
                         column: x => x.HardwareId,
-                        principalTable: "Hardwares",
+                        principalTable: "HardwareModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TrigersConditions_Ports_PortId",
+                        name: "FK_TrigerConditionModelDB_PortModelDB_PortId",
                         column: x => x.PortId,
-                        principalTable: "Ports",
+                        principalTable: "PortModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TrigersConditions_Trigers_OwnerId",
+                        name: "FK_TrigerConditionModelDB_TrigerModelDB_OwnerId",
                         column: x => x.OwnerId,
-                        principalTable: "Trigers",
+                        principalTable: "TrigerModelDB",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Commands_ScriptId",
-                table: "Commands",
-                column: "ScriptId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ConditionsCommands_HardwareId",
-                table: "ConditionsCommands",
+                name: "IX_CommandConditionModelDB_HardwareId",
+                table: "CommandConditionModelDB",
                 column: "HardwareId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConditionsCommands_OwnerId_HardwareId_PortId",
-                table: "ConditionsCommands",
+                name: "IX_CommandConditionModelDB_OwnerId_HardwareId_PortId",
+                table: "CommandConditionModelDB",
                 columns: new[] { "OwnerId", "HardwareId", "PortId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConditionsCommands_PortId",
-                table: "ConditionsCommands",
+                name: "IX_CommandConditionModelDB_PortId",
+                table: "CommandConditionModelDB",
                 column: "PortId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CommandModelDB_ScriptId",
+                table: "CommandModelDB",
+                column: "ScriptId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ContentionsMaster",
-                table: "Contentions",
+                table: "ContentionsModelDB",
                 column: "MasterScriptId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContentionsSlave",
-                table: "Contentions",
+                table: "ContentionsModelDB",
                 column: "SlaveScriptId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScriptJoinLink",
-                table: "Contentions",
+                table: "ContentionsModelDB",
                 columns: new[] { "MasterScriptId", "SlaveScriptId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Hardwares_Address",
-                table: "Hardwares",
+                name: "IX_HardwareModelDB_Address",
+                table: "HardwareModelDB",
                 column: "Address",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Hardwares_AlarmSubscriber_CommandsAllowed",
-                table: "Hardwares",
+                name: "IX_HardwareModelDB_AlarmSubscriber_CommandsAllowed",
+                table: "HardwareModelDB",
                 columns: new[] { "AlarmSubscriber", "CommandsAllowed" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ports_HardwareId",
-                table: "Ports",
+                name: "IX_PortModelDB_HardwareId",
+                table: "PortModelDB",
                 column: "HardwareId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_OwnerTaskId",
-                table: "Reports",
-                column: "OwnerTaskId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasks_ScriptId",
-                table: "Tasks",
-                column: "ScriptId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Trigers_ScriptId",
-                table: "Trigers",
-                column: "ScriptId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TrigersConditions_HardwareId",
-                table: "TrigersConditions",
+                name: "IX_TrigerConditionModelDB_HardwareId",
+                table: "TrigerConditionModelDB",
                 column: "HardwareId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrigersConditions_OwnerId_HardwareId_PortId",
-                table: "TrigersConditions",
+                name: "IX_TrigerConditionModelDB_OwnerId_HardwareId_PortId",
+                table: "TrigerConditionModelDB",
                 columns: new[] { "OwnerId", "HardwareId", "PortId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrigersConditions_PortId",
-                table: "TrigersConditions",
+                name: "IX_TrigerConditionModelDB_PortId",
+                table: "TrigerConditionModelDB",
                 column: "PortId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrigerModelDB_ScriptId",
+                table: "TrigerModelDB",
+                column: "ScriptId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ConditionsCommands");
+                name: "CommandConditionModelDB");
 
             migrationBuilder.DropTable(
-                name: "Contentions");
+                name: "ContentionsModelDB");
 
             migrationBuilder.DropTable(
                 name: "ParametersStorage");
 
             migrationBuilder.DropTable(
-                name: "Reports");
+                name: "TrigerConditionModelDB");
 
             migrationBuilder.DropTable(
-                name: "TrigersConditions");
+                name: "CommandModelDB");
 
             migrationBuilder.DropTable(
-                name: "Commands");
+                name: "PortModelDB");
 
             migrationBuilder.DropTable(
-                name: "Tasks");
+                name: "TrigerModelDB");
 
             migrationBuilder.DropTable(
-                name: "Ports");
+                name: "HardwareModelDB");
 
             migrationBuilder.DropTable(
-                name: "Trigers");
-
-            migrationBuilder.DropTable(
-                name: "Hardwares");
-
-            migrationBuilder.DropTable(
-                name: "Scripts");
+                name: "ScriptModelDB");
         }
     }
 }

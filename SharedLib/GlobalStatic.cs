@@ -62,15 +62,6 @@ namespace SharedLib
             }
         }
 
-        /// <summary>
-        /// имя файла базы данных логов
-        /// </summary>
-        private const string LogsDatabaseFilename = "logs.sqlite";
-        /// <summary>
-        /// путь к файлу базы данных логов
-        /// </summary>
-        public static string LogsDatabasePath => Path.Combine(RootDatabasePathBase, LogsDatabaseFilename);
-
 
         /// <summary>
         /// имя файла логов SMTP
@@ -81,39 +72,23 @@ namespace SharedLib
         /// </summary>
         public static string LogsSmtpPath => Path.Combine(RootMailPathBase, LogsSmtpFilename);
 
-
         /// <summary>
-        /// имя файла логов IMAP
+        /// 
         /// </summary>
-        private const string LogsImapFilename = "imap.logs";
-        /// <summary>
-        /// путь к файлу логов IMAP
-        /// </summary>
-        public static string LogsImapPath => Path.Combine(RootMailPathBase, LogsImapFilename);
-
-
+        public static string PefixDbFile = "";
         /// <summary>
         /// имя файла основной базы данны
         /// </summary>
-        private const string MainDatabaseFilename = "server.sqlite";
+        private static string MainDatabaseFilename => $"main-db{PefixDbFile}.sqlite";
         /// <summary>
         /// путь к файлу основной базы данных
         /// </summary>
         public static string MainDatabasePath => Path.Combine(RootDatabasePathBase, MainDatabaseFilename);
 
         /// <summary>
-        /// имя файла базы данных пользователей и их сообщений
-        /// </summary>
-        private const string UsersDatabaseFilename = "users.sqlite";
-        /// <summary>
-        /// путь к файлу базы данных пользователей и их сообщений
-        /// </summary>
-        public static string UsersDatabasePath => Path.Combine(RootDatabasePathBase, UsersDatabaseFilename);
-
-        /// <summary>
         /// имя файла базы данных хранения параметров
         /// </summary>
-        private const string ParametersStorageDatabaseFilename = "parameters.sqlite";
+        private static string ParametersStorageDatabaseFilename => $"parameters-db{PefixDbFile}.sqlite";
         /// <summary>
         /// путь к файлу базы данных хранения параметров
         /// </summary>
@@ -262,7 +237,10 @@ namespace SharedLib
             /// 
             /// </summary>
             public const string Triggers = "triggers";
-
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string Tools = "tools";
             /// <summary>
             /// 
             /// </summary>
@@ -293,6 +271,18 @@ namespace SharedLib
             /// 
             /// </summary>
             public const string LIST = "list";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string START = "start";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string STOP = "stop";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string STATUS = "status";
             /// <summary>
             /// 
             /// </summary>
@@ -345,34 +335,49 @@ namespace SharedLib
 
 
             /// <summary>
+            /// 
+            /// </summary>
+            public const string HTTP = "http";
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string CAMERAS = "cameras";
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string SHOT = "shot";
+
+            /// <summary>
             /// Запрос: HTTP команда
             /// </summary>
-            public const string REQUEST_HTTP_COMMAND = $"{REQUEST_PREFIX}http-command";
+            public const string REQUEST_HTTP = $"{REQUEST_PREFIX}{HTTP}";
 
             /// <summary>
             /// Ответ: на HTTP команду
             /// </summary>
-            public const string RESULT_HTTP_COMMAND = $"{RESULT_PREFIX}http-command";
+            public const string RESULT_HTTP = $"{RESULT_PREFIX}{HTTP}";
 
             /// <summary>
             /// Запрос: перечень доступных камер
             /// </summary>
-            public const string REQUEST_AVAILABLE_CAMERAS_COMMAND = $"{REQUEST_PREFIX}available-cameras";
+            public const string REQUEST_CAMERAS = $"{REQUEST_PREFIX}{CAMERAS}";
 
             /// <summary>
             /// Ответ: перечень доступных камер
             /// </summary>
-            public const string RESULT_AVAILABLE_CAMERAS_COMMAND = $"{RESULT_PREFIX}available-cameras";
+            public const string RESULT_CAMERAS = $"{RESULT_PREFIX}{CAMERAS}";
 
             /// <summary>
             /// Запрос: фотография с камеры
             /// </summary>
-            public const string REQUEST_SHOT_CAMERA_COMMAND = $"{REQUEST_PREFIX}one-shot-camera";
+            public const string REQUEST_SHOT = $"{REQUEST_PREFIX}{SHOT}";
 
             /// <summary>
             /// Ответ: фотография с камеры
             /// </summary>
-            public const string RESULT_SHOT_CAMERA_COMMAND = $"{RESULT_PREFIX}one-shot-camera";
+            public const string RESULT_SHOT = $"{RESULT_PREFIX}{SHOT}";
         }
     }
 }

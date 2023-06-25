@@ -20,10 +20,4 @@ public interface IEmailService
     /// </summary>
     /// <param name="conf">Конфигурация подключения SMTP/IMAP</param>
     public Task<ResponseBaseModel> ConnectSmtpAsync(EmailConfigModel conf);
-
-    /// <summary>
-    /// Подключиться к IMAP серверу
-    /// </summary>
-    /// <param name="conf">Конфигурация подключения SMTP/IMAP</param>
-    public Task<ResponseBaseModel> ConnectImapAsync(EmailConfigModel conf);
 }

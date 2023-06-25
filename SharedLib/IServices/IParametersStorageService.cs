@@ -17,11 +17,6 @@ public interface IParametersStorageService
     /// </summary>
     public Task<EmailConfigResponseModel> GetEmailConfig();
 
-    /// <summary>
-    /// Тест Email подключения (SMTP)
-    /// </summary>
-    public Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null);
-
     #endregion
 
     #region MQTT
@@ -35,11 +30,6 @@ public interface IParametersStorageService
     /// Получить настройки MQTT
     /// </summary>
     public Task<MqttConfigResponseModel> GetMqttConfig();
-
-    /// <summary>
-    /// Проверить подключение MQTT
-    /// </summary>
-    public Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null);
 
     #endregion
 }
