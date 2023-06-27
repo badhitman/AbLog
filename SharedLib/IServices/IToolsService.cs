@@ -29,4 +29,9 @@ public interface IToolsService
     /// Тест Email подключения (SMTP)
     /// </summary>
     public Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message);
 }

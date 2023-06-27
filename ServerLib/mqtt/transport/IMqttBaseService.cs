@@ -41,5 +41,5 @@ public interface IMqttBaseService
     /// <summary>
     /// Опубликовать сообщение
     /// </summary>
-    public Task<MqttPublishMessageResultModel> PublishMessage(byte[] Payload, string[] Topics, bool retain_flag = false, string[]? response_topics = null, IEnumerable<KeyValuePair<string, string>>? user_properties = null, byte[]? correlation_data = null);
+    public Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message);
 }

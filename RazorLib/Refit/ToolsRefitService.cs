@@ -84,4 +84,22 @@ public class ToolsRefitService : IToolsService
 
         return rest.Content!;
     }
+
+    /// <inheritdoc/>
+    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message)
+    {
+        MqttPublishMessageResultModel res = new();
+
+        Refit.ApiResponse<MqttPublishMessageResultModel> rest = await _refit_tools.PublishMqttMessage(message);
+        if (rest.Content is null || !rest.IsSuccessStatusCode)
+            res.AddError($"rest.Content is null || !rest.IsSuccessStatusCode {{FA1F8616-B93B-445F-B92B-A37FE4F24C7F}}");
+
+        if (rest.Error is not null)
+            res.AddError(rest.Error.Message);
+
+        if (!res.IsSuccess)
+            return res;
+
+        return rest.Content!;
+    }
 }

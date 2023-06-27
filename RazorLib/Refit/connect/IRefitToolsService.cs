@@ -38,4 +38,10 @@ public interface IRefitToolsService
     /// </summary>
     [Post($"/api/{GlobalStatic.HttpRoutes.Tools}/{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.CHECK}")]
     public Task<ApiResponse<ResponseBaseModel>> MqttConfigTestSmtpConnection(MqttConfigModel? mqtt_conf);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [Post($"/api/{GlobalStatic.HttpRoutes.Tools}/{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.PUBLISH}")]
+    public Task<ApiResponse<MqttPublishMessageResultModel>> PublishMqttMessage(MqttPublishMessageModel message);
 }

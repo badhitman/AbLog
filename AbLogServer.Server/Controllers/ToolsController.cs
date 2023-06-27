@@ -52,4 +52,9 @@ public class ToolsController : ControllerBase
     [HttpPost($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.CHECK}")]
     public async Task<ResponseBaseModel> MqttConfigTestConnection(MqttConfigModel? mqtt_conf) => await _toolss_service.TestMqttConnect(mqtt_conf);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    [HttpPost($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.PUBLISH}")]
+    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message) => await _toolss_service.PublishMqttMessage(message);
 }

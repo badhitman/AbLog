@@ -312,6 +312,11 @@ namespace SharedLib
             public const string CHECK = "check";
 
             /// <summary>
+            /// 
+            /// </summary>
+            public const string PUBLISH = "publish";
+
+            /// <summary>
             /// check
             /// </summary>
             public const string GET = "get";

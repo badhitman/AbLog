@@ -86,4 +86,7 @@ public class ToolsLocalService : IToolsService
 
         return res;
     }
+
+    /// <inheritdoc/>
+    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message) => await _mqttClientService.PublishMessage(message);
 }

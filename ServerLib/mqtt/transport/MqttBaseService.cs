@@ -155,28 +155,28 @@ public abstract class MqttBaseService : IMqttBaseService
     }
 
     /// <inheritdoc/>
-    public async Task<MqttPublishMessageResultModel> PublishMessage(byte[] Payload, string[] Topics, bool retain_flag = false, string[]? response_topics = null, IEnumerable<KeyValuePair<string, string>>? user_properties = null, byte[]? correlation_data = null)
+    public async Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message)
     {
         MqttApplicationMessageBuilder msg = new MqttApplicationMessageBuilder()
-            .WithRetainFlag(retain_flag)
-            .WithPayload(Payload);
+            .WithRetainFlag(message.RetainFlag)
+            .WithPayload(message.Payload);
 
         if (!string.IsNullOrWhiteSpace(_mqtt_settings.Topic))
             msg.WithTopic(_mqtt_settings.Topic);
 
-        if (correlation_data?.Any() == true)
-            msg.WithCorrelationData(correlation_data);
+        if (message.CorrelationData?.Any() == true)
+            msg.WithCorrelationData(message.CorrelationData);
 
-        if (response_topics?.Any() == true)
-            foreach (string response_topic in response_topics)
+        if (message.ResponseTopics?.Any() == true)
+            foreach (string response_topic in message.ResponseTopics)
                 msg.WithResponseTopic(response_topic);
 
-        if (Topics.Any())
-            foreach (string topic in Topics)
+        if (message.Topics.Any())
+            foreach (string topic in message.Topics)
                 msg.WithTopic(topic);
 
-        if (user_properties?.Any() == true)
-            foreach (KeyValuePair<string, string> prop in user_properties)
+        if (message.UserProperties?.Any() == true)
+            foreach (KeyValuePair<string, string> prop in message.UserProperties)
                 msg.WithUserProperty(prop.Key, prop.Value);
 
         MqttApplicationMessage app_msg = msg.Build();
