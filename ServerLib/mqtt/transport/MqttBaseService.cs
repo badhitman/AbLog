@@ -155,11 +155,21 @@ public abstract class MqttBaseService : IMqttBaseService
     }
 
     /// <inheritdoc/>
-    public async Task<MqttPublishMessageResultModel> PublishMessage(byte[] Payload, string[] Topics, IEnumerable<KeyValuePair<string, string>>? user_properties = null)
+    public async Task<MqttPublishMessageResultModel> PublishMessage(byte[] Payload, string[] Topics, bool retain_flag = false, string[]? response_topics = null, IEnumerable<KeyValuePair<string, string>>? user_properties = null, byte[]? correlation_data = null)
     {
         MqttApplicationMessageBuilder msg = new MqttApplicationMessageBuilder()
-            .WithTopic(_mqtt_settings.Topic)
+            .WithRetainFlag(retain_flag)
             .WithPayload(Payload);
+
+        if (!string.IsNullOrWhiteSpace(_mqtt_settings.Topic))
+            msg.WithTopic(_mqtt_settings.Topic);
+
+        if (correlation_data?.Any() == true)
+            msg.WithCorrelationData(correlation_data);
+
+        if (response_topics?.Any() == true)
+            foreach (string response_topic in response_topics)
+                msg.WithResponseTopic(response_topic);
 
         if (Topics.Any())
             foreach (string topic in Topics)
@@ -187,12 +197,3 @@ public abstract class MqttBaseService : IMqttBaseService
         return res;
     }
 }
-/*
- MqttApplicationMessage applicationMessage = new MqttApplicationMessageBuilder()
-            .WithTopic(_mqtt_settings.Topic)
-            .WithUserProperty("test_prop_name", "test_prop_value")
-            .WithPayload("19.5")
-            .Build();
-
-            MqttClientPublishResult cpr = await _mqttClient.PublishAsync(applicationMessage, CancellationToken.None);
- */
