@@ -25,12 +25,7 @@
                     <label for="exampleInputPort" class="form-label">Порт</label>
                     <input @bind-value="conf.Port" @bind-value:event="oninput" type="number" class="form-control" id="exampleInputPort" aria-describedby="portHelp">
                     <div id="portHelp" class="form-text">MQTT</div>
-                </div>
-                <div class="col-sm">
-                    <label for="exampleInputTopic" class="form-label">Топик</label>
-                    <input @bind-value="conf.Topic" @bind-value:event="oninput" type="text" class="form-control" id="exampleInputTopic" aria-describedby="topicHelp">
-                    <div id="topicHelp" class="form-text">Имя топика</div>
-                </div>
+                </div>                
                 <div class="col-sm">
                     <label for="exampleInputMaxSize" class="form-label">Размер пакета</label>
                     <input @bind-value="conf.MessageMaxSizeBytes" @bind-value:event="oninput" type="number" class="form-control" id="exampleInputMaxSize" aria-describedby="maxSizeHelp">

@@ -2,32 +2,104 @@
 using MQTTnet.Client;
 using SharedLib;
 using MQTTnet;
+using System.Runtime.Versioning;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace ServerLib;
 
 /// <summary>
 /// 
 /// </summary>
-public class MqttServerService : MqttBaseService
+[SupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("android")]
+public class MqttServerService : MqttBaseServiceAbstraction
 {
+    readonly IHardwaresService _hardwares_service;
+    readonly IMqttBaseService _mqtt_base;
+
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
                 .CreateSubscribeOptionsBuilder()
                 .WithTopicFilter(f =>
                 {
-                    f.WithTopic(_mqtt_settings.Topic);
-                    f.WithTopic(GlobalStatic.Commands.REQUEST_CAMERAS);
-                    f.WithTopic(GlobalStatic.Commands.REQUEST_HTTP);
-                    f.WithTopic(GlobalStatic.Commands.REQUEST_SHOT);
+                    f.WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM);
+                    f.WithTopic(GlobalStatic.Commands.CAMERAS);
+                    f.WithTopic(GlobalStatic.Commands.HTTP);
+                    f.WithTopic(GlobalStatic.Commands.SHOT);
+                    f.WithTopic(GlobalStatic.Commands.HARDWARES);
                 })
             .Build();
 
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory)
-        : base(mqttClient, logger, mqtt_settings, mqttFactory)
+    public MqttServerService(IMqttClient mqttClient, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IMqttBaseService mqtt_base)
+        : base(mqttClient, mqtt_settings, mqttFactory)
     {
+        _logger = logger;
+        _hardwares_service = hardwares_service;
+        _mqtt_base = mqtt_base;
+    }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public override async Task ApplicationMessageReceiveHandledAsync(MqttApplicationMessageReceivedEventArgs e)
+    {
+        byte[] payload_bytes = await CipherService.DecryptAsync(e.ApplicationMessage.PayloadSegment.ToArray(), this._mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
+        string payload_json = Encoding.UTF8.GetString(payload_bytes);
+        string salt = Guid.NewGuid().ToString();
+        switch (e.ApplicationMessage.Topic)
+        {
+            case GlobalStatic.Commands.HARDWARES:
+                SimpleIdNoiseModel? req = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+
+                if (req is null)
+                {
+                    _logger.LogError("req is null. error 1C55124E-8DF4-4CCC-A9FF-8CC2C0AF6B65");
+                    return;
+                }
+
+                string response_json;
+                if (req.Id <= 0)
+                {
+                    HardwaresResponseModel hardwares = await _hardwares_service.HardwaresGetAll();
+                    response_json = JsonConvert.SerializeObject(hardwares);
+                }
+                else
+                {
+                    HardwareResponseModel hw = await _hardwares_service.HardwareGet(req.Id);
+                    response_json = JsonConvert.SerializeObject(hw);
+                }
+
+                payload_bytes = await CipherService.EncryptAsync(response_json, this._mqtt_settings.Secret ?? CipherService.DefaultSecret, salt);
+                MqttPublishMessageModel pub_msg = new(payload_bytes, new[] { e.ApplicationMessage.ResponseTopic })
+                {
+                    CorrelationData = Encoding.UTF8.GetBytes(salt),
+                };
+
+                MqttPublishMessageResultModel pub_red = await _mqtt_base.PublishMessage(pub_msg);
+
+                if (!pub_red.IsSuccess)
+                    _logger.LogError($"!pub_red.IsSuccess ({pub_red.Message}). error {{07CFEFD6-1F99-4082-925B-7F636BB6CC0A}}");
+
+                break;
+            case GlobalStatic.Commands.SHOT:
+
+                break;
+            case GlobalStatic.Commands.CAMERAS:
+
+                break;
+            case GlobalStatic.Commands.HTTP:
+
+                break;
+            case GlobalStatic.Commands.AB_LOG_SYSTEM:
+
+                break;
+        }
+
+        await base.ApplicationMessageReceiveHandledAsync(e);
     }
 }

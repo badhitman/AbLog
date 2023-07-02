@@ -1,5 +1,5 @@
-﻿using System.Runtime.Versioning;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using System.Runtime.Versioning;
 using System.Text;
 
 namespace SharedLib
@@ -7,6 +7,9 @@ namespace SharedLib
     /// <summary>
     /// 
     /// </summary>
+    [SupportedOSPlatform("windows")]
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("android")]
     public static class CipherService
     {
         static readonly Encoding encoding = Encoding.Unicode;
@@ -16,17 +19,26 @@ namespace SharedLib
         /// <summary>
         /// 
         /// </summary>
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("android")]
+        public const string DefaultSecret = "{A6531485-B7DF-4BFB-8F6A-862485E0EF72}";
+
+        /// <summary>
+        /// 
+        /// </summary>
         public static async Task<string> EncryptAsStringAsync(string clearText, string EncryptionKey, byte[] salt) => Convert.ToBase64String(await EncryptAsync(encoding.GetBytes(clearText), EncryptionKey, salt));
 
         /// <summary>
         /// 
         /// </summary>
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("android")]
+        public static async Task<string> EncryptAsStringAsync(string clearText, string EncryptionKey, string salt) => Convert.ToBase64String(await EncryptAsync(encoding.GetBytes(clearText), EncryptionKey, encoding.GetBytes(salt)));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static async Task<byte[]> EncryptAsync(string clearText, string EncryptionKey, string salt) => await EncryptAsync(encoding.GetBytes(clearText), EncryptionKey, encoding.GetBytes(salt));
+
+        /// <summary>
+        /// 
+        /// </summary>
         public static async Task<byte[]> EncryptAsync(byte[] clearBytes, string EncryptionKey, byte[] salt)
         {
             using Aes encryption = Aes.Create();
@@ -44,17 +56,11 @@ namespace SharedLib
         /// <summary>
         /// 
         /// </summary>
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("android")]
         public static async Task<string> DecryptAsStringAsync(string cipherText, string EncryptionKey, byte[] salt) => Convert.ToBase64String(await DecryptAsync(Convert.FromBase64String(cipherText.Replace(" ", "+")), EncryptionKey, salt));
 
         /// <summary>
         /// 
-        /// </summary>
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("android")]
+        /// </summary>        
         public static async Task<byte[]> DecryptAsync(byte[] cipherBytes, string EncryptionKey, byte[] salt)
         {
             using Aes encryption = Aes.Create();
@@ -71,17 +77,14 @@ namespace SharedLib
         /// <summary>
         /// 
         /// </summary>
-        [SupportedOSPlatform("windows")]
-        [SupportedOSPlatform("linux")]
-        [SupportedOSPlatform("android")]
         public static async Task<MemoryStream> DecryptAsync(MemoryStream ms, string EncryptionKey, byte[] salt) => new MemoryStream(await DecryptAsync(ms.ToArray(), EncryptionKey, salt));
 
         /// <summary>
         /// 
         /// </summary>
-        public static byte[] GenerateRandomEntropy(int sise)
+        public static byte[] GenerateRandomEntropy(int size)
         {
-            byte[] randomBytes = new byte[sise];
+            byte[] randomBytes = new byte[size];
             using RandomNumberGenerator rngCsp = RandomNumberGenerator.Create();
             rngCsp.GetBytes(randomBytes);
             return randomBytes;

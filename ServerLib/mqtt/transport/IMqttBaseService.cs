@@ -11,6 +11,11 @@ public interface IMqttBaseService
     /// <summary>
     /// 
     /// </summary>
+    public event Func<MqttApplicationMessageReceivedEventArgs, Task>? ApplicationMessageReceivedAsync;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public MqttClientSubscribeOptions MqttSubscribeOptions { get; }
 
     /// <summary>

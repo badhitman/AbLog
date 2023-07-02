@@ -323,66 +323,34 @@ namespace SharedLib
         }
 
         /// <summary>
-        /// Команды (имена вложенных файлов)
+        /// Команды (топики MQTT)
         /// </summary>
         public static class Commands
         {
             /// <summary>
-            /// Префикс имени файла ЗАПРОСА
+            /// Системный топик MQTT на который будут подписаны все
             /// </summary>
-            public const string REQUEST_PREFIX = "request-";
+            public const string AB_LOG_SYSTEM = "ab-log-system";
 
             /// <summary>
-            /// Префикс имени файла РЕЗУЛЬТАТА обработки запроса
-            /// </summary>
-            public const string RESULT_PREFIX = "result-";
-
-
-
-            /// <summary>
-            /// 
+            /// http
             /// </summary>
             public const string HTTP = "http";
 
             /// <summary>
-            /// 
+            /// cameras
             /// </summary>
             public const string CAMERAS = "cameras";
 
             /// <summary>
-            /// 
+            /// hardwares
+            /// </summary>
+            public const string HARDWARES = "hardwares";
+
+            /// <summary>
+            /// shot
             /// </summary>
             public const string SHOT = "shot";
-
-            /// <summary>
-            /// Запрос: HTTP команда
-            /// </summary>
-            public const string REQUEST_HTTP = $"{REQUEST_PREFIX}{HTTP}";
-
-            /// <summary>
-            /// Ответ: на HTTP команду
-            /// </summary>
-            public const string RESULT_HTTP = $"{RESULT_PREFIX}{HTTP}";
-
-            /// <summary>
-            /// Запрос: перечень доступных камер
-            /// </summary>
-            public const string REQUEST_CAMERAS = $"{REQUEST_PREFIX}{CAMERAS}";
-
-            /// <summary>
-            /// Ответ: перечень доступных камер
-            /// </summary>
-            public const string RESULT_CAMERAS = $"{RESULT_PREFIX}{CAMERAS}";
-
-            /// <summary>
-            /// Запрос: фотография с камеры
-            /// </summary>
-            public const string REQUEST_SHOT = $"{REQUEST_PREFIX}{SHOT}";
-
-            /// <summary>
-            /// Ответ: фотография с камеры
-            /// </summary>
-            public const string RESULT_SHOT = $"{RESULT_PREFIX}{SHOT}";
         }
     }
 }

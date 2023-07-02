@@ -3,15 +3,20 @@ using MQTTnet.Client;
 using System.Text;
 using SharedLib;
 using MQTTnet;
+using ab.context;
+using Newtonsoft.Json;
 
 namespace ServerLib;
 
 /// <summary>
 /// MQTT служба
 /// </summary>
-public abstract class MqttBaseService : IMqttBaseService
+public abstract class MqttBaseServiceAbstraction : IMqttBaseService
 {
-    readonly ILogger<MqttBaseService> _logger;
+    /// <summary>
+    /// 
+    /// </summary>
+    protected ILogger<MqttBaseServiceAbstraction> _logger = default!;
     /// <summary>
     /// 
     /// </summary>
@@ -20,7 +25,10 @@ public abstract class MqttBaseService : IMqttBaseService
     /// 
     /// </summary>
     protected readonly MqttFactory _mqttFactory;
-    readonly IMqttClient _mqttClient;
+    /// <summary>
+    /// 
+    /// </summary>
+    protected readonly IMqttClient _mqttClient;
     /// <summary>
     /// 
     /// </summary>
@@ -37,12 +45,11 @@ public abstract class MqttBaseService : IMqttBaseService
     /// <summary>
     /// MQTT служба
     /// </summary>
-    public MqttBaseService(IMqttClient mqttClient, ILogger<MqttBaseService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory)
+    public MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttConfigModel mqtt_settings, MqttFactory mqttFactory)
     {
         _mqtt_settings = mqtt_settings;
         _mqttFactory = mqttFactory;
         _mqttClient = mqttClient;
-        _logger = logger;
 
         mqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTls()
@@ -58,8 +65,7 @@ public abstract class MqttBaseService : IMqttBaseService
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> StartService()
     {
-        await StopService();
-        ResponseBaseModel res = new();
+        ResponseBaseModel res = await StopService();
         try
         {
             // Create TCP based options using the builder.
@@ -86,7 +92,7 @@ public abstract class MqttBaseService : IMqttBaseService
             MqttClientSubscribeResult csr = await _mqttClient.SubscribeAsync(MqttSubscribeOptions, CancellationToken.None);
 #if DEBUG
             MqttApplicationMessage applicationMessage = new MqttApplicationMessageBuilder()
-            .WithTopic(_mqtt_settings.Topic)
+            .WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM)
             .WithUserProperty("test_prop_name", "test_prop_value")
             .WithPayload("19.5")
             .Build();
@@ -139,6 +145,24 @@ public abstract class MqttBaseService : IMqttBaseService
         else
             res.AddInfo("Соединение отсутсвует (закрывать нечего)");
 
+        using ParametersContext _context = new();
+        string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
+        MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
+
+        if (_mqtt_settings != mqtt_settings)
+        {
+            _mqtt_settings.Username = mqtt_settings.Username;
+            _mqtt_settings.Password = mqtt_settings.Password;
+            _mqtt_settings.Server = mqtt_settings.Server;
+            _mqtt_settings.Port = mqtt_settings.Port;
+            _mqtt_settings.ClientId = mqtt_settings.ClientId;
+            _mqtt_settings.Secret = mqtt_settings.Secret;
+            _mqtt_settings.MessageMaxSizeBytes = mqtt_settings.MessageMaxSizeBytes;
+            _mqtt_settings.AutoStart = mqtt_settings.AutoStart;
+
+            res.AddWarning("Конфигурация подключения изменилась!");
+        }
+
         return res;
     }
 
@@ -161,8 +185,7 @@ public abstract class MqttBaseService : IMqttBaseService
             .WithRetainFlag(message.RetainFlag)
             .WithPayload(message.Payload);
 
-        if (!string.IsNullOrWhiteSpace(_mqtt_settings.Topic))
-            msg.WithTopic(_mqtt_settings.Topic);
+            msg.WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM);
 
         if (message.CorrelationData?.Any() == true)
             msg.WithCorrelationData(message.CorrelationData);

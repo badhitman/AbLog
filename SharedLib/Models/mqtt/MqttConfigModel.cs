@@ -3,48 +3,42 @@
 namespace SharedLib
 {
     /// <summary>
-    /// 
+    /// Конфигурация MQTT
     /// </summary>
     public class MqttConfigModel
     {
         /// <summary>
-        /// 
+        /// Адрес сервера MQTT
         /// </summary>
         [Required]
         public string? Server { get; set; }
 
         /// <summary>
-        /// 
+        /// Порт сервера MQTT
         /// </summary>
         [Required]
         public int Port { get; set; } = 8883;
 
         /// <summary>
-        /// 
+        /// Максимальный размер пакета/сообщения MQTT
         /// </summary>
         [Required]
         public uint MessageMaxSizeBytes { get; set; } = 1000000;
 
         /// <summary>
-        /// 
+        /// Логин пользователя для авторизации на сервере MQTT
         /// </summary>
         [Required]
         public string? Username { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        [Required]
-        public string? Topic { get; set; } = "ab-log";
-
-        /// <summary>
-        /// 
+        /// Пароль пользователя для авторизации на сервере MQTT
         /// </summary>
         [Required]
         public string? Password { get; set; }
 
         /// <summary>
-        /// 
+        /// Идентификатор
         /// </summary>
         [NotEqual(nameof(Username), ErrorMessage = "Логин должен отличаться от имени/идентификатора")]
         public string? ClientId { get; set; }
@@ -66,7 +60,6 @@ namespace SharedLib
         public bool IsConfigured =>
             !string.IsNullOrWhiteSpace(Server) &&
             Port > 0 &&
-            !string.IsNullOrWhiteSpace(Topic) &&
             !string.IsNullOrWhiteSpace(Secret) &&
             !string.IsNullOrWhiteSpace(Username) &&
             !string.IsNullOrWhiteSpace(Password) &&
@@ -79,7 +72,6 @@ namespace SharedLib
                 l.AutoStart == r.AutoStart &&
                 ((l.Server?.Equals(r.Server) == true) || (l.Server is null && r.Server is null)) &&
                 l.Port == r.Port &&
-                ((l.Topic?.Equals(r.Topic) == true) || (l.Topic is null && r.Topic is null)) &&
                 ((l.ClientId?.Equals(r.ClientId) == true) || (l.ClientId is null && r.ClientId is null)) &&
                 l.MessageMaxSizeBytes == r.MessageMaxSizeBytes &&
                 ((l.Username?.Equals(r.Username) == true) || (l.Username is null && r.Username is null)) &&
@@ -110,6 +102,6 @@ namespace SharedLib
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() => $"{Server}{Port}{Username}{Password}{Secret}{Topic}{MessageMaxSizeBytes}{ClientId}{AutoStart}".GetHashCode();
+        public override int GetHashCode() => $"{Server}{Port}{Username}{Password}{Secret}{MessageMaxSizeBytes}{ClientId}{AutoStart}".GetHashCode();
     }
 }

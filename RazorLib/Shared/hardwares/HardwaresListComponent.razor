@@ -2,6 +2,7 @@
 @using SharedLib;
 
 @inherits BlazorBusyComponentBaseModel
+@implements IDisposable
 
 @inject IHardwaresService _hardwares
 
@@ -13,7 +14,7 @@
         </div>
     </div>
 }
-else if (Elements?.Any() != true)
+else if (HardwaresElements?.Any() != true)
 {
     <div class="alert alert-danger" role="alert">
         Устройств нет
@@ -22,7 +23,7 @@ else if (Elements?.Any() != true)
 else
 {
     int num_count = 0;
-    <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsBusyProgress" LoadingProgressColor="Color.Info">
+    <MudTable Items="@HardwaresElements" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsBusyProgress" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>#</MudTh>
             <MudTh>Name/Address</MudTh>
@@ -61,7 +62,7 @@ else
 }
 
 @code {
-    IEnumerable<HardwareModel> Elements = Enumerable.Empty<HardwareModel>();
+    IEnumerable<HardwareModel> HardwaresElements = Enumerable.Empty<HardwareModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,12 +73,17 @@ else
     {
         IsBusyProgress = true;
         HardwaresResponseModel res = await _hardwares.HardwaresGetAll();
-        Elements = res?.Hardwares ?? Enumerable.Empty<HardwareModel>();
+        HardwaresElements = res?.Hardwares ?? Enumerable.Empty<HardwareModel>();
         IsBusyProgress = false;
     }
 
     public void ReloadHardwares()
     {
         InvokeAsync(async () => { IsBusyProgress = true; StateHasChanged(); await UpdateList(); StateHasChanged(); });
+    }
+
+    public void Dispose()
+    {
+        
     }
 }
