@@ -11,7 +11,7 @@ namespace ServerLib;
 public class HardwaresLocalService : IHardwaresService
 {
     /// <inheritdoc/>
-    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req)
+    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
     {
         HardwareModelDB? db_hw;
         lock (ServerContext.DbLocker)
@@ -44,12 +44,12 @@ public class HardwaresLocalService : IHardwaresService
 
             if (!uri_path.StartsWith(db_hw.Password))
                 uri_path = $"{db_hw.Password}/{uri_path}";
-            CancellationToken ct = new CancellationTokenSource(2000).Token;
-            HttpResponseMessage response = await client.GetAsync(uri_path, ct);
+            
+            HttpResponseMessage response = await client.GetAsync(uri_path, cancellation_token);
             return new()
             {
                 StatusCode = response.StatusCode,
-                TextPayload = await response.Content.ReadAsStringAsync()
+                TextPayload = await response.Content.ReadAsStringAsync(cancellation_token)
             };
         }
         catch (TaskCanceledException tcex)
@@ -75,7 +75,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<HardwareResponseModel> HardwareGet(int hardware_id)
+    public Task<HardwareResponseModel> HardwareGet(int hardware_id, CancellationToken cancellation_token = default)
     {
         HardwareResponseModel res_hw = new();
 
@@ -94,7 +94,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<PortHardwareResponseModel> HardwarePortGet(int port_id)
+    public Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
     {
         PortHardwareResponseModel res_port = new();
         lock (ServerContext.DbLocker)
@@ -113,7 +113,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<HardwaresResponseModel> HardwaresGetAll()
+    public Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
     {
         HardwaresResponseModel res_hws = new();
         lock (ServerContext.DbLocker)
@@ -129,7 +129,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<EntriesResponseModel> HardwaresGetAllAsEntries()
+    public Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
     {
         EntriesResponseModel res_hws = new();
         lock (ServerContext.DbLocker)
@@ -141,7 +141,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries()
+    public Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
     {
         EntriesNestedResponseModel res_tree_hw = new();
         lock (ServerContext.DbLocker)
@@ -169,7 +169,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req)
+    public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
     {
         EntriyResponseModel res = new();
         if (req.HardwareId <= 0 || req.PortNum < 0)
@@ -200,7 +200,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware)
+    public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
     {
         HardwareResponseModel res = new();
 
@@ -257,7 +257,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name)
+    public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
         if (port_id_name.Id < 0 || string.IsNullOrWhiteSpace(port_id_name.Name))
@@ -284,7 +284,7 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> HardwareDelete(int hardware_id)
+    public Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
         HardwareModelDB? hw_db;

@@ -19,9 +19,9 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req)
+        public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
         {
-            Refit.ApiResponse<HttpResponseModel> rest = await _refit_hardwares.GetHardwareHtmlPage(req);
+            Refit.ApiResponse<HttpResponseModel> rest = await _refit_hardwares.GetHardwareHtmlPage(req, cancellation_token);
 
             if (rest.Content is null)
                 return new HttpResponseModel(ResponseBaseModel.CreateError("rest.Content is null // error {26ABE035-F428-4433-9BA6-9D8937051942}"));
@@ -30,10 +30,10 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<HardwareResponseModel> HardwareGet(int hardware_id)
+        public async Task<HardwareResponseModel> HardwareGet(int hardware_id, CancellationToken cancellation_token = default)
         {
             HardwareResponseModel res = new();
-            Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareGet(hardware_id);
+            Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareGet(hardware_id, cancellation_token);
 
             if (rest.Content is null)
             {
@@ -48,10 +48,10 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id)
+        public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
         {
             PortHardwareResponseModel res = new();
-            Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit_hardwares.HardwarePortGet(port_id);
+            Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit_hardwares.HardwarePortGet(port_id, cancellation_token);
 
             if (rest.Content is null)
             {
@@ -66,10 +66,10 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<HardwaresResponseModel> HardwaresGetAll()
+        public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
         {
             HardwaresResponseModel res = new();
-            Refit.ApiResponse<HardwaresResponseModel> rest = await _refit_hardwares.HardwaresGetAll();
+            Refit.ApiResponse<HardwaresResponseModel> rest = await _refit_hardwares.HardwaresGetAll(cancellation_token);
 
             if (rest.Content is null)
             {
@@ -84,10 +84,10 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<EntriesResponseModel> HardwaresGetAllAsEntries()
+        public async Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
         {
             EntriesResponseModel res = new();
-            Refit.ApiResponse<EntriesResponseModel> rest = await _refit_hardwares.HardwaresGetAllAsEntries();
+            Refit.ApiResponse<EntriesResponseModel> rest = await _refit_hardwares.HardwaresGetAllAsEntries(cancellation_token);
 
             if (rest.Content is null)
             {
@@ -102,10 +102,10 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries()
+        public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
         {
             EntriesNestedResponseModel res = new();
-            Refit.ApiResponse<EntriesNestedResponseModel> rest = await _refit_hardwares.HardwaresGetTreeNestedEntries();
+            Refit.ApiResponse<EntriesNestedResponseModel> rest = await _refit_hardwares.HardwaresGetTreeNestedEntries(cancellation_token);
 
             if (rest.Content is null)
             {
@@ -120,10 +120,10 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req)
+        public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
         {
             EntriyResponseModel res = new();
-            Refit.ApiResponse<EntriyResponseModel> rest = await _refit_hardwares.CheckPortHardware(req);
+            Refit.ApiResponse<EntriyResponseModel> rest = await _refit_hardwares.CheckPortHardware(req, cancellation_token);
 
             if (rest.Content is null)
             {
@@ -138,11 +138,11 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware)
+        public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
         {
             HardwareResponseModel res = new();
 
-            Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareUpdate(hardware);
+            Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareUpdate(hardware, cancellation_token);
 
             if (rest.Content is null)
             {
@@ -157,9 +157,9 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name)
+        public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
         {
-            Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.SetNamePort(port_id_name);
+            Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.SetNamePort(port_id_name, cancellation_token);
 
             if (rest.Content is null)
                 return ResponseBaseModel.CreateError("rest.Content is null // error {1A93C004-2AC6-4541-8351-D15B349CC7B1}");
@@ -168,9 +168,9 @@ namespace RazorLib
         }
 
         /// <inheritdoc/>
-        public async Task<ResponseBaseModel> HardwareDelete(int hardware_id)
+        public async Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
         {
-            Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.HardwareDelete(hardware_id);
+            Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.HardwareDelete(hardware_id, cancellation_token);
 
             if (rest.Content is null)
                 return ResponseBaseModel.CreateError("rest.Content is null // error {E5DDF9CE-8C59-4E5B-802D-027BCE753BCA}");

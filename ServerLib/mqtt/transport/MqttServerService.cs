@@ -17,7 +17,6 @@ namespace ServerLib;
 public class MqttServerService : MqttBaseServiceAbstraction
 {
     readonly IHardwaresService _hardwares_service;
-    readonly IMqttBaseService _mqtt_base;
 
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
@@ -35,12 +34,11 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IMqttBaseService mqtt_base)
-        : base(mqttClient, mqtt_settings, mqttFactory)
+    public MqttServerService(IMqttClient mqttClient, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
+        : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
         _logger = logger;
         _hardwares_service = hardwares_service;
-        _mqtt_base = mqtt_base;
     }
 
     /// <summary>
@@ -48,7 +46,21 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// </summary>
     public override async Task ApplicationMessageReceiveHandledAsync(MqttApplicationMessageReceivedEventArgs e)
     {
-        byte[] payload_bytes = await CipherService.DecryptAsync(e.ApplicationMessage.PayloadSegment.ToArray(), this._mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
+        await base.ApplicationMessageReceiveHandledAsync(e);
+        _logger.LogInformation($"call >> {nameof(ApplicationMessageReceiveHandledAsync)}");
+        byte[] payload_bytes = e.ApplicationMessage.PayloadSegment.ToArray();
+
+        try
+        {
+            payload_bytes = await CipherService.DecryptAsync(payload_bytes, this._mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("", ex);
+            return;
+        }
+
+
         string payload_json = Encoding.UTF8.GetString(payload_bytes);
         string salt = Guid.NewGuid().ToString();
         switch (e.ApplicationMessage.Topic)
@@ -80,10 +92,13 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     CorrelationData = Encoding.UTF8.GetBytes(salt),
                 };
 
-                MqttPublishMessageResultModel pub_red = await _mqtt_base.PublishMessage(pub_msg);
+                MqttPublishMessageResultModel pub_red = await PublishMessage(pub_msg);
 
                 if (!pub_red.IsSuccess)
                     _logger.LogError($"!pub_red.IsSuccess ({pub_red.Message}). error {{07CFEFD6-1F99-4082-925B-7F636BB6CC0A}}");
+
+                break;
+            case GlobalStatic.Commands.HTTP:
 
                 break;
             case GlobalStatic.Commands.SHOT:
@@ -92,14 +107,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
             case GlobalStatic.Commands.CAMERAS:
 
                 break;
-            case GlobalStatic.Commands.HTTP:
-
-                break;
             case GlobalStatic.Commands.AB_LOG_SYSTEM:
 
                 break;
         }
-
-        await base.ApplicationMessageReceiveHandledAsync(e);
     }
 }

@@ -11,9 +11,9 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.16" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.16" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-		<PackageReference Include="MudBlazor" Version="6.4.1" />
-		<PackageReference Include="Refit" Version="6.5.1" />
-		<PackageReference Include="Refit.HttpClientFactory" Version="6.5.1" />
+		<PackageReference Include="MudBlazor" Version="6.6.0" />
+		<PackageReference Include="Refit" Version="7.0.0" />
+		<PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

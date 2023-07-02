@@ -64,6 +64,8 @@ else
 @code {
     IEnumerable<HardwareModel> HardwaresElements = Enumerable.Empty<HardwareModel>();
 
+    CancellationToken cancellationToken = new CancellationToken();
+
     protected override async Task OnInitializedAsync()
     {
         await UpdateList();
@@ -72,7 +74,7 @@ else
     async Task UpdateList()
     {
         IsBusyProgress = true;
-        HardwaresResponseModel res = await _hardwares.HardwaresGetAll();
+        HardwaresResponseModel res = await _hardwares.HardwaresGetAll(cancellationToken);
         HardwaresElements = res?.Hardwares ?? Enumerable.Empty<HardwareModel>();
         IsBusyProgress = false;
     }
@@ -84,6 +86,6 @@ else
 
     public void Dispose()
     {
-        
+        cancellationToken.ThrowIfCancellationRequested();
     }
 }

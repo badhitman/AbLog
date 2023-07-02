@@ -14,11 +14,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AngleSharp" Version="1.0.3" />
+		<PackageReference Include="AngleSharp" Version="1.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.16" />
-		<PackageReference Include="MudBlazor" Version="6.4.1" />
-		<PackageReference Include="Refit" Version="6.5.1" />
-		<PackageReference Include="Refit.HttpClientFactory" Version="6.5.1" />
+		<PackageReference Include="MudBlazor" Version="6.6.0" />
+		<PackageReference Include="Refit" Version="7.0.0" />
+		<PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

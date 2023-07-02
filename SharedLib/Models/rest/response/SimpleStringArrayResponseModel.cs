@@ -1,13 +1,12 @@
-﻿namespace SharedLib
+﻿namespace SharedLib;
+
+/// <summary>
+/// Универсальная модель ответа коллекцией строк
+/// </summary>
+public class SimpleStringArrayResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Универсальная модель ответа коллекцией строк
+    /// Данные ответа
     /// </summary>
-    public class SimpleStringArrayResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// Данные ответа
-        /// </summary>
-        public IEnumerable<string>? Elements { get; set; }
-    }
+    public IEnumerable<string>? Elements { get; set; }
 }

@@ -15,10 +15,10 @@ namespace ServerLib;
 [SupportedOSPlatform("android")]
 public class HardwaresMqttService : IHardwaresService
 {
-    readonly IMqttBaseService _mqtt;
-    readonly MqttConfigModel _conf;
     readonly MqttFactory _mqttFactory;
     readonly IMqttClient _mqtt_client;
+    readonly IMqttBaseService _mqtt;
+    readonly MqttConfigModel _conf;
 
     /// <summary>
     /// Устройства IMqttClient
@@ -32,119 +32,111 @@ public class HardwaresMqttService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public async Task<HardwaresResponseModel> HardwaresGetAll()
+    public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
     {
         HardwaresResponseModel res = new();
-        BoolResponseModel status = _mqtt.StatusService();
-        if (!status.Response)
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel(), GlobalStatic.Commands.HARDWARES, cancellation_token);
+
+        if (!rpc.IsSuccess)
         {
-            res.AddMessages(status.Messages);
+            res.AddError("!rpc.IsSuccess. error {48093688-E3C7-4EDA-92BC-66E0468300A8}");
             return res;
         }
 
-        string msg_id = Guid.NewGuid().ToString();
-        string response_topic = Guid.NewGuid().ToString();
-
-
-
-        MqttClientSubscribeOptions subscr_opt = _mqttFactory.CreateSubscribeOptionsBuilder()
-               .WithTopicFilter(f => { f.WithTopic(response_topic); })
-               .Build();
-        MqttClientSubscribeResult subscr_res = await _mqtt_client.SubscribeAsync(subscr_opt, CancellationToken.None);
-        MqttClientUnsubscribeOptions unsubscr_opt = _mqttFactory.CreateUnsubscribeOptionsBuilder()
-            .WithTopicFilter(response_topic)
-               .Build();
-        MqttClientUnsubscribeResult unsubscr_res = await _mqtt_client.UnsubscribeAsync(unsubscr_opt);
-
-
-
-        SimpleIdNoiseModel request = new();
-        byte[] request_bytes = await CipherService.EncryptAsync(JsonConvert.SerializeObject(request), _conf.Secret ?? CipherService.DefaultSecret, msg_id);
-
-        MqttPublishMessageModel p_msg = new(request_bytes, new[] { GlobalStatic.Commands.HARDWARES })
+        if (string.IsNullOrEmpty(rpc.Response))
         {
-            CorrelationData = Encoding.UTF8.GetBytes(msg_id),
-            ResponseTopics = new string[] { response_topic }
-        };
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {DB031034-891C-4C8B-8BDE-8546C6888E71}");
+            return res;
+        }
 
-        Func<MqttApplicationMessageReceivedEventArgs, Task> MessageReceivedEvent = (MqttApplicationMessageReceivedEventArgs args)=> 
-        { 
-            if(args.ApplicationMessage.Topic.Equals(response_topic))
-            {
+        HardwaresResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwaresResponseModel>(rpc.Response);
 
-            }
+        if (response_mqtt is null)
+            res.AddError("response_mqtt is null. error {7AB0CF56-0A0F-4CDE-9DFE-F43D3E4C0119}");
+        else
+            return response_mqtt;
 
-
-            return Task.CompletedTask; 
-        };
-
-        _mqtt.ApplicationMessageReceivedAsync += MessageReceivedEvent;
-
-        MqttPublishMessageResultModel send_msg = await _mqtt.PublishMessage(p_msg);
-
-
-        _mqtt.ApplicationMessageReceivedAsync -= MessageReceivedEvent;
-
-        throw new NotImplementedException();
-    }
-
-    private Task ApplicationMessageReceivedHandlerAsync(MqttApplicationMessageReceivedEventArgs args)
-    {
-        
-
-        throw new NotImplementedException();
+        return res;
     }
 
     /// <inheritdoc/>
-    public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req)
+    public async Task<HardwareResponseModel> HardwareGet(int hardware_id, CancellationToken cancellation_token = default)
     {
-        throw new NotImplementedException();
+        HardwareResponseModel res = new();
+        if (hardware_id <= 0)
+        {
+            res.AddError("!rpc.IsSuccess. error {14E0BF67-B692-459D-BAD5-44235C46B36F}");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, GlobalStatic.Commands.HARDWARES, cancellation_token);
+
+        if (!rpc.IsSuccess)
+        {
+            res.AddError("!rpc.IsSuccess. error {A7C52F1E-AAAF-4426-A9C3-64FD5843B507}");
+            return res;
+        }
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {C514933D-965B-4AB0-9B77-EE9BD2D145B0}");
+            return res;
+        }
+
+        HardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwareResponseModel>(rpc.Response);
+
+        if (response_mqtt is null)
+            res.AddError("response_mqtt is null. error {B4E1C721-BA86-43B1-B2CB-ED637134BE61}");
+        else
+            return response_mqtt;
+
+        return res;
     }
 
     /// <inheritdoc/>
-    public Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task<ResponseBaseModel> HardwareDelete(int hardware_id)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task<HardwareResponseModel> HardwareGet(int hardware_id)
+    public Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task<PortHardwareResponseModel> HardwarePortGet(int port_id)
+    public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task<EntriesResponseModel> HardwaresGetAllAsEntries()
+    public Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries()
+    public Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware)
+    public Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name)
+    public Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }

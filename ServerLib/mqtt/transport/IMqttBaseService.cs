@@ -21,7 +21,7 @@ public interface IMqttBaseService
     /// <summary>
     /// Запутить MQTT службу
     /// </summary>
-    public Task<ResponseBaseModel> StartService();
+    public Task<ResponseBaseModel> StartService(CancellationToken cancellation_token = default);
 
     /// <summary>
     /// 
@@ -36,7 +36,7 @@ public interface IMqttBaseService
     /// <summary>
     /// Остановить MQTT службу
     /// </summary>
-    public Task<ResponseBaseModel> StopService();
+    public Task<ResponseBaseModel> StopService(CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Получить статус службы
@@ -46,5 +46,10 @@ public interface IMqttBaseService
     /// <summary>
     /// Опубликовать сообщение
     /// </summary>
-    public Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message);
+    public Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default);
+
+    /// <summary>
+    /// Удалённый вызов серверного функционала через MQTT
+    /// </summary>
+    public Task<SimpleStringResponseModel> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token = default);
 }

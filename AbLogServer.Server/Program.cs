@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
+using System.Runtime.Versioning;
 using Newtonsoft.Json;
 using MQTTnet.Client;
-using System.Text;
 using ab.context;
 using SharedLib;
 using ServerLib;
@@ -12,6 +12,9 @@ using NLog;
 namespace AbLogServer;
 
 #pragma warning disable CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
+[SupportedOSPlatform("windows")]
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("android")]
 public class Program
 {
     public static async Task Main(string[] args)

@@ -12,7 +12,7 @@ namespace SharedLib
     [SupportedOSPlatform("android")]
     public static class CipherService
     {
-        static readonly Encoding encoding = Encoding.Unicode;
+        static readonly Encoding encoding = Encoding.UTF8;
         static readonly int secret_key_size = 32;
         static readonly int iv_key_size = 16;
 
