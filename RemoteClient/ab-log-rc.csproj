@@ -37,6 +37,7 @@
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppInstallerUri>https://ab-log-app.iq-s.pro/</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<DefaultLanguage>ru-ru</DefaultLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -66,6 +67,64 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Platforms\Windows\res\ab-log.big.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.big.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.big.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.big.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.big.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-16.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-16_altform-lightunplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-16_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-24.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-24_altform-lightunplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-24_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-256.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-256_altform-lightunplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-256_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-32.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-32_altform-lightunplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-32_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-48.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-48_altform-lightunplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.ico.targetsize-48_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.logo.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.logo.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.logo.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.logo.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.logo.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.medium.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.medium.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.medium.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.medium.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.medium.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.min.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.min.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.min.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.min.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.min.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.splash.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.splash.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.splash.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.splash.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.splash.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.width.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.width.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.width.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.width.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\ab-log.width.scale-400.png" />
+	  <None Remove="Platforms\Windows\res\BadgeLogo.scale-100.png" />
+	  <None Remove="Platforms\Windows\res\BadgeLogo.scale-125.png" />
+	  <None Remove="Platforms\Windows\res\BadgeLogo.scale-150.png" />
+	  <None Remove="Platforms\Windows\res\BadgeLogo.scale-200.png" />
+	  <None Remove="Platforms\Windows\res\BadgeLogo.scale-400.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\RazorLib\razor-lib.csproj" />
 		<ProjectReference Include="..\ServerLib\server-lib.csproj" />
 	</ItemGroup>
@@ -80,6 +139,61 @@
 		<Content Include="..\AbLogServer.Client\wwwroot\conf.json" Link="wwwroot\conf.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Platforms\Windows\res\ab-log.big.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.big.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.big.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.big.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.big.scale-400.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.scale-400.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-16.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-16_altform-lightunplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-16_altform-unplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-24.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-24_altform-lightunplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-24_altform-unplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-256.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-256_altform-lightunplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-256_altform-unplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-32.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-32_altform-lightunplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-32_altform-unplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-48.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-48_altform-lightunplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.ico.targetsize-48_altform-unplated.png" />
+		<Content Include="Platforms\Windows\res\ab-log.logo.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.logo.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.logo.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.logo.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.logo.scale-400.png" />
+		<Content Include="Platforms\Windows\res\ab-log.medium.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.medium.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.medium.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.medium.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.medium.scale-400.png" />
+		<Content Include="Platforms\Windows\res\ab-log.min.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.min.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.min.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.min.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.min.scale-400.png" />
+		<Content Include="Platforms\Windows\res\ab-log.splash.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.splash.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.splash.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.splash.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.splash.scale-400.png" />
+		<Content Include="Platforms\Windows\res\ab-log.width.scale-100.png" />
+		<Content Include="Platforms\Windows\res\ab-log.width.scale-125.png" />
+		<Content Include="Platforms\Windows\res\ab-log.width.scale-150.png" />
+		<Content Include="Platforms\Windows\res\ab-log.width.scale-200.png" />
+		<Content Include="Platforms\Windows\res\ab-log.width.scale-400.png" />
+		<Content Include="Platforms\Windows\res\BadgeLogo.scale-100.png" />
+		<Content Include="Platforms\Windows\res\BadgeLogo.scale-125.png" />
+		<Content Include="Platforms\Windows\res\BadgeLogo.scale-150.png" />
+		<Content Include="Platforms\Windows\res\BadgeLogo.scale-200.png" />
+		<Content Include="Platforms\Windows\res\BadgeLogo.scale-400.png" />
 		<Content Update="wwwroot\**">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
