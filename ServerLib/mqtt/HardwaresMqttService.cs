@@ -39,7 +39,7 @@ public class HardwaresMqttService : IHardwaresService
 
         if (!rpc.IsSuccess)
         {
-            res.AddError("!rpc.IsSuccess. error {48093688-E3C7-4EDA-92BC-66E0468300A8}");
+            res.AddMessages(rpc.Messages);
             return res;
         }
 
@@ -60,6 +60,41 @@ public class HardwaresMqttService : IHardwaresService
     }
 
     /// <inheritdoc/>
+    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
+    {
+
+        HttpResponseModel res = new();
+        if (req.HardwareId <= 0)
+        {
+            res.AddError("req.HardwareId <= 0. error {CEBF08AE-721E-4CC8-A2A5-CFE980316F3C}");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{GlobalStatic.Routes.HTTP}", cancellation_token);
+
+        if (!rpc.IsSuccess)
+        {
+            res.AddMessages(rpc.Messages);
+            return res;
+        }
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {D06F8DE6-4189-49E3-907A-2996823C1A87}");
+            return res;
+        }
+
+        HttpResponseModel? response_mqtt = JsonConvert.DeserializeObject<HttpResponseModel>(rpc.Response);
+
+        if (response_mqtt is null)
+            res.AddError("response_mqtt is null. error {F868C3D5-1761-4965-8120-9B42B9281521}");
+        else
+            return response_mqtt;
+
+        return res;
+    }
+
+    /// <inheritdoc/>
     public async Task<HardwareResponseModel> HardwareGet(int hardware_id, CancellationToken cancellation_token = default)
     {
         HardwareResponseModel res = new();
@@ -73,7 +108,7 @@ public class HardwaresMqttService : IHardwaresService
 
         if (!rpc.IsSuccess)
         {
-            res.AddError("!rpc.IsSuccess. error {A7C52F1E-AAAF-4426-A9C3-64FD5843B507}");
+            res.AddMessages(rpc.Messages);
             return res;
         }
 
@@ -94,25 +129,109 @@ public class HardwaresMqttService : IHardwaresService
     }
 
     /// <inheritdoc/>
+    public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
+    {
+        EntriyResponseModel res = new();
+        if (req.HardwareId <= 0)
+        {
+            res.AddError("req.HardwareId <= 0. error {6E82E9D2-881D-4811-A4EB-90C9C57D6B3E}");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}", cancellation_token);
+
+        if (!rpc.IsSuccess)
+        {
+            res.AddMessages(rpc.Messages);
+            return res;
+        }
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {8A686A51-710F-41DD-A0F5-43891548A1E6}");
+            return res;
+        }
+
+        EntriyResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriyResponseModel>(rpc.Response);
+
+        if (response_mqtt is null)
+            res.AddError("response_mqtt is null. error {B27011ED-F460-47A2-9BBC-F2551AF66FE8}");
+        else
+            return response_mqtt;
+
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
+    {
+        PortHardwareResponseModel res = new();
+        if (port_id <= 0)
+        {
+            res.AddError("port_id <= 0. error {AD191D14-A157-432C-A27F-EA145736C771}");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = port_id }, $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}", cancellation_token);
+
+        if (!rpc.IsSuccess)
+        {
+            res.AddMessages(rpc.Messages);
+            return res;
+        }
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {0F024FA9-D04A-4625-BCF2-DF94C1794495}");
+            return res;
+        }
+
+        PortHardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<PortHardwareResponseModel>(rpc.Response);
+
+        if (response_mqtt is null)
+            res.AddError("response_mqtt is null. error {0CC2267F-5F91-4064-95B7-671701B71860}");
+        else
+            return response_mqtt;
+
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
+    {
+        ResponseBaseModel res = new();
+        if (port_id_name.Id <= 0)
+        {
+            res.AddError("port_id_name.Id <= 0. error {C27B6E42-455D-4CDC-B31B-3A4CD874B16F}");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(port_id_name, $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
+
+        if (!rpc.IsSuccess)
+        {
+            res.AddMessages(rpc.Messages);
+            return res;
+        }
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {BE75698E-7956-48AA-A56E-85EFD75FDC63}");
+            return res;
+        }
+
+        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.Response);
+
+        if (response_mqtt is null)
+            res.AddError("response_mqtt is null. error {DFA6BCC6-ACC5-48DC-95CE-2549CD45431B}");
+        else
+            return response_mqtt;
+
+        return res;
+    }
+
+    /// <inheritdoc/>
     public Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }
@@ -131,12 +250,6 @@ public class HardwaresMqttService : IHardwaresService
 
     /// <inheritdoc/>
     public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
     {
         throw new NotImplementedException();
     }

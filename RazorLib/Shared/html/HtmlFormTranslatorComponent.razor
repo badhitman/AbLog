@@ -40,7 +40,7 @@
     protected override void OnInitialized()
     {
         string? _action = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("action", StringComparison.OrdinalIgnoreCase)).Value;
-        FormContext = new FormContextModel() { FormAction = new(_action ?? "") };
+        FormContext = new FormContextModel() { FormAction = new(_action ?? "", UriKind.RelativeOrAbsolute) };
         base.OnInitialized();
     }
 

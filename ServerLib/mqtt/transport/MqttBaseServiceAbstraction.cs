@@ -91,15 +91,6 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
 
             MqttClientSubscribeResult csr = await _mqttClient.SubscribeAsync(MqttSubscribeOptions, CancellationToken.None);
             _logger.LogWarning($"{csr.ReasonString} _mqttClient.Subscribe >> {JsonConvert.SerializeObject(MqttSubscribeOptions.TopicFilters.Select(x => x.Topic))}");
-#if DEBUG
-            MqttApplicationMessage applicationMessage = new MqttApplicationMessageBuilder()
-            .WithTopic(GlobalStatic.Routes.AB_LOG_SYSTEM)
-            .WithUserProperty("test_prop_name", "test_prop_value")
-            .WithPayload("19.5")
-            .Build();
-
-            MqttClientPublishResult cpr = await _mqttClient.PublishAsync(applicationMessage, CancellationToken.None);
-#endif
         }
         catch (Exception ex)
         {

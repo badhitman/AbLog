@@ -232,6 +232,10 @@ namespace SharedLib
             /// <summary>
             /// 
             /// </summary>
+            public const string Port = "port";
+            /// <summary>
+            /// 
+            /// </summary>
             public const string Scripts = "scripts";
             /// <summary>
             /// 

@@ -33,7 +33,7 @@ public class Program
             IWebHostEnvironment _env = builder.Environment;
 
             builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
-            builder.Services.AddScoped<IHardwaresService, HardwaresLocalService>();
+            builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
             builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
 

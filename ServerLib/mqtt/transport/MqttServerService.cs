@@ -28,6 +28,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.SHOT); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}"); })
             .Build();
 
     /// <summary>
@@ -57,7 +60,6 @@ public class MqttServerService : MqttBaseServiceAbstraction
         {
             case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}":
                 NoiseModel? req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
-
                 if (req is null)
                 {
                     _logger.LogError("req is null. error 1C55124E-8DF4-4CCC-A9FF-8CC2C0AF6B65");
@@ -65,11 +67,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
 
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
-
                 break;
             case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}":
                 SimpleIdNoiseModel? req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
-
                 if (req_nid is null)
                 {
                     _logger.LogError("req is null. error 98C12EAC-73A9-4946-8850-7B075613833E");
@@ -77,10 +77,46 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
 
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
-
                 break;
             case GlobalStatic.Routes.HTTP:
+                HardvareGetRequestModel? req_http = JsonConvert.DeserializeObject<HardvareGetRequestModel>(payload_json);
+                if (req_http is null)
+                {
+                    _logger.LogError("req is null. error 1EB8300D-9436-44B0-9413-31BAA01018F2");
+                    return;
+                }
 
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.GetHardwareHtmlPage(req_http)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}":
+                req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+                if (req_nid is null)
+                {
+                    _logger.LogError("req is null. error D4D48AE6-C24E-4532-AA92-07ECB1AFB549");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwarePortGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}":
+                PortHardwareCheckRequestModel? req_port_check = JsonConvert.DeserializeObject<PortHardwareCheckRequestModel>(payload_json);
+                if (req_port_check is null)
+                {
+                    _logger.LogError("req is null. error 2CB7CA8A-18B3-4FDF-84F0-CD8BBEA4BA45");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.CheckPortHardware(req_port_check)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}":
+                EntryModel? req_e = JsonConvert.DeserializeObject<EntryModel>(payload_json);
+                if (req_e is null)
+                {
+                    _logger.LogError("req is null. 2415B593-DAD5-4B61-849F-7B95A174739F");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.SetNamePort(req_e)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case GlobalStatic.Routes.SHOT:
 
