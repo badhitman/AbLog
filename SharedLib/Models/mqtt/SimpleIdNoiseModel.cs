@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class SimpleIdNoiseModel: NoiseModel
+    public class SimpleIdNoiseModel : NoiseModel
     {
         /// <summary>
         /// 

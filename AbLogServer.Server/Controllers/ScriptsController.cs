@@ -25,7 +25,7 @@ public class ScriptsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
+    [HttpGet($"{GlobalStatic.Routes.LIST}")]
     public ScriptsResponseModel ScriptsGetAll()
     {
         ScriptsResponseModel res_s = new();
@@ -67,7 +67,7 @@ public class ScriptsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"{GlobalStatic.Routes.UPDATE}")]
     public ScriptsResponseModel ScriptUpdateOrCreate(EntryDescriptionModel script)
     {
         ScriptsResponseModel res_s = new();
@@ -124,7 +124,7 @@ public class ScriptsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPut($"{GlobalStatic.HttpRoutes.ENABLE}/{{script_id}}")]
+    [HttpPut($"{GlobalStatic.Routes.ENABLE}/{{script_id}}")]
     public ResponseBaseModel ScriptEnableSet([FromRoute] int script_id, bool is_enable)
     {
         ResponseBaseModel res = new();

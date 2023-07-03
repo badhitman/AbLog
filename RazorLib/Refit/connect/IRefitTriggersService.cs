@@ -12,7 +12,7 @@ public interface IRefitTriggersService
     /// <summary>
     /// Получить все тригеры
     /// </summary>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Triggers}/{GlobalStatic.HttpRoutes.LIST}")]
+    [Get($"/api/{GlobalStatic.Routes.Triggers}/{GlobalStatic.Routes.LIST}")]
     public Task<ApiResponse<TriggersResponseModel>> TriggersGetAll();
 
     /// <summary>
@@ -20,7 +20,7 @@ public interface IRefitTriggersService
     /// </summary>
     /// <param name="trigger">Тригер обновления</param>
     /// <returns>Все тригеры</returns>
-    [Post($"/api/{GlobalStatic.HttpRoutes.Triggers}/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [Post($"/api/{GlobalStatic.Routes.Triggers}/{GlobalStatic.Routes.UPDATE}")]
     public Task<ApiResponse<TriggersResponseModel>> TriggerUpdateOrCreate(TrigerModelDB trigger);
 
     /// <summary>
@@ -28,6 +28,6 @@ public interface IRefitTriggersService
     /// </summary>
     /// <param name="trigger_id">Идентификатор тригшера для удаления</param>
     /// <returns>Все тригеры</returns>
-    [Delete($"/api/{GlobalStatic.HttpRoutes.Triggers}/{{trigger_id}}")]
+    [Delete($"/api/{GlobalStatic.Routes.Triggers}/{{trigger_id}}")]
     public Task<ApiResponse<TriggersResponseModel>> TriggerDelete(int trigger_id);
 }

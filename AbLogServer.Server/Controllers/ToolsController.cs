@@ -25,36 +25,36 @@ public class ToolsController : ControllerBase
     /// <summary>
     /// Запустить MQTT службу
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.START}")]
+    [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.START}")]
     public async Task<ResponseBaseModel> StartMqtt() => await _toolss_service.StartMqtt();
 
     /// <summary>
     /// Остановить MQTT службу
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.STOP}")]
+    [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STOP}")]
     public async Task<ResponseBaseModel> StopMqtt() => await _toolss_service.StopMqtt();
 
     /// <summary>
     /// Получить статус MQTT службы
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.STATUS}")]
+    [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")]
     public async Task<BoolResponseModel> StatusMqtt() => await _toolss_service.StatusMqtt();
 
     /// <summary>
     /// Проверить подключение к Email (конфигурация imap+smtp)
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.Email}/{GlobalStatic.HttpRoutes.CHECK}")]
+    [HttpPost($"{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}")]
     public async Task<ResponseBaseModel> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf) => await _toolss_service.TestEmailConnect(email_conf);
 
     /// <summary>
     /// Проверить подключение к Mqtt
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.CHECK}")]
+    [HttpPost($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.CHECK}")]
     public async Task<ResponseBaseModel> MqttConfigTestConnection(MqttConfigModel? mqtt_conf) => await _toolss_service.TestMqttConnect(mqtt_conf);
 
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.PUBLISH}")]
+    [HttpPost($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.PUBLISH}")]
     public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message) => await _toolss_service.PublishMqttMessage(message);
 }

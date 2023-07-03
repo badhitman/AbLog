@@ -25,19 +25,19 @@ public class HardwaresController : ControllerBase
     /// <summary>
     /// Устройства (все)
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
+    [HttpGet($"{GlobalStatic.Routes.LIST}")]
     public async Task<HardwaresResponseModel> HardwaresGetAll() => await _hardwares_service.HardwaresGetAll();
 
     /// <summary>
     /// Устройства (все) в виде Entries[]
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.ENTRIES}")]
+    [HttpGet($"{GlobalStatic.Routes.ENTRIES}")]
     public async Task<EntriesResponseModel> HardwaresGetAllAsEntries() => await _hardwares_service.HardwaresGetAllAsEntries();
 
     /// <summary>
     /// Устройства (все) в виде Entries[] вместе с портами
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.NESTED_ENTRIES}")]
+    [HttpGet($"{GlobalStatic.Routes.NESTED_ENTRIES}")]
     public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries() => await _hardwares_service.HardwaresGetTreeNestedEntries();
 
     /// <summary>
@@ -55,30 +55,30 @@ public class HardwaresController : ControllerBase
     /// <summary>
     /// Обновить/создать устройство (управляющий блок/контроллер)
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"{GlobalStatic.Routes.UPDATE}")]
     public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware) => await _hardwares_service.HardwareUpdate(hardware);
 
     /// <summary>
     /// Порт контроллера
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.Ports}/{{port_id}}")]
+    [HttpGet($"{GlobalStatic.Routes.Ports}/{{port_id}}")]
     public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id) => await _hardwares_service.HardwarePortGet(port_id);
 
     /// <summary>
     /// Получить HTML основной страницы устройства
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.HTML}/{GlobalStatic.HttpRoutes.MAIN}")]
+    [HttpPost($"{GlobalStatic.Routes.HTML}/{GlobalStatic.Routes.MAIN}")]
     public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req) => await _hardwares_service.GetHardwareHtmlPage(req);
 
     /// <summary>
     /// Запрос/проверка порта устройства
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.Ports}/{GlobalStatic.HttpRoutes.CHECK}")]
+    [HttpPost($"{GlobalStatic.Routes.Ports}/{GlobalStatic.Routes.CHECK}")]
     public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req) => await _hardwares_service.CheckPortHardware(req);
 
     /// <summary>
     /// Установить имя порта
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.Ports}/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"{GlobalStatic.Routes.Ports}/{GlobalStatic.Routes.UPDATE}")]
     public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name) => await _hardwares_service.SetNamePort(port_id_name);
 }

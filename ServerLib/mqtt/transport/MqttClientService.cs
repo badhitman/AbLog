@@ -16,11 +16,8 @@ public class MqttClientService : MqttBaseServiceAbstraction
 {
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
-                .CreateSubscribeOptionsBuilder()        
-                .WithTopicFilter(f =>
-                {
-                    f.WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM);
-                })
+                .CreateSubscribeOptionsBuilder()
+                .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.AB_LOG_SYSTEM); })
             .Build();
 
     /// <summary>

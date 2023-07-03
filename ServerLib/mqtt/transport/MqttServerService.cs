@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Runtime.Versioning;
+using Newtonsoft.Json;
 using MQTTnet.Client;
+using System.Text;
 using SharedLib;
 using MQTTnet;
-using System.Runtime.Versioning;
-using System.Text;
-using Newtonsoft.Json;
+using MQTTnet.Packets;
 
 namespace ServerLib;
 
@@ -21,14 +22,12 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
                 .CreateSubscribeOptionsBuilder()
-                .WithTopicFilter(f =>
-                {
-                    f.WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM);
-                    f.WithTopic(GlobalStatic.Commands.CAMERAS);
-                    f.WithTopic(GlobalStatic.Commands.HTTP);
-                    f.WithTopic(GlobalStatic.Commands.SHOT);
-                    f.WithTopic(GlobalStatic.Commands.HARDWARES);
-                })
+                .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.AB_LOG_SYSTEM); })
+                .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.Cameras); })
+                .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.HTTP); })
+                .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.SHOT); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}"); })
             .Build();
 
     /// <summary>
@@ -37,6 +36,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
     public MqttServerService(IMqttClient mqttClient, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
         : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
+
         _logger = logger;
         _hardwares_service = hardwares_service;
     }
@@ -48,25 +48,15 @@ public class MqttServerService : MqttBaseServiceAbstraction
     {
         await base.ApplicationMessageReceiveHandledAsync(e);
         _logger.LogInformation($"call >> {nameof(ApplicationMessageReceiveHandledAsync)}");
-        byte[] payload_bytes = e.ApplicationMessage.PayloadSegment.ToArray();
-
-        try
-        {
-            payload_bytes = await CipherService.DecryptAsync(payload_bytes, this._mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("", ex);
-            return;
-        }
-
+        byte[] payload_bytes = await CipherService.DecryptAsync(e.ApplicationMessage.PayloadSegment.ToArray(), _mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
 
         string payload_json = Encoding.UTF8.GetString(payload_bytes);
         string salt = Guid.NewGuid().ToString();
+
         switch (e.ApplicationMessage.Topic)
         {
-            case GlobalStatic.Commands.HARDWARES:
-                SimpleIdNoiseModel? req = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+            case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}":
+                NoiseModel? req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
 
                 if (req is null)
                 {
@@ -74,42 +64,59 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     return;
                 }
 
-                string response_json;
-                if (req.Id <= 0)
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+
+                break;
+            case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}":
+                SimpleIdNoiseModel? req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+
+                if (req_nid is null)
                 {
-                    HardwaresResponseModel hardwares = await _hardwares_service.HardwaresGetAll();
-                    response_json = JsonConvert.SerializeObject(hardwares);
+                    _logger.LogError("req is null. error 98C12EAC-73A9-4946-8850-7B075613833E");
+                    return;
                 }
-                else
-                {
-                    HardwareResponseModel hw = await _hardwares_service.HardwareGet(req.Id);
-                    response_json = JsonConvert.SerializeObject(hw);
-                }
 
-                payload_bytes = await CipherService.EncryptAsync(response_json, this._mqtt_settings.Secret ?? CipherService.DefaultSecret, salt);
-                MqttPublishMessageModel pub_msg = new(payload_bytes, new[] { e.ApplicationMessage.ResponseTopic })
-                {
-                    CorrelationData = Encoding.UTF8.GetBytes(salt),
-                };
-
-                MqttPublishMessageResultModel pub_red = await PublishMessage(pub_msg);
-
-                if (!pub_red.IsSuccess)
-                    _logger.LogError($"!pub_red.IsSuccess ({pub_red.Message}). error {{07CFEFD6-1F99-4082-925B-7F636BB6CC0A}}");
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
 
                 break;
-            case GlobalStatic.Commands.HTTP:
+            case GlobalStatic.Routes.HTTP:
 
                 break;
-            case GlobalStatic.Commands.SHOT:
+            case GlobalStatic.Routes.SHOT:
 
                 break;
-            case GlobalStatic.Commands.CAMERAS:
+            case GlobalStatic.Routes.Cameras:
 
                 break;
-            case GlobalStatic.Commands.AB_LOG_SYSTEM:
+            case GlobalStatic.Routes.AB_LOG_SYSTEM:
 
                 break;
         }
     }
+
+    /// <inheritdoc/>
+    public async Task PublishMessage(string body_string, string topic, string? secret, string salt)
+    {
+        byte[] payload_bytes = await CipherService.EncryptAsync(body_string, secret ?? CipherService.DefaultSecret, salt);
+        MqttPublishMessageModel pub_msg = new(payload_bytes, new[] { topic })
+        {
+            CorrelationData = Encoding.UTF8.GetBytes(salt),
+        };
+
+        MqttPublishMessageResultModel pub_res = await PublishMessage(pub_msg);
+
+        if (!pub_res.IsSuccess)
+            _logger.LogError($"!pub_red.IsSuccess ({pub_res.Message}). error FAB191D8-4648-4705-AEFF-DF0AB762E527");
+    }
 }
+/*
+EntriesResponseModel HardwaresGetAllAsEntries();
+EntriesNestedResponseModel HardwaresGetTreeNestedEntries();
+
+ResponseBaseModel HardwareDelete(int hardware_id);
+HardwareResponseModel HardwareUpdate(HardwareBaseModel hardware);
+PortHardwareResponseModel HardwarePortGet(int port_id);
+HttpResponseModel GetHardwareHtmlPage(HardvareGetRequestModel req);
+EntriyResponseModel CheckPortHardware(PortHardwareCheckRequestModel req);
+ResponseBaseModel SetNamePort(EntryModel port_id_name);
+ */

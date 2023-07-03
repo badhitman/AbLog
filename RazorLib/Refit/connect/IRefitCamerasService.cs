@@ -12,6 +12,6 @@ public interface IRefitCamerasService
     /// <summary>
     /// Получить все доступные камеры
     /// </summary>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Cameras}/{GlobalStatic.HttpRoutes.LIST}")]
+    [Get($"/api/{GlobalStatic.Routes.Cameras}/{GlobalStatic.Routes.LIST}")]
     public Task<ApiResponse<EntriesSortingResponseModel>> GetAllCameras();
 }

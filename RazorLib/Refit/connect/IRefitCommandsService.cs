@@ -14,21 +14,21 @@ public interface IRefitCommandsService
     /// </summary>
     /// <param name="script_id">Идентификатор скрипта</param>
     /// <returns>Команды скрипта</returns>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Commands}/{GlobalStatic.HttpRoutes.BY_OWNER}/{{script_id}}")]
+    [Get($"/api/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.BY_OWNER}/{{script_id}}")]
     public Task<ApiResponse<EntriesSortingResponseModel>> GetCommandsEntriesByScript(int script_id);
 
     /// <summary>
     /// Получить команду
     /// </summary>
     /// <param name="command_id">Идентификатор команды</param>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Commands}/{{command_id}}")]
+    [Get($"/api/{GlobalStatic.Routes.Commands}/{{command_id}}")]
     public Task<ApiResponse<CommandResponseModel>> CommandGet(int command_id);
 
     /// <summary>
     /// Обновитьсоздать команду
     /// </summary>
     /// <param name="command">Команда обновления</param>
-    [Post($"/api/{GlobalStatic.HttpRoutes.Commands}/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [Post($"/api/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}")]
     public Task<ApiResponse<ResponseBaseModel>> CommandUpdateOrCreate(CommandModelDB command);
 
     /// <summary>
@@ -36,7 +36,7 @@ public interface IRefitCommandsService
     /// </summary>
     /// <param name="commands_for_move">Идентификаторы команд, которые нужно поменять месстами в сортировке</param>
     /// <returns>Новый (актуальный) перечень команд</returns>
-    [Put($"/api/{GlobalStatic.HttpRoutes.Commands}/{GlobalStatic.HttpRoutes.SORTING}")]
+    [Put($"/api/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.SORTING}")]
     public Task<ApiResponse<EntriesSortingResponseModel>> CommandSortingSet(IdsPairModel commands_for_move);
 
     /// <summary>
@@ -44,6 +44,6 @@ public interface IRefitCommandsService
     /// </summary>
     /// <param name="id_command">Идентификатор команды для удаления</param>
     /// <returns></returns>
-    [Delete($"/api/{GlobalStatic.HttpRoutes.Commands}/{{id_command}}")]
+    [Delete($"/api/{GlobalStatic.Routes.Commands}/{{id_command}}")]
     public Task<ApiResponse<ResponseBaseModel>> CommandDelete(int id_command);
 }

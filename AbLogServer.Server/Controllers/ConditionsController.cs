@@ -44,7 +44,7 @@ public class ConditionsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"/{GlobalStatic.Routes.UPDATE}")]
     public ConditionsAnonimResponseModel ConditionUpdateOrCreate(UpdateConditionRequestModel condition_request)
     {
         ConditionsAnonimResponseModel res_ac = new();
@@ -137,7 +137,7 @@ public class ConditionsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpDelete($"/{GlobalStatic.HttpRoutes.Conditions}/{{condition_id}}/{{condition_type}}")]
+    [HttpDelete($"/{GlobalStatic.Routes.Conditions}/{{condition_id}}/{{condition_type}}")]
     public ConditionsAnonimResponseModel ConditionDelete(int condition_id, ConditionsTypesEnum condition_type)
     {
         ConditionsAnonimResponseModel res_ac = new();

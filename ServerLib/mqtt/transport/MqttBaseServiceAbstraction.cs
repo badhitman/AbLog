@@ -93,7 +93,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             _logger.LogWarning($"{csr.ReasonString} _mqttClient.Subscribe >> {JsonConvert.SerializeObject(MqttSubscribeOptions.TopicFilters.Select(x => x.Topic))}");
 #if DEBUG
             MqttApplicationMessage applicationMessage = new MqttApplicationMessageBuilder()
-            .WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM)
+            .WithTopic(GlobalStatic.Routes.AB_LOG_SYSTEM)
             .WithUserProperty("test_prop_name", "test_prop_value")
             .WithPayload("19.5")
             .Build();
@@ -112,7 +112,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     /// <inheritdoc/>
     public virtual Task ApplicationMessageReceiveHandledAsync(MqttApplicationMessageReceivedEventArgs e)
     {
-        _logger.LogInformation($"client:{e.ClientId}; topic:{e.ApplicationMessage.Topic};{e.ApplicationMessage.UserProperties}");
+        _logger.LogInformation($"client:{e.ClientId}; topic:{e.ApplicationMessage.Topic};");
         if (e.ApplicationMessage.PayloadSegment.Array is not null)
             _logger.LogInformation(Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment.Array));
         if (ApplicationMessageReceivedAsync is not null)
@@ -187,7 +187,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             .WithRetainFlag(message.RetainFlag)
             .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
             .WithPayload(message.Payload)
-            .WithTopic(GlobalStatic.Commands.AB_LOG_SYSTEM);
+            .WithTopic(GlobalStatic.Routes.AB_LOG_SYSTEM);
 
         if (message.CorrelationData?.Any() == true)
             msg.WithCorrelationData(message.CorrelationData);

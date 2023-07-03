@@ -14,7 +14,7 @@ public interface IRefitContentionsService
     /// </summary>
     /// <param name="script_id">script_id/ScriptMasterId</param>
     /// <returns>Перечень Id скриптов, которым запрещён автозапуск во время выполенния конкурирующего скрипта script_id (ScriptMasterId)</returns>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Contentions}/{{script_id}}")]
+    [Get($"/api/{GlobalStatic.Routes.Contentions}/{{script_id}}")]
     public Task<ApiResponse<IdsResponseModel>> ContentionsGetByScript(int script_id);
 
     /// <summary>
@@ -22,6 +22,6 @@ public interface IRefitContentionsService
     /// </summary>
     /// <param name="contention_upd">Запрос</param>
     /// <returns>Перечень Id скриптов, которым запрещён автозапуск во время выполенния конкурирующего скрипта ScriptMasterId</returns>
-    [Post($"/api/{GlobalStatic.HttpRoutes.Contentions}/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [Post($"/api/{GlobalStatic.Routes.Contentions}/{GlobalStatic.Routes.UPDATE}")]
     public Task<ApiResponse<IdsResponseModel>> ContentionSet(UpdateContentionRequestModel contention_upd);
 }

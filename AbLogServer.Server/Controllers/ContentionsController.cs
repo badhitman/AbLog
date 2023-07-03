@@ -48,7 +48,7 @@ public class ContentionsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"{GlobalStatic.Routes.UPDATE}")]
     public IdsResponseModel ContentionSet(UpdateContentionRequestModel contention_json)
     {
         IdsResponseModel res_ids = new();

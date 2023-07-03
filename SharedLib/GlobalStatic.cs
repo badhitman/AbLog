@@ -199,12 +199,16 @@ namespace SharedLib
         /// <summary>
         /// 
         /// </summary>
-        public static class HttpRoutes
+        public static class Routes
         {
             /// <summary>
             /// 
             /// </summary>
             public const string Hardwares = "hardwares";
+            /// <summary>
+            /// 
+            /// </summary>
+            public const string Hardware = "hardware";
             /// <summary>
             /// 
             /// </summary>
@@ -320,13 +324,7 @@ namespace SharedLib
             /// check
             /// </summary>
             public const string GET = "get";
-        }
 
-        /// <summary>
-        /// Команды (топики MQTT)
-        /// </summary>
-        public static class Commands
-        {
             /// <summary>
             /// Системный топик MQTT на который будут подписаны все
             /// </summary>
@@ -336,16 +334,6 @@ namespace SharedLib
             /// http
             /// </summary>
             public const string HTTP = "http";
-
-            /// <summary>
-            /// cameras
-            /// </summary>
-            public const string CAMERAS = "cameras";
-
-            /// <summary>
-            /// hardwares
-            /// </summary>
-            public const string HARDWARES = "hardwares";
 
             /// <summary>
             /// shot

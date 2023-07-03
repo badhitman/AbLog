@@ -14,13 +14,13 @@ public interface IRefitStorageService
     /// <summary>
     /// Получить конфигурацию Email (imap+smtp)
     /// </summary>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.Email}/{GlobalStatic.HttpRoutes.GET}")]
+    [Get($"/api/{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}")]
     public Task<ApiResponse<EmailConfigResponseModel>> EmailConfigGet();
 
     /// <summary>
     /// Сохранить конфигурацию Email (imap+smtp)
     /// </summary>
-    [Post($"/api/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.Email}/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [Post($"/api/{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}")]
     public Task<ApiResponse<ResponseBaseModel>> EmailConfigSave(EmailConfigModel email_conf);
 
     #endregion
@@ -30,13 +30,13 @@ public interface IRefitStorageService
     /// <summary>
     /// Получить конфигурацию Mqtt
     /// </summary>
-    [Get($"/api/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.GET}")]
+    [Get($"/api/{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.GET}")]
     public Task<ApiResponse<MqttConfigResponseModel>> MqttConfigGet();
 
     /// <summary>
     /// Сохранить конфигурацию Mqtt
     /// </summary>
-    [Post($"/api/{GlobalStatic.HttpRoutes.Storage}/{GlobalStatic.HttpRoutes.Mqtt}/{GlobalStatic.HttpRoutes.UPDATE}")]
+    [Post($"/api/{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.UPDATE}")]
     public Task<ApiResponse<ResponseBaseModel>> MqttConfigSave(MqttConfigModel mqtt_conf);
 
     #endregion

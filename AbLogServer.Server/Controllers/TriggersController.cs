@@ -24,7 +24,7 @@ public class TriggersController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.LIST}")]
+    [HttpGet($"{GlobalStatic.Routes.LIST}")]
     public TriggersResponseModel TriggersGetAll()
     {
         TriggersResponseModel res_trigs = new();
@@ -40,7 +40,7 @@ public class TriggersController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"{GlobalStatic.Routes.UPDATE}")]
     public TriggersResponseModel TriggerUpdateOrCreate(TrigerModelDB trigger_json)
     {
         TriggersResponseModel res_trigs = new();

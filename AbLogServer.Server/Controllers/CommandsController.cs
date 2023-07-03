@@ -26,7 +26,7 @@ public class CommandsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpGet($"{GlobalStatic.HttpRoutes.BY_OWNER}/{{script_id}}")]
+    [HttpGet($"{GlobalStatic.Routes.BY_OWNER}/{{script_id}}")]
     public EntriesSortingResponseModel GetCommandsEntriesByScript(int script_id)
     {
         EntriesSortingResponseModel res_oe = new();
@@ -64,7 +64,7 @@ public class CommandsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.HttpRoutes.UPDATE}")]
+    [HttpPost($"{GlobalStatic.Routes.UPDATE}")]
     public ResponseBaseModel CommandUpdateOrCreate(CommandModelDB command_json)
     {
         ResponseBaseModel res_b = new();
@@ -183,7 +183,7 @@ public class CommandsController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpPut($"{GlobalStatic.HttpRoutes.SORTING}")]
+    [HttpPut($"{GlobalStatic.Routes.SORTING}")]
     public EntriesSortingResponseModel CommandSortingSet(IdsPairModel req)
     {
         EntriesSortingResponseModel res_oe = new();

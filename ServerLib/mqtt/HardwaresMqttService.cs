@@ -35,7 +35,7 @@ public class HardwaresMqttService : IHardwaresService
     public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
     {
         HardwaresResponseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel(), GlobalStatic.Commands.HARDWARES, cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -69,7 +69,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, GlobalStatic.Commands.HARDWARES, cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -141,3 +141,14 @@ public class HardwaresMqttService : IHardwaresService
         throw new NotImplementedException();
     }
 }
+/* 
+EntriesResponseModel HardwaresGetAllAsEntries();
+EntriesNestedResponseModel HardwaresGetTreeNestedEntries();
+
+ResponseBaseModel HardwareDelete(int hardware_id);
+HardwareResponseModel HardwareUpdate(HardwareBaseModel hardware);
+PortHardwareResponseModel HardwarePortGet(int port_id);
+HttpResponseModel GetHardwareHtmlPage(HardvareGetRequestModel req);
+EntriyResponseModel CheckPortHardware(PortHardwareCheckRequestModel req);
+ResponseBaseModel SetNamePort(EntryModel port_id_name);
+ */
