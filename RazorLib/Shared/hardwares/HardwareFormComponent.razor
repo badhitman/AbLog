@@ -108,9 +108,9 @@ else
     {
         IsBusyProgress = true;
         HardwareResponseModel rest = await _hardwares.HardwareUpdate(hw);
+        showMessages?.ShowMessages(rest.Messages);
         if (!rest.IsSuccess || rest.Hardware is null)
         {
-            showMessages?.ShowMessages(rest.Messages);
             IsBusyProgress = false;
             return;
         }

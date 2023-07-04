@@ -36,15 +36,19 @@ public class HardwaresLocalService : IHardwaresService
 
         try
         {
-            using HttpClient client = new();
-            client.BaseAddress = new Uri(db_hw.Address);
+            using HttpClient client = new()
+            {
+                BaseAddress = new Uri(db_hw.Address),
+                Timeout = TimeSpan.FromSeconds(3)
+            };
+
             string uri_path = string.IsNullOrWhiteSpace(req.Path)
                 ? db_hw.Password
                 : req.Path;
 
             if (!uri_path.StartsWith(db_hw.Password))
                 uri_path = $"{db_hw.Password}/{uri_path}";
-            
+
             HttpResponseMessage response = await client.GetAsync(uri_path, cancellation_token);
             return new()
             {
@@ -192,7 +196,7 @@ public class HardwaresLocalService : IHardwaresService
                 port_db = new PortModelDB() { HardwareId = req.HardwareId, PortNum = req.PortNum, Name = $"№ {req.PortNum}" };
                 db.Add(port_db);
                 db.SaveChanges();
-                res.AddInfo("Порт создан");
+                res.AddInfo($"Порт создан: №{port_db.PortNum} - '{port_db.Name}'");
             }
             res.Entry = new EntryModel() { Id = port_db.Id, Name = port_db.Name };
         }
@@ -243,12 +247,14 @@ public class HardwaresLocalService : IHardwaresService
                 db_hw.CommandsAllowed = hardware.CommandsAllowed;
                 db.Update(db_hw);
                 db.SaveChanges();
+                res.AddSuccess("Сохранение выполнено");
             }
             else
             {
                 db_hw = new(hardware);
                 db.Add(db_hw);
                 db.SaveChanges();
+                res.AddSuccess("Устройство создано");
             }
         }
         res.Hardware = new(db_hw!);

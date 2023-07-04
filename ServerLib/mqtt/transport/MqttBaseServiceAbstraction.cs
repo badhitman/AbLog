@@ -248,8 +248,16 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
         };
 
         _mqttClient.ApplicationMessageReceivedAsync += MessageReceivedEvent;
-
-        MqttPublishMessageResultModel send_msg = await PublishMessage(p_msg, cancellation_token);
+        MqttPublishMessageResultModel send_msg;
+        try
+        {
+            send_msg = await PublishMessage(p_msg, cancellation_token);
+        }
+        catch (Exception ex)
+        {
+            res.AddError(ex.Message);
+            return res;
+        }
 
         while (res.Response is null)
             await Task.Delay(100, cancellation_token);

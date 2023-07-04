@@ -28,6 +28,10 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.SHOT); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.ENTRIES}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.NESTED_ENTRIES}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.UPDATE}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.DELETE}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}"); })
@@ -68,6 +72,26 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
+            case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.ENTRIES}":
+                req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req is null)
+                {
+                    _logger.LogError("req is null. error C1595114-C3E5-4AE1-937B-8B45C59C8507");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAllAsEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.NESTED_ENTRIES}":
+                req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req is null)
+                {
+                    _logger.LogError("req is null. error 787DE141-F012-4369-AD88-95ACBB7BD937");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetTreeNestedEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
             case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}":
                 SimpleIdNoiseModel? req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
                 if (req_nid is null)
@@ -77,6 +101,26 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
 
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.UPDATE}":
+                HardwareBaseModel? req_hw = JsonConvert.DeserializeObject<HardwareBaseModel>(payload_json);
+                if (req_hw is null)
+                {
+                    _logger.LogError("req is null. error F7657C6A-2601-49BE-8F65-F302F5B1B4A3");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareUpdate(req_hw)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.DELETE}":
+                req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+                if (req_nid is null)
+                {
+                    _logger.LogError("req is null. error 86375673-BAA9-41EA-83F9-0F30DB918D05");
+                    return;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareDelete(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case GlobalStatic.Routes.HTTP:
                 HardvareGetRequestModel? req_http = JsonConvert.DeserializeObject<HardvareGetRequestModel>(payload_json);
@@ -145,14 +189,3 @@ public class MqttServerService : MqttBaseServiceAbstraction
             _logger.LogError($"!pub_red.IsSuccess ({pub_res.Message}). error FAB191D8-4648-4705-AEFF-DF0AB762E527");
     }
 }
-/*
-EntriesResponseModel HardwaresGetAllAsEntries();
-EntriesNestedResponseModel HardwaresGetTreeNestedEntries();
-
-ResponseBaseModel HardwareDelete(int hardware_id);
-HardwareResponseModel HardwareUpdate(HardwareBaseModel hardware);
-PortHardwareResponseModel HardwarePortGet(int port_id);
-HttpResponseModel GetHardwareHtmlPage(HardvareGetRequestModel req);
-EntriyResponseModel CheckPortHardware(PortHardwareCheckRequestModel req);
-ResponseBaseModel SetNamePort(EntryModel port_id_name);
- */

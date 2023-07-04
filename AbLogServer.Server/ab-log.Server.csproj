@@ -6,11 +6,16 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>ABLog</RootNamespace>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<ApplicationIcon>favicon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <DefineConstants>$(DefineConstants);DEMO</DefineConstants>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="favicon.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.16" />
