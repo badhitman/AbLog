@@ -4,6 +4,7 @@
 @using RazorLib.Shared.html;
 @using System.Web;
 @using SharedLib;
+@using System.Collections.Concurrent;
 
 @inherits ReloadPageComponentBaseModel
 
@@ -62,6 +63,8 @@ else
 
         await GetData();
     }
+    static SemaphoreSlim _syncLock = new SemaphoreSlim(3, 3);
+    static BlockingCollection<Task> tasks = new();
 
     static Regex port_num = new(@"^\d+$", RegexOptions.Compiled);
 
@@ -78,19 +81,27 @@ else
         NameValueCollection path_parameters = HttpUtility.ParseQueryString(ext_path);
         if (path_parameters.Count == 1 && port_num.IsMatch(path_parameters.Get("pt") ?? ""))
         {
-            IsBusyProgress = true;
-            EntriyResponseModel rest = await _hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = int.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true });
+            await InvokeAsync(async () =>
+            {
+                IsBusyProgress = true;
+                StateHasChanged();
+                await _syncLock.WaitAsync();
 
-            showMessages?.ShowMessages(rest.Messages);
-            if (!rest.IsSuccess)
-                return;
+                EntriyResponseModel rest = await _hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = int.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true });
 
-            PortEntry = rest.Entry ?? new();
+                showMessages?.ShowMessages(rest.Messages);
+                if (!rest.IsSuccess)
+                    return;
 
-            if (AutoLoadAndExpand)
-                await Expand();
+                PortEntry = rest.Entry ?? new();
 
-            IsBusyProgress = false;
+                if (AutoLoadAndExpand)
+                    await Expand();
+
+                _syncLock.Release();
+                IsBusyProgress = false;
+                StateHasChanged();
+            });
         }
     }
 }
