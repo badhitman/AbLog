@@ -25,13 +25,13 @@ public class StorageController : ControllerBase
     #region Email
 
     /// <summary>
-    /// Получить конфигурацию Email (imap+smtp)
+    /// Получить конфигурацию Email (smtp)
     /// </summary>
     [HttpGet($"{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}")]
     public async Task<EmailConfigResponseModel> EmailConfigGet() => await _parameters_storage.GetEmailConfig();
 
     /// <summary>
-    /// Сохранить конфигурацию Email (imap+smtp)
+    /// Сохранить конфигурацию Email (smtp)
     /// </summary>
     [HttpPost($"{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}")]
     public async Task<ResponseBaseModel> EmailConfigSave(EmailConfigModel e_conf) => await _parameters_storage.SaveEmailConfig(e_conf);
@@ -47,7 +47,7 @@ public class StorageController : ControllerBase
     public async Task<MqttConfigResponseModel> MqttConfigGet() => await _parameters_storage.GetMqttConfig();
 
     /// <summary>
-    /// Сохранить конфигурацию Mqtt (imap+smtp)
+    /// Сохранить конфигурацию Mqtt
     /// </summary>
     [HttpPost($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.UPDATE}")]
     public async Task<ResponseBaseModel> MqttConfigSave(MqttConfigModel e_conf)

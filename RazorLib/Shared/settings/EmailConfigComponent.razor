@@ -1,6 +1,11 @@
-﻿@using SharedLib;
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
 
 @inject IParametersStorageService _storage
+@inject IToolsService _tools
+@inject ISnackbar _snackbar
 
 <div class="card">
     <div class="card-body">
@@ -8,31 +13,116 @@
         <hr />
         <form>
             <div class="mb-3">
-                <label for="exampleInputServer" class="form-label">Сервер</label>
-                <input type="text" class="form-control" id="exampleInputServer" aria-describedby="serverHelp">
-                <div id="serverHelp" class="form-text">Адрес сервера SMTP</div>
+                <div class="row">
+                    <div class="col">
+                        <label for="exampleInputEmail" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp">
+                    </div>
+                    <div class="col">
+                        <label for="exampleInputLogin" class="form-label">Логин</label>
+                        <input type="text" class="form-control" id="exampleInputLogin" aria-describedby="loginHelp">
+                    </div>
+                    <div class="col">
+                        <label for="exampleInputPassword" class="form-label">Пароль</label>
+                        <div class="input-group">
+                            <input type="@(ShowPassword ? "text" : "password")" class="form-control" id="exampleInputPassword">
+                            <button @onclick="() => { ShowPassword = !ShowPassword; }" class="btn btn@(ShowPassword ? "" : "-outline")-secondary" type="button">@(ShowPassword ? "Скрыть" : "Показать")</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="mb-3">
-                <label for="exampleInputLogin" class="form-label">Логин</label>
-                <input type="text" class="form-control" id="exampleInputLogin" aria-describedby="loginHelp">
-                <div id="loginHelp" class="form-text">Имя пользователя для авторизации на сервере SMTP.</div>
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="exampleInputPassword">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">SMTP</h5>
+                        <div>
+                            <label class="form-label"><span class="text-info">host:port</span></label>
+                            <div class="input-group mb-3">
+                                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control border-info border-end-0" @bind-value="connect_config.HostSmtp" @bind-value:event="oninput" placeholder="SMTP Host" aria-label="SMTP Server host">
+                                <span class="input-group-text px-1 border-info border-start-0 border-end-0">:</span>
+                                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="number" class="form-control border-info border-start-0" @bind-value="connect_config.PortSmtp" @bind-value:event="oninput" style="max-width: 100px;" placeholder="Port" aria-label="Smtp Server port">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label"><span class="text-primary">(ssl mode: @(connect_config.UseSslSmtp))</span> | <span class="text-@(connect_config.LogsSmtp ? "white" : "secondary")">логирование @(connect_config.LogsSmtp ? "включено" : "отключено")</span></label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text border-primary">SSL</span>
+                                <select disabled="@(TestConnectProcess || IsBusyProgress)" class="form-select border-primary border-start-0" @bind="connect_config.UseSslSmtp">
+                                    @foreach (SecureSocketOptionsEnum sso in (SecureSocketOptionsEnum[])Enum.GetValues(typeof(SecureSocketOptionsEnum)))
+                                    {
+                                        <option value="@sso">@sso.ToFriendlyString()</option>
+                                    }
+                                </select>
+                                <div class="input-group-text">
+                                    <input disabled="@(TestConnectProcess || IsBusyProgress)" class="form-check-input mt-0" type="checkbox" @bind="connect_config.LogsSmtp" aria-label="логировать smtp" name="@(nameof(connect_config.LogsSmtp))" id="@(nameof(connect_config.LogsSmtp))">
+                                    <label class="form-check-label ms-1 text-@(connect_config.LogsSmtp ? "dark" : "secondary")" for="@(nameof(connect_config.LogsSmtp))">
+                                        logs
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
                     <button type="button" class="btn btn-outline-primary">Сохранить</button>
                     <button type="button" class="btn btn-outline-primary">Отмена</button>
                 </div>
-                @*<button class="btn btn-primary me-md-2" type="button">Button</button>*@
                 <button class="btn btn-primary" type="button">Тест подключения</button>
             </div>
         </form>
     </div>
 </div>
 
-@code {
+<ShowMessagesComponent @ref="_messages_ref" />
 
+@code {
+    bool CanSave => connect_config != connect_config_orign;
+    bool ShowPassword;
+
+    EmailConfigModel connect_config = new();
+    EmailConfigModel connect_config_orign = new();
+
+    //ToastContainerComponent? toast_ref;
+    ShowMessagesComponent? _messages_ref;
+
+    bool TestConnectProcess = false;
+
+    async Task SaveConfig()
+    {
+        IsBusyProgress = true;
+        ResponseBaseModel rest = await _storage.SaveEmailConfig(connect_config);
+        if (rest.IsSuccess)
+        {
+            connect_config_orign = GlobalStatic.CreateDeepCopy(connect_config);
+        }
+        IsBusyProgress = false;
+        _messages_ref?.ShowMessages(rest.Messages);
+    }
+
+    async Task TectConfigConnect()
+    {
+        TestConnectProcess = true;
+        ResponseBaseModel rest = await _tools.TestEmailConnect(connect_config);
+        _messages_ref?.ShowMessages(rest.Messages);
+        TestConnectProcess = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusyProgress = true;
+        EmailConfigResponseModel res = await _storage.GetEmailConfig();
+
+        _messages_ref?.ShowMessages(res.Messages);
+        if (!res.IsSuccess || res.Conf is null)
+        {
+            IsBusyProgress = false;
+            return;
+        }
+
+        connect_config_orign = res.Conf;
+        connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign);
+        IsBusyProgress = false;
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using MailKit.Net.Smtp;
-using MailKit.Net.Imap;
 using MailKit.Security;
 using SharedLib;
 using MimeKit;
@@ -62,8 +61,8 @@ public class EmailLocalService : IEmailService, IDisposable
     {
         using MimeMessage emailMessage = new();
 
-        emailMessage.From.Add(new MailboxAddress(conf.Name, conf.Email));
-        emailMessage.To.Add(new MailboxAddress("", email));
+        emailMessage.From.Add(new MailboxAddress(conf.Email, conf.Email));
+        emailMessage.To.Add(new MailboxAddress(email, email));
         emailMessage.Subject = subject;
         emailMessage.Body = new TextPart(html_format ? MimeKit.Text.TextFormat.Plain : MimeKit.Text.TextFormat.Html)
         {
