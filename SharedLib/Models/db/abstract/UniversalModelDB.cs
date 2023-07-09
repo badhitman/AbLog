@@ -5,23 +5,22 @@
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
-namespace SharedLib
+namespace SharedLib;
+
+/// <summary>
+/// Универсальная модель:
+/// с признаками AlarmSubscriber (подписка на уведомления) и CommandsAllowed (поддержка команд)
+/// </summary>
+[Index(nameof(AlarmSubscriber), nameof(CommandsAllowed))]
+public abstract class UniversalModelDB : EntryModel
 {
     /// <summary>
-    /// Универсальная модель:
-    /// с признаками AlarmSubscriber (подписка на уведомления) и CommandsAllowed (поддержка команд)
+    /// Подписка на уведомления
     /// </summary>
-    [Index(nameof(AlarmSubscriber), nameof(CommandsAllowed))]
-    public abstract class UniversalModelDB : EntryModel
-    {
-        /// <summary>
-        /// Подписка на уведомления
-        /// </summary>
-        public bool AlarmSubscriber { get; set; }
+    public bool AlarmSubscriber { get; set; }
 
-        /// <summary>
-        /// Поддержка команд
-        /// </summary>
-        public bool CommandsAllowed { get; set; }
-    }
+    /// <summary>
+    /// Поддержка команд
+    /// </summary>
+    public bool CommandsAllowed { get; set; }
 }

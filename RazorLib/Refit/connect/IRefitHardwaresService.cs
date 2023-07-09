@@ -1,4 +1,8 @@
-﻿using SharedLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using SharedLib;
 using Refit;
 
 namespace BlazorLib;
@@ -57,7 +61,7 @@ public interface IRefitHardwaresService
     /// Получить HTML основной страницы устройства
     /// </summary>
     [Post($"/api/{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTML}/{GlobalStatic.Routes.MAIN}")]
-    public Task<ApiResponse<HttpResponseModel>> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default);
+    public Task<ApiResponse<HttpResponseModel>> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Запрос/проверка порта устройства

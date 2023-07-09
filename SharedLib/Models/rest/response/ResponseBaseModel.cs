@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Newtonsoft.Json;
 
 namespace SharedLib;
 
@@ -31,6 +35,16 @@ public class ResponseBaseModel
     /// Создать ответ с ошибкой
     /// </summary>
     public static ResponseBaseModel CreateError(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Error, Text = msg } } };
+
+    /// <summary>
+    /// Создать ответ с Success
+    /// </summary>
+    public static ResponseBaseModel CreateSuccess(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Success, Text = msg } } };
+
+    /// <summary>
+    /// Создать ответ с Warning
+    /// </summary>
+    public static ResponseBaseModel CreateWarning(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Warning, Text = msg } } };
 
     /// <summary>
     /// Базовая модель ответа сервера rest/api

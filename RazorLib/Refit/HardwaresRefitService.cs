@@ -1,181 +1,184 @@
-﻿using BlazorLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using BlazorLib;
 using SharedLib;
 
-namespace RazorLib
+namespace RazorLib;
+
+/// <summary>
+/// Устройства
+/// </summary>
+public class HardwaresRefitService : IHardwaresService
 {
+    readonly IRefitHardwaresService _refit_hardwares;
+
     /// <summary>
     /// Устройства
     /// </summary>
-    public class HardwaresRefitService : IHardwaresService
+    public HardwaresRefitService(IRefitHardwaresService refit_hardwares)
     {
-        readonly IRefitHardwaresService _refit_hardwares;
+        _refit_hardwares = refit_hardwares;
+    }
 
-        /// <summary>
-        /// Устройства
-        /// </summary>
-        public HardwaresRefitService(IRefitHardwaresService refit_hardwares)
+    /// <inheritdoc/>
+    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default)
+    {
+        Refit.ApiResponse<HttpResponseModel> rest = await _refit_hardwares.GetHardwareHtmlPage(req, cancellation_token);
+
+        if (rest.Content is null)
+            return new HttpResponseModel(ResponseBaseModel.CreateError("rest.Content is null // error {26ABE035-F428-4433-9BA6-9D8937051942}"));
+
+        return rest.Content;
+    }
+
+    /// <inheritdoc/>
+    public async Task<HardwareResponseModel> HardwareGet(int hardware_id, CancellationToken cancellation_token = default)
+    {
+        HardwareResponseModel res = new();
+        Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareGet(hardware_id, cancellation_token);
+
+        if (rest.Content is null)
         {
-            _refit_hardwares = refit_hardwares;
+            res.AddError("rest.Content is null // error {0CA3B140-267D-47C9-B094-62E3D07523B2}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
+    {
+        PortHardwareResponseModel res = new();
+        Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit_hardwares.HardwarePortGet(port_id, cancellation_token);
+
+        if (rest.Content is null)
         {
-            Refit.ApiResponse<HttpResponseModel> rest = await _refit_hardwares.GetHardwareHtmlPage(req, cancellation_token);
-
-            if (rest.Content is null)
-                return new HttpResponseModel(ResponseBaseModel.CreateError("rest.Content is null // error {26ABE035-F428-4433-9BA6-9D8937051942}"));
-
-            return rest.Content;
+            res.AddError("rest.Content is null // error {2A5377F9-CFBB-432D-941C-F2DD50D43238}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<HardwareResponseModel> HardwareGet(int hardware_id, CancellationToken cancellation_token = default)
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
+    {
+        HardwaresResponseModel res = new();
+        Refit.ApiResponse<HardwaresResponseModel> rest = await _refit_hardwares.HardwaresGetAll(cancellation_token);
+
+        if (rest.Content is null)
         {
-            HardwareResponseModel res = new();
-            Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareGet(hardware_id, cancellation_token);
-
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {0CA3B140-267D-47C9-B094-62E3D07523B2}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
-
-            return res;
+            res.AddError("rest.Content is null // error {B51CD9F7-B48A-4949-9F3E-FB561EC08959}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
+    {
+        EntriesResponseModel res = new();
+        Refit.ApiResponse<EntriesResponseModel> rest = await _refit_hardwares.HardwaresGetAllAsEntries(cancellation_token);
+
+        if (rest.Content is null)
         {
-            PortHardwareResponseModel res = new();
-            Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit_hardwares.HardwarePortGet(port_id, cancellation_token);
-
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {2A5377F9-CFBB-432D-941C-F2DD50D43238}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
-
-            return res;
+            res.AddError("rest.Content is null // error {C5D2189B-2E1E-4C83-BE8E-8AF5600B7DB4}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
+    {
+        EntriesNestedResponseModel res = new();
+        Refit.ApiResponse<EntriesNestedResponseModel> rest = await _refit_hardwares.HardwaresGetTreeNestedEntries(cancellation_token);
+
+        if (rest.Content is null)
         {
-            HardwaresResponseModel res = new();
-            Refit.ApiResponse<HardwaresResponseModel> rest = await _refit_hardwares.HardwaresGetAll(cancellation_token);
-
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {B51CD9F7-B48A-4949-9F3E-FB561EC08959}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
-
-            return res;
+            res.AddError("rest.Content is null // error {0E2597BA-C8AA-4B6F-843B-08ED1B6F1C9E}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
+    {
+        EntriyResponseModel res = new();
+        Refit.ApiResponse<EntriyResponseModel> rest = await _refit_hardwares.CheckPortHardware(req, cancellation_token);
+
+        if (rest.Content is null)
         {
-            EntriesResponseModel res = new();
-            Refit.ApiResponse<EntriesResponseModel> rest = await _refit_hardwares.HardwaresGetAllAsEntries(cancellation_token);
-
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {C5D2189B-2E1E-4C83-BE8E-8AF5600B7DB4}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
-
-            return res;
+            res.AddError("rest.Content is null // error {22228B6C-C216-45BE-A861-BE41ECC0EDE3}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
+    {
+        HardwareResponseModel res = new();
+
+        Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareUpdate(hardware, cancellation_token);
+
+        if (rest.Content is null)
         {
-            EntriesNestedResponseModel res = new();
-            Refit.ApiResponse<EntriesNestedResponseModel> rest = await _refit_hardwares.HardwaresGetTreeNestedEntries(cancellation_token);
-
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {0E2597BA-C8AA-4B6F-843B-08ED1B6F1C9E}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
-
-            return res;
+            res.AddError("rest.Content is null // error {8C403734-E575-46E4-A784-17742D0AEF97}");
+            if (rest.Error is not null)
+                res.AddError(rest.Error.Message);
         }
+        else
+            res = rest.Content;
 
-        /// <inheritdoc/>
-        public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
-        {
-            EntriyResponseModel res = new();
-            Refit.ApiResponse<EntriyResponseModel> rest = await _refit_hardwares.CheckPortHardware(req, cancellation_token);
+        return res;
+    }
 
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {22228B6C-C216-45BE-A861-BE41ECC0EDE3}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
+    /// <inheritdoc/>
+    public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
+    {
+        Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.SetNamePort(port_id_name, cancellation_token);
 
-            return res;
-        }
+        if (rest.Content is null)
+            return ResponseBaseModel.CreateError("rest.Content is null // error {1A93C004-2AC6-4541-8351-D15B349CC7B1}");
 
-        /// <inheritdoc/>
-        public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
-        {
-            HardwareResponseModel res = new();
+        return rest.Content;
+    }
 
-            Refit.ApiResponse<HardwareResponseModel> rest = await _refit_hardwares.HardwareUpdate(hardware, cancellation_token);
+    /// <inheritdoc/>
+    public async Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
+    {
+        Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.HardwareDelete(hardware_id, cancellation_token);
 
-            if (rest.Content is null)
-            {
-                res.AddError("rest.Content is null // error {8C403734-E575-46E4-A784-17742D0AEF97}");
-                if (rest.Error is not null)
-                    res.AddError(rest.Error.Message);
-            }
-            else
-                res = rest.Content;
+        if (rest.Content is null)
+            return ResponseBaseModel.CreateError("rest.Content is null // error {E5DDF9CE-8C59-4E5B-802D-027BCE753BCA}");
 
-            return res;
-        }
-
-        /// <inheritdoc/>
-        public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
-        {
-            Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.SetNamePort(port_id_name, cancellation_token);
-
-            if (rest.Content is null)
-                return ResponseBaseModel.CreateError("rest.Content is null // error {1A93C004-2AC6-4541-8351-D15B349CC7B1}");
-
-            return rest.Content;
-        }
-
-        /// <inheritdoc/>
-        public async Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
-        {
-            Refit.ApiResponse<ResponseBaseModel> rest = await _refit_hardwares.HardwareDelete(hardware_id, cancellation_token);
-
-            if (rest.Content is null)
-                return ResponseBaseModel.CreateError("rest.Content is null // error {E5DDF9CE-8C59-4E5B-802D-027BCE753BCA}");
-
-            return rest.Content;
-        }
+        return rest.Content;
     }
 }

@@ -1,13 +1,16 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Тригеры (все): Ответ rest/api
+/// </summary>
+public class TriggersResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Тригеры (все): Ответ rest/api
+    /// Перечень тригеров
     /// </summary>
-    public class TriggersResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// Перечень тригеров
-        /// </summary>
-        public IEnumerable<TrigerModelDB>? Triggers { get; set; }
-    }
+    public IEnumerable<TrigerModelDB>? Triggers { get; set; }
 }

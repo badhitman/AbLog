@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Microsoft.EntityFrameworkCore;
 using ab.context;
 using SharedLib;
 using System.Net;
@@ -11,7 +15,7 @@ namespace ServerLib;
 public class HardwaresLocalService : IHardwaresService
 {
     /// <inheritdoc/>
-    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
+    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default)
     {
         HardwareModelDB? db_hw;
         lock (ServerContext.DbLocker)

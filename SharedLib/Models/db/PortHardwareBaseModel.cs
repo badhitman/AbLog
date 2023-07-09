@@ -2,16 +2,15 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-namespace SharedLib
+namespace SharedLib;
+
+/// <summary>
+/// Порт устройства (базовая модель)
+/// </summary>
+public class PortHardwareBaseModel : EntryModel
 {
     /// <summary>
-    /// Порт устройства (базовая модель)
+    /// Номер порта
     /// </summary>
-    public class PortHardwareBaseModel : EntryModel
-    {
-        /// <summary>
-        /// Номер порта
-        /// </summary>
-        public int PortNum { get; set; }
-    }
+    public int PortNum { get; set; }
 }

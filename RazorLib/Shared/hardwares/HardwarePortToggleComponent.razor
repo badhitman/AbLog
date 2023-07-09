@@ -30,7 +30,7 @@
     async Task RequestPortStateSet()
     {
         IsBusyProgress = true;
-        HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardvareGetRequestModel() { HardwareId = Id, Path = $"?cmd={PortNum}:{PortState}" });
+        HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = $"?cmd={PortNum}:{PortState}" });
 
         showMessages?.ShowMessages(rest.Messages);
         if (!rest.IsSuccess)

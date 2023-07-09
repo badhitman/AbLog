@@ -2,36 +2,35 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-namespace SharedLib
+namespace SharedLib;
+
+/// <summary>
+/// Порт устройства
+/// </summary>
+public class PortModelDB : PortHardwareBaseModel
 {
     /// <summary>
-    /// Порт устройства
+    /// FK: Устройство
     /// </summary>
-    public class PortModelDB : PortHardwareBaseModel
+    public int HardwareId { get; set; }
+
+    /// <summary>
+    /// Устройство
+    /// </summary>
+    public HardwareModelDB? Hardware { get; set; }
+
+    /// <inheritdoc/>
+    public override string ToString()
     {
-        /// <summary>
-        /// FK: Устройство
-        /// </summary>
-        public int HardwareId { get; set; }
-
-        /// <summary>
-        /// Устройство
-        /// </summary>
-        public HardwareModelDB? Hardware { get; set; }
-
-        /// <inheritdoc/>
-        public override string ToString()
+        string port_name;
+        if (string.IsNullOrWhiteSpace(Name))
         {
-            string port_name;
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                port_name = $"P{PortNum}";
-            }
-            else
-            {
-                port_name = $"{Name} (P{PortNum})";
-            }
-            return port_name;
+            port_name = $"P{PortNum}";
         }
+        else
+        {
+            port_name = $"{Name} (P{PortNum})";
+        }
+        return port_name;
     }
 }

@@ -1,18 +1,21 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Тип значения для сравнивания (как строка, как число)
+/// </summary>
+public enum СomparisonsValuesTypesEnum
 {
     /// <summary>
-    /// Тип значения для сравнивания (как строка, как число)
+    /// Как число с точкой
     /// </summary>
-    public enum СomparisonsValuesTypesEnum
-    {
-        /// <summary>
-        /// Как число с точкой
-        /// </summary>
-        ValueAsDecimal,
+    ValueAsDecimal,
 
-        /// <summary>
-        /// Как строка
-        /// </summary>
-        ValueAsString,
-    }
+    /// <summary>
+    /// Как строка
+    /// </summary>
+    ValueAsString,
 }

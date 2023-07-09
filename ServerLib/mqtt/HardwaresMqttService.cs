@@ -1,4 +1,8 @@
-﻿using System.Runtime.Versioning;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using System.Runtime.Versioning;
 using Newtonsoft.Json;
 using MQTTnet.Client;
 using System.Text;
@@ -15,20 +19,14 @@ namespace ServerLib;
 [SupportedOSPlatform("android")]
 public class HardwaresMqttService : IHardwaresService
 {
-    readonly MqttFactory _mqttFactory;
-    readonly IMqttClient _mqtt_client;
     readonly IMqttBaseService _mqtt;
-    readonly MqttConfigModel _conf;
 
     /// <summary>
     /// Устройства IMqttClient
     /// </summary>
-    public HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel conf, MqttFactory mqttFactory, IMqttClient mqtt_client)
+    public HardwaresMqttService(IMqttBaseService mqtt)
     {
         _mqtt = mqtt;
-        _conf = conf;
-        _mqttFactory = mqttFactory;
-        _mqtt_client = mqtt_client;
     }
 
     /// <inheritdoc/>
@@ -60,7 +58,7 @@ public class HardwaresMqttService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default)
+    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default)
     {
 
         HttpResponseModel res = new();

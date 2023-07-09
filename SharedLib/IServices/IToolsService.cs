@@ -1,7 +1,11 @@
-﻿namespace SharedLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
 
 /// <summary>
-/// Tools
+/// Tools: MQTT and Email
 /// </summary>
 public interface IToolsService
 {
@@ -29,6 +33,11 @@ public interface IToolsService
     /// Тест Email подключения (SMTP)
     /// </summary>
     public Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null);
+
+    /// <summary>
+    /// Тест TelegramBot токена
+    /// </summary>
+    public Task<DictionaryResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null);
 
     /// <summary>
     /// 

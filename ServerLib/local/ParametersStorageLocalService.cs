@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Newtonsoft.Json;
 using ab.context;
 using SharedLib;
 using MQTTnet;
@@ -10,15 +14,46 @@ namespace ServerLib;
 /// </summary>
 public class ParametersStorageLocalService : IParametersStorageService
 {
-    readonly MqttFactory _mqtt_fact;
+    //readonly MqttFactory _mqtt_fact;
 
     /// <summary>
     /// Хранение параметров IMqttClient
     /// </summary>
-    public ParametersStorageLocalService(MqttFactory mqtt_fact)
+    public ParametersStorageLocalService()
     {
-        _mqtt_fact = mqtt_fact;
+        // _mqtt_fact = mqtt_fact;
     }
+
+    #region Telegram Bot
+
+    /// <inheritdoc/>
+    public virtual Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
+    {
+        using ParametersContext _context = new();
+        ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(connect_config));
+        ResponseBaseModel res = new();
+        res.AddSuccess($"Данные успешно записаны в БД #{p.Id}");
+        return Task.FromResult(res);
+    }
+
+    /// <inheritdoc/>
+    public virtual Task<TelegramBotConfigResponseModel> GetTelegramBotConfig()
+    {
+        TelegramBotConfigResponseModel res = new();
+        using ParametersContext _context = new();
+        string _telegramBotConfig = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
+        if (string.IsNullOrWhiteSpace(_telegramBotConfig))
+        {
+            res.AddWarning("Конфигурация не обнаружена");
+            return Task.FromResult(res);
+        }
+
+        res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig) ?? new();
+
+        return Task.FromResult(res);
+    }
+
+    #endregion
 
     #region Email
 

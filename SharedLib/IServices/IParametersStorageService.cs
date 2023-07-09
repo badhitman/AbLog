@@ -1,11 +1,29 @@
-﻿namespace SharedLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
 
 /// <summary>
 /// Хранение параметров в БД
 /// </summary>
 public interface IParametersStorageService
 {
-    #region Email
+    #region TelegramBot (удалённое хранение: на сервере)
+
+    /// <summary>
+    /// Сохранить конфигурацию TelegramBot токена
+    /// </summary>
+    public Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config);
+
+    /// <summary>
+    /// Получить конфигурацию TelegramBot токена
+    /// </summary>
+    public Task<TelegramBotConfigResponseModel> GetTelegramBotConfig();
+
+    #endregion
+
+    #region Email (удалённое хранение: на сервере)
 
     /// <summary>
     /// Сохранить конфигурацию Email подключения
@@ -19,7 +37,7 @@ public interface IParametersStorageService
 
     #endregion
 
-    #region MQTT
+    #region MQTT (локальное хранение)
 
     /// <summary>
     /// Сохранить настройки MQTT

@@ -8,6 +8,10 @@ using ServerLib;
 using NLog.Web;
 using MQTTnet;
 using NLog;
+using Telegram.Bot.Polling;
+using Telegram.Bot;
+using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot.Services;
 
 namespace AbLogServer;
 
@@ -32,6 +36,8 @@ public class Program
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             IWebHostEnvironment _env = builder.Environment;
 
+            builder.Services.AddHttpClient<ToolsLocalService>();
+            builder.Services.AddHttpClient<MqttServerService>();
             builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
             builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
             builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
@@ -63,8 +69,8 @@ public class Program
             }
 
             using ParametersContext _context = new();
-            string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
-            MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
+            string _json_config_raw = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
+            MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_json_config_raw) ?? new();
             builder.Services.AddSingleton(x => mqtt_settings);
 
             MqttFactory mqttFactory = new();
@@ -72,6 +78,25 @@ public class Program
             IMqttClient mqttClient = mqttFactory.CreateMqttClient();
             builder.Services.AddSingleton(x => mqttClient);
             builder.Services.AddSingleton<IMqttBaseService, MqttServerService>();
+
+            _json_config_raw = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
+            TelegramBotConfigModel tbot_settings = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_json_config_raw) ?? new();
+            builder.Services.AddSingleton(x => mqtt_settings);
+
+            if(tbot_settings.IsConfigured && tbot_settings.AutoStart && !string.IsNullOrEmpty(tbot_settings.TelegramBotToken))
+            {
+                builder.Services.AddHttpClient("telegram_bot_client")
+                .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
+                {
+                    //BotConfiguration? botConfig = sp.GetConfiguration<BotConfiguration>();
+                    TelegramBotClientOptions options = new(tbot_settings.TelegramBotToken);
+                    return new TelegramBotClient(options, httpClient);
+                });
+
+                builder.Services.AddScoped<UpdateHandler>();
+                builder.Services.AddScoped<ReceiverService>();
+                builder.Services.AddHostedService<PollingService>();
+            }
 
             WebApplication app = builder.Build();
 

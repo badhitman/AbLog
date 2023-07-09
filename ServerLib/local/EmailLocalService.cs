@@ -1,4 +1,8 @@
-﻿using MailKit.Net.Smtp;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using MailKit.Net.Smtp;
 using MailKit.Security;
 using SharedLib;
 using MimeKit;

@@ -1,33 +1,36 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// 
+/// </summary>
+public enum InputFormTypesEnum
 {
     /// <summary>
     /// 
     /// </summary>
-    public enum InputFormTypesEnum
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        Text,
+    Text,
 
-        /// <summary>
-        /// 
-        /// </summary>
-        Hidden,
+    /// <summary>
+    /// 
+    /// </summary>
+    Hidden,
 
-        /// <summary>
-        /// 
-        /// </summary>
-        Checkbox,
+    /// <summary>
+    /// 
+    /// </summary>
+    Checkbox,
 
-        /// <summary>
-        /// 
-        /// </summary>
-        Submit,
+    /// <summary>
+    /// 
+    /// </summary>
+    Submit,
 
-        /// <summary>
-        /// 
-        /// </summary>
-        Password
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    Password
 }

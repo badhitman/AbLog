@@ -1,23 +1,26 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Выравнивание по горизонтали
+/// </summary>
+public enum HorizontalAlignmentsEnum
 {
     /// <summary>
-    /// Выравнивание по горизонтали
+    /// По левому краю
     /// </summary>
-    public enum HorizontalAlignmentsEnum
-    {
-        /// <summary>
-        /// По левому краю
-        /// </summary>
-        Left,
+    Left,
 
-        /// <summary>
-        /// По центру
-        /// </summary>
-        Center,
+    /// <summary>
+    /// По центру
+    /// </summary>
+    Center,
 
-        /// <summary>
-        /// По правому краю
-        /// </summary>
-        Right
-    }
+    /// <summary>
+    /// По правому краю
+    /// </summary>
+    Right
 }

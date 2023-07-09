@@ -1,13 +1,16 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// 
+/// </summary>
+public class ShotCameraAsBase64ResponseModel : ResponseBaseModel
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ShotCameraAsBase64ResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public ShotCameraAsBase64Model ShotCameraImage { get; set; }
-    }
+    public ShotCameraAsBase64Model ShotCameraImage { get; set; }
 }

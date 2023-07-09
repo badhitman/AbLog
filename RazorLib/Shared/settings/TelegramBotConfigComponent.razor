@@ -1,60 +1,153 @@
 ﻿@using MudBlazor;
 @using SharedLib;
 
+@inherits BlazorBusyComponentBaseModel
+
 @inject IParametersStorageService _storage
+@inject IToolsService _tools;
+@inject ISnackbar _snackbar;
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Интерактивный доступ</h5>
         <hr />
-        <form>
-            <div class="mb-3">
-                <label for="exampleInputToken" class="form-label">Ключ бота</label>
-                <input type="text" class="form-control" id="exampleInputToken" aria-describedby="tokenHelp">
-                <div id="tokenHelp" class="form-text">Токен TelegramBot</div>
-            </div>
-            <MudTable ServerData="@(new Func<TableState, Task<TableData<TelegramUserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Пользователи Telegram</MudText>
-                    <MudSpacer />
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Пользователь</MudTh>
-                    <MudTh>Права</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Id">@context.Id</MudTd>
-                    <MudTd DataLabel="Name">@context.Name</MudTd>
-                </RowTemplate>
-                <NoRecordsContent>
-                    <MudText>No matching records found</MudText>
-                </NoRecordsContent>
-                <LoadingContent>
-                    <MudText>Loading...</MudText>
-                </LoadingContent>
-                <PagerContent>
-                    <MudTablePager />
-                </PagerContent>
-            </MudTable>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
-                    <button type="button" class="btn btn-outline-primary">Сохранить</button>
-                    <button type="button" class="btn btn-outline-primary">Отмена</button>
+        @if (IsBusyProgress)
+        {
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
                 </div>
-                @*<button class="btn btn-primary me-md-2" type="button">Button</button>*@
-                <button class="btn btn-primary" type="button">Проверка токена</button>
             </div>
-        </form>
+        }
+        else
+        {
+            <form>
+                <div class="mb-3">
+                    <EditForm Model="_conf" OnValidSubmit="OnValidSubmitHandle">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="mb-3">
+                            <label for="exampleInputToken" class="form-label">Ключ бота</label>
+                            <input @bind-value="_conf.TelegramBotToken" type="text" @bind-value:event="oninput" class="form-control" id="exampleInputToken" aria-describedby="tokenHelp">
+                            <div id="tokenHelp" class="form-text">Токен TelegramBot</div>
+                        </div>
+                        <div class="mb-3">
+                            <div title="Постоянное подключение (автоподключение при старте)" class="form-check form-check-inline form-switch">
+                                <input checked="@_conf.AutoStart" @bind-value="_conf.AutoStart" @bind-value:event="oninput" class="form-check-input" type="checkbox" id="inlineCheckboxCommandsAllowed">
+                                <label class="form-check-label" for="inlineCheckboxCommandsAllowed">Постоянное подключение (автоподключение при старте)</label>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                            <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
+                                <button disabled="@(!CanSave)" type="submit" class="btn btn-outline-primary">Сохранить</button>
+                                @if (CanSave)
+                                {
+                                    <button @onclick="ResetForm" type="button" class="btn btn-outline-primary">Отмена</button>
+                                }
+                            </div>
+                            <button @onclick="TestTelegramBotConfig" class="btn btn-primary" type="button">Проверка токена</button>
+                        </div>
+                    </EditForm>
+                </div>
+                <hr />
+                <MudTable ServerData="@(new Func<TableState, Task<TableData<TelegramUserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Пользователи Telegram</MudText>
+                        <MudSpacer />
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Пользователь</MudTh>
+                        <MudTh>Права</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                    </RowTemplate>
+                    <NoRecordsContent>
+                        <MudText>No matching records found</MudText>
+                    </NoRecordsContent>
+                    <LoadingContent>
+                        <MudText>Loading...</MudText>
+                    </LoadingContent>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            </form>
+        }
     </div>
 </div>
-
+<ShowMessagesComponent @ref="showMessages" />
 @code {
     private IEnumerable<TelegramUserModelDB>? pagedData;
     private MudTable<TelegramUserModelDB>? table;
-
+    ShowMessagesComponent? showMessages;
     private int totalItems;
     private string? searchString = null;
+
+    TelegramBotConfigModel _conf = new();
+    TelegramBotConfigModel _conf_self = new();
+
+    bool CanSave => _conf != _conf_self;
+
+    void ResetForm()
+    {
+        _conf = GlobalStatic.CreateDeepCopy(_conf_self);
+    }
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusyProgress = true;
+        TelegramBotConfigResponseModel _bot_conf = await _storage.GetTelegramBotConfig();
+        Severity _style;
+        foreach (ResultMessage m in _bot_conf.Messages)
+        {
+            _style = m.TypeMessage switch
+            {
+                ResultTypeEnum.Success => Severity.Success,
+                ResultTypeEnum.Info => Severity.Info,
+                ResultTypeEnum.Warning => Severity.Warning,
+                ResultTypeEnum.Error => Severity.Error,
+                _ => Severity.Normal
+            };
+            _snackbar.Add(m.Text, _style, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        }
+
+        _conf = _bot_conf.Conf ?? new();
+        _conf_self = GlobalStatic.CreateDeepCopy(_conf);
+        IsBusyProgress = false;
+    }
+
+    async Task TestTelegramBotConfig()
+    {
+        DictionaryResponseModel _conf_bot = await _tools.TestTelegramBotConnect(_conf);
+        showMessages?.ShowMessages(_conf_bot.Messages);
+        if (_conf_bot.DictionaryResponse?.Any() == true)
+        {
+            _snackbar.Add(string.Join("<br/>", _conf_bot.DictionaryResponse.Select(x => $"[<b>{x.Key}</b>:{x.Value}]")), Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        }
+        else
+        {
+            _snackbar.Add("Ошибка. Токен не прошёл проверку.", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        }
+        StateHasChanged();
+    }
+
+    /// <inheritdoc/>
+    async Task OnValidSubmitHandle()
+    {
+        IsBusyProgress = true;
+        ResponseBaseModel rest = await _storage.SaveTelegramBotConfig(_conf);
+        showMessages?.ShowMessages(rest.Messages);
+        if (!rest.IsSuccess)
+        {
+            IsBusyProgress = false;
+            return;
+        }
+        _conf_self = GlobalStatic.CreateDeepCopy(_conf);
+        IsBusyProgress = false;
+    }
 
     /// <summary>
     /// Here we simulate getting the paged, filtered and ordered data from the server

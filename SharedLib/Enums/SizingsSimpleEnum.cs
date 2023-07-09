@@ -1,23 +1,26 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Размеры
+/// </summary>
+public enum SizingsSimpleEnum
 {
     /// <summary>
-    /// Размеры
+    /// Маленький
     /// </summary>
-    public enum SizingsSimpleEnum
-    {
-        /// <summary>
-        /// Маленький
-        /// </summary>
-        Sm,
+    Sm,
 
-        /// <summary>
-        /// Средний
-        /// </summary>
-        Norm,
+    /// <summary>
+    /// Средний
+    /// </summary>
+    Norm,
 
-        /// <summary>
-        /// Большой
-        /// </summary>
-        Lg
-    }
+    /// <summary>
+    /// Большой
+    /// </summary>
+    Lg
 }

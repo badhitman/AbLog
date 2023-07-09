@@ -1,13 +1,16 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Настройки Email: Ответ rest/api
+/// </summary>
+public class EmailConfigResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Настройки Email: Ответ rest/api
+    /// Порт устройства
     /// </summary>
-    public class EmailConfigResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// Порт устройства
-        /// </summary>
-        public EmailConfigModel? Conf { get; set; }
-    }
+    public EmailConfigModel? Conf { get; set; }
 }

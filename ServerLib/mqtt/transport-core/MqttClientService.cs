@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Microsoft.Extensions.Logging;
 using System.Runtime.Versioning;
 using MQTTnet.Client;
 using SharedLib;

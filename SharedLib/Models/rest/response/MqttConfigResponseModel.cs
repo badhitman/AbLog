@@ -1,13 +1,16 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Настройки MQTT: Ответ rest/api
+/// </summary>
+public class MqttConfigResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Настройки MQTT: Ответ rest/api
+    /// Настройки
     /// </summary>
-    public class MqttConfigResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// Порт устройства
-        /// </summary>
-        public MqttConfigModel? Conf { get; set; }
-    }
+    public MqttConfigModel? Conf { get; set; }
 }

@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Microsoft.Extensions.Logging;
 using System.Runtime.Versioning;
 using Newtonsoft.Json;
 using MQTTnet.Client;
@@ -131,7 +135,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             _mqttClient.DisconnectedAsync -= DisconnectedHandleAsync;
             _mqttClient.ApplicationMessageReceivedAsync -= ApplicationMessageReceiveHandledAsync;
 
-            await _mqttClient.DisconnectAsync();
+            await _mqttClient.DisconnectAsync(cancellationToken: cancellation_token);
             res.AddSuccess("Соединение закрыто");
         }
         else

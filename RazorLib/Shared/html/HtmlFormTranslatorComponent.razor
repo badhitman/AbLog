@@ -77,7 +77,7 @@
             {
                 IsBusyProgress = true;
                 string path_query = string.Join("&", FormContext.DataContext.Select(x => $"{x.Key}={x.Value.ToString()}"));
-                HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardvareGetRequestModel() { HardwareId = Id.Value, Path = $"?{path_query}" });
+                HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id.Value, Path = $"?{path_query}" });
                 if (!rest.IsSuccess)
                 {
                     showMessages?.ShowMessages(rest.Messages);

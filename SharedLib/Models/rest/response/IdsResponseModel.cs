@@ -1,13 +1,16 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Перечень идентификаторов: Ответ rest/api
+/// </summary>
+public class IdsResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Перечень идентификаторов: Ответ rest/api
+    /// Перечень идентификаторов
     /// </summary>
-    public class IdsResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// Перечень идентификаторов
-        /// </summary>
-        public IEnumerable<int>? Ids { get; set; }
-    }
+    public IEnumerable<int>? Ids { get; set; }
 }

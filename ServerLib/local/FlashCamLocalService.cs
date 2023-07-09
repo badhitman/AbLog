@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Microsoft.Extensions.Logging;
 using SharedLib;
 using FlashCap;
 

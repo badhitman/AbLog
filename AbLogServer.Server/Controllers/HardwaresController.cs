@@ -1,3 +1,7 @@
+////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
 using Microsoft.AspNetCore.Mvc;
 using SharedLib;
 
@@ -68,7 +72,7 @@ public class HardwaresController : ControllerBase
     /// Получить HTML основной страницы устройства
     /// </summary>
     [HttpPost($"{GlobalStatic.Routes.HTML}/{GlobalStatic.Routes.MAIN}")]
-    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req) => await _hardwares_service.GetHardwareHtmlPage(req);
+    public async Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req) => await _hardwares_service.GetHardwareHtmlPage(req);
 
     /// <summary>
     /// Запрос/проверка порта устройства

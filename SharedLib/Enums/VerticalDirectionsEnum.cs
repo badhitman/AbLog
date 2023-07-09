@@ -1,18 +1,21 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Направления (вертикальные). Вверх, Вниз
+/// </summary>
+public enum VerticalDirectionsEnum
 {
     /// <summary>
-    /// Направления (вертикальные). Вверх, Вниз
+    /// Вверх
     /// </summary>
-    public enum VerticalDirectionsEnum
-    {
-        /// <summary>
-        /// Вверх
-        /// </summary>
-        Up,
+    Up,
 
-        /// <summary>
-        /// Вниз
-        /// </summary>
-        Down
-    }
+    /// <summary>
+    /// Вниз
+    /// </summary>
+    Down
 }

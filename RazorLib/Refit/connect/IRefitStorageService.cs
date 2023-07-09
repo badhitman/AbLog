@@ -1,4 +1,8 @@
-﻿using SharedLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using SharedLib;
 using Refit;
 
 namespace BlazorLib;
@@ -9,7 +13,7 @@ namespace BlazorLib;
 [Headers("Content-Type: application/json")]
 public interface IRefitStorageService
 {
-    #region Email
+    #region Email (удалённое хранение: на сервере)
 
     /// <summary>
     /// Получить конфигурацию Email (imap+smtp)
@@ -25,7 +29,7 @@ public interface IRefitStorageService
 
     #endregion
 
-    #region Mqtt
+    #region Mqtt (локальное хранение конфигурации)
 
     /// <summary>
     /// Получить конфигурацию Mqtt
@@ -40,4 +44,21 @@ public interface IRefitStorageService
     public Task<ApiResponse<ResponseBaseModel>> MqttConfigSave(MqttConfigModel mqtt_conf);
 
     #endregion
+
+    #region TelegramBot (локальное хранение конфигурации)
+
+    /// <summary>
+    /// Получить конфигурацию TelegramBot
+    /// </summary>
+    [Get($"/api/{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}")]
+    public Task<ApiResponse<TelegramBotConfigResponseModel>> TelegramBotConfigGet();
+
+    /// <summary>
+    /// Сохранить конфигурацию TelegramBot
+    /// </summary>
+    [Post($"/api/{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}")]
+    public Task<ApiResponse<ResponseBaseModel>> TelegramBotConfigSave(TelegramBotConfigModel mqtt_conf);
+
+    #endregion
+
 }

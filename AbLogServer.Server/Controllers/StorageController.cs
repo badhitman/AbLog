@@ -1,3 +1,7 @@
+////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
 using Microsoft.AspNetCore.Mvc;
 using SharedLib;
 
@@ -21,6 +25,22 @@ public class StorageController : ControllerBase
         _logger = logger;
         _parameters_storage = parameters_storage;
     }
+
+    #region TelegramBot
+
+    /// <summary>
+    /// Получить конфигурацию TelegramBot
+    /// </summary>
+    [HttpGet($"{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}")]
+    public async Task<TelegramBotConfigResponseModel> TelegramBotConfigGet() => await _parameters_storage.GetTelegramBotConfig();
+
+    /// <summary>
+    /// Сохранить конфигурацию TelegramBot
+    /// </summary>
+    [HttpPost($"{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}")]
+    public async Task<ResponseBaseModel> TelegramBotConfigSave(TelegramBotConfigModel t_conf) => await _parameters_storage.SaveTelegramBotConfig(t_conf);
+
+    #endregion
 
     #region Email
 

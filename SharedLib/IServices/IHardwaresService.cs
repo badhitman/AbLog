@@ -1,4 +1,8 @@
-﻿namespace SharedLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
 
 /// <summary>
 /// Устройства
@@ -43,7 +47,7 @@ public interface IHardwaresService
     /// <summary>
     /// Получить HTML страницы управляющего блока (прим: http://192.168.0.14/sec)
     /// </summary>
-    public Task<HttpResponseModel> GetHardwareHtmlPage(HardvareGetRequestModel req, CancellationToken cancellation_token = default);
+    public Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Запрос/проверка порта устройства

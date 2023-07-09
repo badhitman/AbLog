@@ -1,4 +1,8 @@
-﻿using SharedLib;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using SharedLib;
 using Refit;
 
 namespace BlazorLib;
@@ -28,10 +32,16 @@ public interface IRefitToolsService
     public Task<ApiResponse<BoolResponseModel>> StatusMqtt();
 
     /// <summary>
-    /// Проверить подключение к Email (конфигурация imap+smtp)
+    /// Проверить подключение к Email (smtp)
     /// </summary>
     [Post($"/api/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}")]
     public Task<ApiResponse<ResponseBaseModel>> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf);
+
+    /// <summary>
+    /// Проверить подключение к TelegramBot
+    /// </summary>
+    [Post($"/api/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}")]
+    public Task<ApiResponse<DictionaryResponseModel>> TelegramBotConfigTest(TelegramBotConfigModel? telegram_bot_conf);
 
     /// <summary>
     /// Проверить подключение к Mqtt

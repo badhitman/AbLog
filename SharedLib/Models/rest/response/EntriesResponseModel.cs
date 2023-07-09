@@ -1,13 +1,16 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Перечень базовых элеметнов [Entry]: Ответ rest/api
+/// </summary>
+public class EntriesResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Перечень базовых элеметнов [Entry]: Ответ rest/api
+    /// Перечень базовых элеметнов [Entry]
     /// </summary>
-    public class EntriesResponseModel : ResponseBaseModel
-    {
-        /// <summary>
-        /// Перечень базовых элеметнов [Entry]
-        /// </summary>
-        public IEnumerable<EntryModel>? Entries { get; set; }
-    }
+    public IEnumerable<EntryModel>? Entries { get; set; }
 }

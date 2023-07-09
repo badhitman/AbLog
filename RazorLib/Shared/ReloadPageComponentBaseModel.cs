@@ -70,7 +70,7 @@ namespace RazorLib
             IsUpdated = false;
             IsBusyProgress = true;
             StateHasChanged();
-            HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardvareGetRequestModel() { HardwareId = Id, Path = PagePath });
+            HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = PagePath });
 
             if (!rest.IsSuccess)
             {

@@ -1,28 +1,31 @@
-﻿namespace SharedLib
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// Режимы сравнения (равно, не равно...)
+/// </summary>
+public enum СomparisonsModesEnum
 {
     /// <summary>
-    /// Режимы сравнения (равно, не равно...)
+    /// Равно
     /// </summary>
-    public enum СomparisonsModesEnum
-    {
-        /// <summary>
-        /// Равно
-        /// </summary>
-        Equal,
+    Equal,
 
-        /// <summary>
-        /// Не равно
-        /// </summary>
-        NotEqual,
+    /// <summary>
+    /// Не равно
+    /// </summary>
+    NotEqual,
 
-        /// <summary>
-        /// Больше
-        /// </summary>
-        MoreThan,
+    /// <summary>
+    /// Больше
+    /// </summary>
+    MoreThan,
 
-        /// <summary>
-        /// Меньше
-        /// </summary>
-        LessThan
-    }
+    /// <summary>
+    /// Меньше
+    /// </summary>
+    LessThan
 }
