@@ -39,6 +39,7 @@ public static class MauiProgram
         builder.Services.AddHttpClient<ToolsRemoteService>();
         builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRemoteService>();
         builder.Services.AddSingleton<IHardwaresService, HardwaresMqttService>();
+        builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsMqttService>();
 
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;

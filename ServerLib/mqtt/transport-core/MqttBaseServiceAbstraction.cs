@@ -238,10 +238,10 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
         string response_topic = Guid.NewGuid().ToString();
 
         MqttClientSubscribeOptions subscr_opt = _mqttFactory.CreateSubscribeOptionsBuilder()
-               .WithTopicFilter(f => { f.WithTopic(response_topic); })
-               .Build();
-        MqttClientSubscribeResult subscr_res = await _mqttClient.SubscribeAsync(subscr_opt, cancellation_token);
+                               .WithTopicFilter(f => { f.WithTopic(response_topic); })
+                               .Build();
 
+        MqttClientSubscribeResult? subscr_res = await _mqttClient.SubscribeAsync(subscr_opt, cancellation_token);
         byte[] request_bytes = await CipherService.EncryptAsync(JsonConvert.SerializeObject(request), _mqtt_settings.Secret ?? CipherService.DefaultSecret, msg_id);
 
         MqttPublishMessageModel p_msg = new(request_bytes, new[] { topic })

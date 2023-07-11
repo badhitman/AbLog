@@ -23,11 +23,32 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
     }
 
     /// <inheritdoc/>
-    public override Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
+    public override async Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
     {
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(connect_config, $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}");
+        ResponseBaseModel? res = new();
+        if (!rpc.IsSuccess)
+        {
+            res.AddMessages(rpc.Messages);
+            return res;
+        }
 
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {3DD98642-8743-459D-8FC0-9AAC4C180F6F}");
+            return res;
+        }
 
-        return base.SaveTelegramBotConfig(connect_config);
+        //res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(rpc.Response);
+        if (res is null)
+        {
+            res = new();
+            res.AddError("res is null error {A0306C7E-7055-4CD2-9143-10923DFD685B}");
+        }
+
+        return res;
+
+        //return base.SaveTelegramBotConfig(connect_config);
     }
 
     /// <inheritdoc/>
@@ -48,10 +69,10 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
         }
 
         res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(rpc.Response);
-        if(res is null)
+        if(res.Conf is null)
         {
-            res = new();
-            res.AddError("res is null error {A0306C7E-7055-4CD2-9143-10923DFD685B}");
+            res.Conf = new();
+            res.AddError("res.Conf is null error {A0306C7E-7055-4CD2-9143-10923DFD685B}");
         }
 
         return res;

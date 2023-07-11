@@ -12,7 +12,6 @@ using MQTTnet;
 using ab.context;
 using Telegram.Bot;
 using Microsoft.Extensions.DependencyInjection;
-using Telegram.Bot.Services;
 
 namespace ServerLib;
 
@@ -25,6 +24,7 @@ namespace ServerLib;
 public class MqttServerService : MqttBaseServiceAbstraction
 {
     readonly IHardwaresService _hardwares_service;
+    readonly ISystemCommandsService _sys_com_service;
     readonly HttpClient _http_client;
     readonly IServiceCollection _services;
 
@@ -50,18 +50,24 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}"); })
+
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.START}"); })
             .Build();
 
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
         : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
         _logger = logger;
         _hardwares_service = hardwares_service;
         _http_client = http_client;
         _services = services;
+        _sys_com_service = sys_com_service;
     }
 
     /// <summary>
@@ -91,8 +97,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 break;
 
             case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}":
-                NoiseModel? req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
-                if (req is null)
+                NoiseModel? req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req_noise is null)
                 {
                     _logger.LogError("req is null. error 1C55124E-8DF4-4CCC-A9FF-8CC2C0AF6B65");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 1C55124E-8DF4-4CCC-A9FF-8CC2C0AF6B65")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -102,8 +108,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.ENTRIES}":
-                req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
-                if (req is null)
+                req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req_noise is null)
                 {
                     _logger.LogError("req is null. error C1595114-C3E5-4AE1-937B-8B45C59C8507");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error C1595114-C3E5-4AE1-937B-8B45C59C8507")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -113,8 +119,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAllAsEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.NESTED_ENTRIES}":
-                req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
-                if (req is null)
+                req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req_noise is null)
                 {
                     _logger.LogError("req is null. error 787DE141-F012-4369-AD88-95ACBB7BD937");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 787DE141-F012-4369-AD88-95ACBB7BD937")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -192,8 +198,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 break;
 
             case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}":
-                TelegramBotConfigModel? conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
-                if (conf is null)
+                TelegramBotConfigModel? conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
+                if (conf_tbot is null)
                 {
                     _logger.LogError("req is null. 720D6445-7D3F-4BE7-AF9E-0C57D48DB5AC");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 720D6445-7D3F-4BE7-AF9E-0C57D48DB5AC")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -204,20 +210,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 {
                     using (ParametersContext _context = new())
                     {
-                        ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(conf));
+                        ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(conf_tbot));
                     };
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateSuccess("Данные успешно сохранены")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
-
-                    if (conf.AutoStart && conf.IsConfigured && !_services.OfType<PollingService>().Any())
-                    {
-                        _services.AddScoped<UpdateHandler>();
-                        _services.AddScoped<ReceiverService>();
-                        _services.AddHostedService<PollingService>();
-                    }
-
-                    //var all_services = _services.OfType<PollingService>();
-                    //_services.AddHostedService<PollingService>();
-
                 }
                 catch (Exception ex)
                 {
@@ -225,8 +220,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
                 break;
             case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}":
-                req = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
-                if (req is null)
+                req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req_noise is null)
                 {
                     _logger.LogError("req is null. C39195BC-C94E-442C-9724-3FABEF157648");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. C39195BC-C94E-442C-9724-3FABEF157648")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -252,8 +247,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
                 break;
             case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}":
-                conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
-                if (conf is null)
+                conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
+                if (conf_tbot is null)
                 {
                     _logger.LogError("req is null. 6814E514-AB2A-495E-93C7-B2E71787338F");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 6814E514-AB2A-495E-93C7-B2E71787338F")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -262,15 +257,15 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
                 DictionaryResponseModel res = new();
 
-                if (string.IsNullOrEmpty(conf?.TelegramBotToken))
+                if (string.IsNullOrEmpty(conf_tbot?.TelegramBotToken))
                 {
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("TelegramBotToken не может быть пустым")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
                 }
 
-                TelegramBotClientOptions options = new(conf.TelegramBotToken);
+                TelegramBotClientOptions options = new(conf_tbot.TelegramBotToken);
 
-                if (!conf!.IsConfigured)
+                if (!conf_tbot!.IsConfigured)
                 {
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("Конфигурация не установлена")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
@@ -295,6 +290,55 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
 
                 break;
+
+            case $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}":
+                req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req_noise is null)
+                {
+                    _logger.LogError("req is null. error A10621EE-505C-4384-8D58-F0BBE7159492");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error A10621EE-505C-4384-8D58-F0BBE7159492")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandsGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}":
+                SystemCommandModelDB? req_sys_com_bd = JsonConvert.DeserializeObject<SystemCommandModelDB>(payload_json);
+                if (req_sys_com_bd is null)
+                {
+                    _logger.LogError("req_sys_com_bd is null. error 23C49BF0-411D-4511-8006-5C4241D83EED");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_sys_com_bd is null. error 23C49BF0-411D-4511-8006-5C4241D83EED")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandUpdateOrCreate(req_sys_com_bd)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.START}":
+                req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+                if (req_nid is null)
+                {
+                    _logger.LogError("req_nid is null. error 7E1D1322-FA6D-4DDB-A9E3-1B61269445AE");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_nid is null. error 7E1D1322-FA6D-4DDB-A9E3-1B61269445AE")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandRun(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+            case $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}":
+                req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+                if (req_nid is null)
+                {
+                    _logger.LogError("req_nid is null. error 0E60251C-C3F0-47F7-8962-A7AECDF3D023");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_nid is null. error 0E60251C-C3F0-47F7-8962-A7AECDF3D023")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandDelete(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+
+
+
+
             case GlobalStatic.Routes.SHOT:
 
                 break;
@@ -316,9 +360,14 @@ public class MqttServerService : MqttBaseServiceAbstraction
             CorrelationData = Encoding.UTF8.GetBytes(salt),
         };
 
+        if (!_mqttClient.IsConnected)
+            await _mqttClient.ConnectAsync(MqttClientOptions);
+
         MqttPublishMessageResultModel pub_res = await PublishMessage(pub_msg);
 
-        if (!pub_res.IsSuccess)
-            _logger.LogError($"!pub_red.IsSuccess ({pub_res.Message}). error FAB191D8-4648-4705-AEFF-DF0AB762E527");
+        if (pub_res?.IsSuccess != true)
+        {
+            _logger.LogError($"!pub_red.IsSuccess ({pub_res?.Message}). error FAB191D8-4648-4705-AEFF-DF0AB762E527");
+        }
     }
 }

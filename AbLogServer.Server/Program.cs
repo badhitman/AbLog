@@ -42,6 +42,7 @@ public class Program
             builder.Services.AddHttpClient<MqttServerService>();
             builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
             builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
+            builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
             builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
 
