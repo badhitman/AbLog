@@ -34,7 +34,7 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
     public override async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig()
     {
         SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}");
-        TelegramBotConfigResponseModel res = new();
+        TelegramBotConfigResponseModel? res = new();
         if (!rpc.IsSuccess)
         {
             res.AddMessages(rpc.Messages);
@@ -48,9 +48,11 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
         }
 
         res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(rpc.Response);
-
-        if (res.Conf is null)
-            res.AddError("response_mqtt is null. error {B36B8278-ADF1-4982-B496-5AF6A2169199}");
+        if(res is null)
+        {
+            res = new();
+            res.AddError("res is null error {A0306C7E-7055-4CD2-9143-10923DFD685B}");
+        }
 
         return res;
     }

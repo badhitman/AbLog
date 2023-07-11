@@ -11,6 +11,8 @@ using SharedLib;
 using MQTTnet;
 using ab.context;
 using Telegram.Bot;
+using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot.Services;
 
 namespace ServerLib;
 
@@ -24,6 +26,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
 {
     readonly IHardwaresService _hardwares_service;
     readonly HttpClient _http_client;
+    readonly IServiceCollection _services;
 
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
@@ -52,12 +55,13 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
         : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
         _logger = logger;
         _hardwares_service = hardwares_service;
         _http_client = http_client;
+        _services = services;
     }
 
     /// <summary>
@@ -203,6 +207,17 @@ public class MqttServerService : MqttBaseServiceAbstraction
                         ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(conf));
                     };
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateSuccess("Данные успешно сохранены")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+
+                    if (conf.AutoStart && conf.IsConfigured && !_services.OfType<PollingService>().Any())
+                    {
+                        _services.AddScoped<UpdateHandler>();
+                        _services.AddScoped<ReceiverService>();
+                        _services.AddHostedService<PollingService>();
+                    }
+
+                    //var all_services = _services.OfType<PollingService>();
+                    //_services.AddHostedService<PollingService>();
+
                 }
                 catch (Exception ex)
                 {
@@ -217,14 +232,15 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. C39195BC-C94E-442C-9724-3FABEF157648")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
                 }
-
+                TelegramBotConfigResponseModel tbc_res = new();
                 try
                 {
                     using ParametersContext _context = new();
                     string _telegramBotConfig = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
                     if (string.IsNullOrWhiteSpace(_telegramBotConfig))
                     {
-                        await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateWarning("Конфигурация не обнаружена error {BCE8ADDA-0A51-4B91-9751-A215015CF415}")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                        tbc_res.AddError("Конфигурация не обнаружена error {BCE8ADDA-0A51-4B91-9751-A215015CF415}");
+                        await PublishMessage(JsonConvert.SerializeObject(tbc_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                         break;
                     }
                     await PublishMessage(JsonConvert.SerializeObject(JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig) ?? new()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);

@@ -57,6 +57,8 @@ public class Program
             builder.Configuration.AddJsonFile("appsettings.json");
             builder.Configuration.AddJsonFile($"appsettings.{_env.EnvironmentName}.json");
 
+            builder.Services.AddSingleton<IServiceCollection, ServiceCollection>();
+
             // Secrets
             string secretPath = Path.Combine("..", "..", "secrets");
             FileInfo fi = new(secretPath);
