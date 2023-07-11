@@ -18,6 +18,8 @@ public class ServerContext : DbContext
     /// </summary>
     public static object DbLocker = new();
 
+    public string? ConnectString { get; private set; }
+
     /// <summary>
     /// Управляющие блоки (устройства)
     /// </summary>
@@ -71,9 +73,9 @@ public class ServerContext : DbContext
     /// <inheritdoc/>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string connect_string = $"Filename={GlobalStatic.MainDatabasePath}";
-        System.Diagnostics.Debug.WriteLine(connect_string);
-        optionsBuilder.UseSqlite(connect_string);
+        ConnectString = $"Filename={GlobalStatic.MainDatabasePath}";
+        System.Diagnostics.Debug.WriteLine(ConnectString);
+        optionsBuilder.UseSqlite(ConnectString);
         base.OnConfiguring(optionsBuilder);
     }
 

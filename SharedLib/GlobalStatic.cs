@@ -204,6 +204,10 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
+        public const string System = "system";
+        /// <summary>
+        /// 
+        /// </summary>
         public const string Hardwares = "hardwares";
         /// <summary>
         /// 

@@ -37,7 +37,7 @@ public class ToolsLocalService : IToolsService
     public async Task<ResponseBaseModel> StopMqtt() => await _mqttClientService.StopService();
 
     /// <inheritdoc/>
-    public Task<BoolResponseModel> StatusMqtt() => Task.FromResult(_mqttClientService.StatusService());
+    public Task<BoolResponseModel> StatusMqtt() => _mqttClientService.StatusService();
 
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null)

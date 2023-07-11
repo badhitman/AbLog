@@ -30,6 +30,8 @@ public class Program
             .GetCurrentClassLogger();
 
         logger.Warn("init main");
+        logger.Warn($"main-db: {GlobalStatic.MainDatabasePath}");
+        logger.Warn($"storage-db: {GlobalStatic.ParametersStorageDatabasePath}");
         CheckContext();
         try
         {

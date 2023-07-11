@@ -18,6 +18,8 @@ public class ParametersContext : DbContext
     /// </summary>
     public static object DbLocker = new();
 
+    public string? ConnectString { get; private set; }
+
     /// <summary>
     /// Хранимые значения параметров (в БД)
     /// </summary>
@@ -26,9 +28,9 @@ public class ParametersContext : DbContext
     /// <inheritdoc/>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string connect_string = $"Filename={GlobalStatic.ParametersStorageDatabasePath}";
-        System.Diagnostics.Debug.WriteLine(connect_string);
-        optionsBuilder.UseSqlite(connect_string);
+        ConnectString = $"Filename={GlobalStatic.ParametersStorageDatabasePath}";
+        System.Diagnostics.Debug.WriteLine(ConnectString);
+        optionsBuilder.UseSqlite(ConnectString);
         base.OnConfiguring(optionsBuilder);
     }
 

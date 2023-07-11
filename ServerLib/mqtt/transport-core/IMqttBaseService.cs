@@ -45,7 +45,7 @@ public interface IMqttBaseService
     /// <summary>
     /// Получить статус службы
     /// </summary>
-    public BoolResponseModel StatusService();
+    public Task<BoolResponseModel> StatusService(int limit_try_if_not_connected = 0);
 
     /// <summary>
     /// Опубликовать сообщение

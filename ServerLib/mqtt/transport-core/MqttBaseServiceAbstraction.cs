@@ -48,9 +48,19 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     /// <summary>
     /// 
     /// </summary>
-    protected MqttClientOptions MqttClientOptions;
+    protected MqttClientOptions MqttClientOptions => new MqttClientOptionsBuilder()
+                .WithTls()
+                .WithMaximumPacketSize(_mqtt_settings.MessageMaxSizeBytes)
+                .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500)
+                .WithClientId(_mqtt_settings.ClientId)
+                .WithTcpServer(_mqtt_settings.Server, _mqtt_settings.Port)
+                .WithCredentials(_mqtt_settings.Username, _mqtt_settings.Password)
+                .WithKeepAlivePeriod(TimeSpan.FromSeconds(10))
+                .Build();
 
     readonly CancellationToken CancellationTokenMain;
+
+
 
     /// <summary>
     /// MQTT служба
@@ -64,15 +74,6 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
 
         _logger.LogInformation($"init >> {GetType().Name}");
 
-        MqttClientOptions = new MqttClientOptionsBuilder()
-                .WithTls()
-                .WithMaximumPacketSize(_mqtt_settings.MessageMaxSizeBytes)
-                .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500)
-                .WithClientId(_mqtt_settings.ClientId)
-                .WithTcpServer(_mqtt_settings.Server, _mqtt_settings.Port)
-                .WithCredentials(_mqtt_settings.Username, _mqtt_settings.Password)
-                .WithKeepAlivePeriod(TimeSpan.FromSeconds(10))
-                .Build();
         CancellationTokenMain = cancellationTokenMain;
     }
 
@@ -163,12 +164,19 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     }
 
     /// <inheritdoc/>
-    public BoolResponseModel StatusService()
+    public async Task<BoolResponseModel> StatusService(int limit_try_if_not_connected = 5)
     {
         BoolResponseModel res = new()
         {
             Response = _mqttClient.IsConnected
         };
+
+        while (limit_try_if_not_connected > 0 && res.Response != true)
+        {
+            await _mqttClient.ConnectAsync(MqttClientOptions);
+            res.Response = _mqttClient.IsConnected;
+        }
+
         res.AddInfo(_mqttClient.IsConnected ? "Клиент подключён" : "Клиент не подключён");
 
         return res;
@@ -219,7 +227,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     public async Task<SimpleStringResponseModel> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token = default)
     {
         SimpleStringResponseModel res = new();
-        BoolResponseModel status = StatusService();
+        BoolResponseModel status = await StatusService();
         if (!status.Response)
         {
             res.AddMessages(status.Messages);
