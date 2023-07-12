@@ -15,28 +15,24 @@ public class UserModelDB : UniversalModelDB
     public string? Email { get; set; }
 
     /// <summary>
-    /// Телефон (сотовый)
-    /// </summary>
-    public string? Phone { get; set; }
-
-    /// <summary>
     /// Идентификатор Telegram (внутренний/технический. не чпу)
     /// </summary>
-    public string? TelegramId { get; set; }
+    public long TelegramId { get; set; }
 
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        string ret_name = Name;
-        if (!string.IsNullOrWhiteSpace(Email))
-        {
-            ret_name = $"{ret_name} [e:{Email}]";
-        }
-        if (!string.IsNullOrWhiteSpace(Phone))
-        {
-            ret_name = $"{ret_name} [t:{Phone}]";
-        }
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool IsDisabled { get; set; } = true;
 
-        return ret_name;
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public string FirstName { get; set; } = default!;
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string? LastName { get; set; }
 }

@@ -115,8 +115,18 @@ public class SystemCommandsLocalService : ISystemCommandsService
                 return Task.FromResult(res);
             }
 
-            Process? proc = Process.Start(new ProcessStartInfo() { FileName = com_db.FileName, Arguments = com_db.Arguments ?? "" });
-            res.AddSuccess("Команда выполнена");
+            Process? p = Process.Start(new ProcessStartInfo() { FileName = com_db.FileName, Arguments = com_db.Arguments ?? "" });
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = Path.GetTempFileName();
+            p.Start();
+            // Do not wait for the child process to exit before
+            // reading to the end of its redirected stream.
+            // p.WaitForExit();
+            // Read the output stream first and then wait.
+            string output = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+            res.AddSuccess($"Команда выполнена:\n{output}");
         }
 
         return Task.FromResult(res);

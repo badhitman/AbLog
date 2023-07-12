@@ -75,6 +75,11 @@ public class ServerContext : DbContext
     /// </summary>
     public DbSet<SystemCommandModelDB> SystemCommands { get; set; }
 
+    /// <summary>
+    /// Пользователи
+    /// </summary>
+    public DbSet<UserModelDB> Users { get; set; }
+
     /// <inheritdoc/>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

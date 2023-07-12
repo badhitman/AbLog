@@ -50,7 +50,7 @@
                     </EditForm>
                 </div>
                 <hr />
-                <MudTable ServerData="@(new Func<TableState, Task<TableData<TelegramUserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
+                <MudTable ServerData="@(new Func<TableState, Task<TableData<UserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
                     <ToolBarContent>
                         <MudText Typo="Typo.h6">Пользователи Telegram</MudText>
                         <MudSpacer />
@@ -81,8 +81,8 @@
 </div>
 <ShowMessagesComponent @ref="showMessages" />
 @code {
-    private IEnumerable<TelegramUserModelDB>? pagedData;
-    private MudTable<TelegramUserModelDB>? table;
+    //private IEnumerable<UserModelDB>? pagedData;
+    private MudTable<UserModelDB>? table;
     ShowMessagesComponent? showMessages;
     private int totalItems;
     private string? searchString = null;
@@ -154,19 +154,19 @@
     /// <summary>
     /// Here we simulate getting the paged, filtered and ordered data from the server
     /// </summary>
-    private Task<TableData<TelegramUserModelDB>> ServerReload(TableState state)
+    private Task<TableData<UserModelDB>> ServerReload(TableState state)
     {
-        IEnumerable<TelegramUserModelDB> data = new List<TelegramUserModelDB>()
+        IEnumerable<UserModelDB> data = new List<UserModelDB>()
                     {
-                        new TelegramUserModelDB() { Id=1, Name="user 1", UserName="UserName_1" },
-                        new TelegramUserModelDB() { Id=2, Name="user 2", UserName="UserName_2" },
-                        new TelegramUserModelDB() { Id=3, Name="user 3", UserName="UserName_3" }
+                        new UserModelDB() { Id=1, Name="user 1", LastName="UserName_1" },
+                        new UserModelDB() { Id=2, Name="user 2", LastName="UserName_2" },
+                        new UserModelDB() { Id=3, Name="user 3", LastName="UserName_3" }
                     };
 
         totalItems = data.Count();
 
-        pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-        return Task.FromResult(new TableData<TelegramUserModelDB>() { TotalItems = totalItems, Items = pagedData });
+        //pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return Task.FromResult(new TableData<UserModelDB>() { TotalItems = totalItems, Items = data });
     }
 
     private void OnSearch(string text)

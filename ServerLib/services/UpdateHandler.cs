@@ -43,7 +43,7 @@ public class UpdateHandler : IUpdateHandler
             // UpdateType.PreCheckoutQuery:
             // UpdateType.Poll:
             { Message: { } message } => BotOnMessageReceived(message, cancellationToken),
-            { EditedMessage: { } message } => BotOnMessageReceived(message, cancellationToken),
+            //{ EditedMessage: { } message } => BotOnMessageReceived(message, cancellationToken),
             { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),
             _ => UnknownUpdateHandlerAsync(update, cancellationToken)
         };
@@ -57,6 +57,8 @@ public class UpdateHandler : IUpdateHandler
         if (message.Text is not { } messageText)
             return;
 
+        ResponseBaseModel check_user = CheckTelegramUser(message.From);
+
         var action = messageText.Split(' ')[0] switch
         {
             "/throw" => FailingHandler(_botClient, message, cancellationToken),
@@ -67,31 +69,21 @@ public class UpdateHandler : IUpdateHandler
 
         static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
-            const string usage = "Бот-обормот";
+            string usage = "Бот-обормот";
 
             using ServerContext _context = new();
             InlineKeyboardMarkup inlineKeyboard;
             lock (ServerContext.DbLocker)
             {
                 inlineKeyboard = new(
-                    _context.SystemCommands.AsEnumerable().Select(x => new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData(x.Name, x.Id.ToString()) }).ToArray()
-                //new []
-                //{
-                //    InlineKeyboardButton.WithCallbackData("Статус MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")
-                //},
-                //new []
-                //{
-                //    InlineKeyboardButton.WithCallbackData("Рестарт MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.UPDATE}")
-                //},
-                //new []
-                //{
-                //    InlineKeyboardButton.WithCallbackData("Перезагрузка сервера", $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.UPDATE}")
-                //}
+                    _context.SystemCommands
+                    .Where(x => !x.IsDisabled)
+                    .AsEnumerable()
+                    .Select(x => new InlineKeyboardButton[] {
+                        InlineKeyboardButton.WithCallbackData(x.Name, x.Id.ToString())
+                    }).ToArray()
                 );
             }
-            // _context.SystemCommands.AsEnumerable().Select(x=>new []{ InlineKeyboardButton.WithCallbackData("Статус MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}") }).ToArray()
-
-
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -110,10 +102,43 @@ public class UpdateHandler : IUpdateHandler
 #pragma warning restore RCS1163 // Unused parameter.
     }
 
+    private ResponseBaseModel CheckTelegramUser(User? from)
+    {
+        ResponseBaseModel res = new();
+        if (from is null)
+        {
+            res.AddError("from is null. error {5513E9FE-75DB-4C9F-92A3-7537072AD3CD}");
+            return res;
+        }
+
+        using ServerContext context = new();
+        lock (ServerContext.DbLocker)
+        {
+            UserModelDB? user_db = context.Users.FirstOrDefault(x => x.TelegramId == from.Id);
+            if (user_db is null)
+            {
+                user_db = new()
+                {
+                    FirstName = from.FirstName,
+                    LastName = from.LastName,
+                    Name = from.Username ?? "",
+                    TelegramId = from.Id
+                };
+                context.Add(user_db);
+                context.SaveChanges();
+            }
+        }
+
+
+        return res;
+    }
+
     // Process Inline Keyboard callback data
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
+
+        ResponseBaseModel check_user = CheckTelegramUser(callbackQuery.Message?.From);
 
         await _botClient.AnswerCallbackQueryAsync(
             callbackQueryId: callbackQuery.Id,
