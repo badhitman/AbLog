@@ -26,9 +26,4 @@ public class SystemCommandModelDB : EntryModel
     /// Команда отключена?
     /// </summary>
     public bool IsDisabled { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool IsCorrect => !string.IsNullOrWhiteSpace(FileName) && !string.IsNullOrWhiteSpace(Name);
 }

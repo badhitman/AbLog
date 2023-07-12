@@ -53,9 +53,9 @@ public class SystemCommandsLocalService : ISystemCommandsService
     public Task<ResponseBaseModel> CommandUpdateOrCreate(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        if (!comm.IsCorrect)
+        if (string.IsNullOrWhiteSpace(comm.FileName))
         {
-            res.AddError("Обязательные поля не заполнены: 'Name' и 'FileName'. error {24FCBE74-127A-473E-9577-1EA58C9CA7E8}");
+            res.AddError("Поле 'FileName' обязательно для заполнения. error {24FCBE74-127A-473E-9577-1EA58C9CA7E8}");
             return Task.FromResult(res);
         }
 
@@ -63,6 +63,15 @@ public class SystemCommandsLocalService : ISystemCommandsService
 
         lock (ServerContext.DbLocker)
         {
+            SystemCommandModelDB? control_com = _context.SystemCommands
+                        .FirstOrDefault(x => x.Id != comm.Id && x.FileName == comm.FileName && x.Arguments == comm.Arguments);
+
+            if (control_com is not null)
+            {
+                res.AddError($"Такая команда уже существует: #{control_com.Id}");
+                return Task.FromResult(res);
+            }
+
             SystemCommandModelDB? com_db = _context.SystemCommands.FirstOrDefault(x => x.Id == comm.Id);
             if (com_db is null)
             {
@@ -77,8 +86,13 @@ public class SystemCommandsLocalService : ISystemCommandsService
                 }
             }
             else
-                _context.Update(comm);
-
+            {
+                com_db.IsDisabled = comm.IsDisabled;
+                com_db.Name = comm.Name;
+                com_db.FileName = comm.FileName;
+                com_db.Arguments = comm.Arguments;
+                _context.Update(com_db);
+            }
             _context.SaveChanges();
             res.AddSuccess("Команда обновлена/сохранена");
         }

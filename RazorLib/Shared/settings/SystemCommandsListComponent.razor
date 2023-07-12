@@ -9,21 +9,79 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Системные команды</h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary">Консольная команда операционной системы</h6>
+        <h6 class="card-subtitle mb-2 text-body-secondary">Эти команды будут доступны через TelegramBot в соответсвии с назначинеыми разрешениями</h6>
+        <MudTable Items="@SystemCommands" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsBusyProgress" CommitEditTooltip="Commit Edit"
+                  OnCommitEditClick="SaveElement"
+                  RowEditPreview="BeckupEditItem" RowEditCancel="ResetItemToOriginalValues"
+                  LoadingProgressColor="Color.Info" CanCancelEdit="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Консольные команды операционной системы</MudText>
+                <MudSpacer />
+                <form class="row row-cols-lg-auto g-3 align-items-center">
+                    <div class="col-12">
+                        <label class="visually-hidden" for="inlineFormInputGroupTitle">Название</label>
+                        <div class="input-group">
+                            <input @bind-value="createCommand.Name" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupTitle" placeholder="Наименование">
+                        </div>
+                    </div>
 
-        <MudTable Items="@SystemCommands" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsBusyProgress" LoadingProgressColor="Color.Info">
+                    <div class="col-12">
+                        <label class="visually-hidden" for="inlineFormInputGroupFilename">Имя файла</label>
+                        <div class="input-group">
+                            <input @bind-value="createCommand.FileName" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupFilename" placeholder="Имя файла">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="visually-hidden" for="inlineFormInputGroupArguments">Аргументы</label>
+                        <div class="input-group">
+                            <input @bind-value="createCommand.Arguments" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupArguments" placeholder="Аргументы">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <button disabled="@(!CanAddingSystemCommand)" @onclick="AddNewCommand" type="button" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </ToolBarContent>
             <HeaderContent>
-                <MudTh>Name</MudTh>
+                <MudTh>Title</MudTh>
                 <MudTh>FileName</MudTh>
                 <MudTh>Arguments</MudTh>
-                <MudTh>IsDisabled</MudTh>
+                <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Name">@context.Name</MudTd>
-                <MudTd DataLabel="FileName">@context.FileName</MudTd>
-                <MudTd DataLabel="Arguments">@context.Arguments</MudTd>
-                <MudTd DataLabel="IsDisabled">@context.IsDisabled</MudTd>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.FileName</MudTd>
+                <MudTd>@context.Arguments</MudTd>
+                <MudTd>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                        @if (context.IsDisabled)
+                        {
+                            <button type="button" disabled class="btn btn-outline-secondary">Отключено</button>
+                        }
+                        else
+                        {
+                            <button type="button" disabled class="btn btn-outline-success">Включено</button>
+                        }
+                        <button @onclick="@(async () => { await RunCommand(context.Id); })" class="btn btn-outline-primary">Запустисть</button>
+                    </div>
+                </MudTd>
             </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd DataLabel="Name">
+                    <MudTextField @bind-Value="@context.Name" Required />
+                </MudTd>
+                <MudTd DataLabel="FileName">
+                    <MudTextField @bind-Value="@context.FileName" Required />
+                </MudTd>
+                <MudTd DataLabel="Arguments">
+                    <MudTextField @bind-Value="@context.Arguments" Required />
+                </MudTd>
+                <MudTd DataLabel="IsDisabled">
+                    <MudCheckBox Label="@(context.IsDisabled ? "Отключено (включить?)" : "Включено (отключить?)")" @bind-Checked="@context.IsDisabled" />
+                </MudTd>
+            </RowEditingTemplate>
             <NoRecordsContent>
                 <MudText>Нет ни одной заиси...</MudText>
             </NoRecordsContent>
@@ -33,6 +91,9 @@
             <PagerContent>
                 <MudTablePager />
             </PagerContent>
+            <EditButtonContent Context="button">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
+            </EditButtonContent>
         </MudTable>
     </div>
 </div>
@@ -40,11 +101,131 @@
 @code {
     ShowMessagesComponent? showMessages;
 
+    bool CanAddingSystemCommand => !string.IsNullOrWhiteSpace(createCommand.FileName) && !string.IsNullOrWhiteSpace(createCommand.Name);
+    SystemCommandModelDB createCommand = new();
+    SystemCommandModelDB elementBeforeEdit = new();
+    private List<string> editEvents = new();
+
     IEnumerable<SystemCommandModelDB> SystemCommands = Enumerable.Empty<SystemCommandModelDB>();
+
+    void SaveElement(MouseEventArgs element)
+    {
+        SystemCommandModelDB? sender = SystemCommands.FirstOrDefault(x => x.Id == elementBeforeEdit.Id);
+
+        if (sender is null)
+        {
+            _snackbar.Add("sender is null. error {C24B208F-15EE-4F32-B853-5FE9C6AB0F41}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(sender.FileName) || string.IsNullOrWhiteSpace(sender.Name))
+        {
+            _snackbar.Add("string.IsNullOrWhiteSpace(sender.FileName) || string.IsNullOrWhiteSpace(sender.Name). error {06356BA7-CD2D-48E3-BC22-B4FBF1276231}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            sender.FileName = elementBeforeEdit.FileName;
+            sender.Arguments = elementBeforeEdit.Arguments;
+            sender.IsDisabled = elementBeforeEdit.IsDisabled;
+            sender.Name = elementBeforeEdit.Name;
+            return;
+        }
+
+        InvokeAsync(async () =>
+        {
+            IsBusyProgress = true;
+            StateHasChanged();
+            ResponseBaseModel upd_command = await _comm.CommandUpdateOrCreate(sender);
+            showMessages?.ShowMessages(upd_command.Messages);
+            if (!upd_command.IsSuccess)
+            {
+                IsBusyProgress = false;
+                StateHasChanged();
+                return;
+            }
+            elementBeforeEdit = new()
+                {
+                    Id = sender.Id,
+                    FileName = sender.FileName,
+                    Arguments = sender.Arguments,
+                    IsDisabled = sender.IsDisabled
+                };
+            await UpdateCommandsList();
+            IsBusyProgress = false;
+            StateHasChanged();
+        });
+    }
+
+    async Task RunCommand(int command_id)
+    {
+        IsBusyProgress = true;
+        ResponseBaseModel run_cmd_res = await _comm.CommandRun(command_id);
+        IsBusyProgress = false;
+        showMessages?.ShowMessages(run_cmd_res.Messages);
+    }
+
+    void BeckupEditItem(object element)
+    {
+        SystemCommandModelDB sender = (SystemCommandModelDB)element;
+
+        elementBeforeEdit = new()
+            {
+                Id = sender.Id,
+                FileName = sender.FileName,
+                Arguments = sender.Arguments,
+                IsDisabled = sender.IsDisabled,
+                Name = sender.Name
+            };
+
+        AddEditionEvent($"RowEditPreview event: made a backup of Element [{((SystemCommandModelDB)element).FileName} {((SystemCommandModelDB)element).Arguments}]");
+    }
+
+    private void ResetItemToOriginalValues(object element)
+    {
+        SystemCommandModelDB sender = (SystemCommandModelDB)element;
+        sender.FileName = elementBeforeEdit.FileName;
+        sender.Arguments = elementBeforeEdit.Arguments;
+        sender.IsDisabled = elementBeforeEdit.IsDisabled;
+        sender.Name = elementBeforeEdit.Name;
+        AddEditionEvent($"RowEditCancel event: Editing of Element [{((SystemCommandModelDB)element).FileName} {((SystemCommandModelDB)element).Arguments}] canceled");
+    }
+
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+
+    async Task AddNewCommand()
+    {
+        if (!CanAddingSystemCommand)
+        {
+            _snackbar.Add("Имя файла и название команды обязательны для заполнения", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        IsBusyProgress = true;
+
+        ResponseBaseModel adding_command = await _comm.CommandUpdateOrCreate(createCommand);
+        if (!adding_command.IsSuccess)
+        {
+            IsBusyProgress = false;
+            showMessages?.ShowMessages(adding_command.Messages);
+            return;
+        }
+        createCommand = new();
+
+        await UpdateCommandsList();
+        IsBusyProgress = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        await UpdateCommandsList();
+    }
+
+    async Task UpdateCommandsList()
+    {
+        IsBusyProgress = true;
         SystemCommandsResponseModel elements = await _comm.CommandsGetAll();
+        IsBusyProgress = false;
         Severity _style;
         foreach (ResultMessage m in elements.Messages)
         {
@@ -62,6 +243,5 @@
         {
             SystemCommands = elements.SystemCommands;
         }
-
     }
 }

@@ -1,3 +1,4 @@
+using ab.context;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SharedLib;
@@ -43,7 +44,7 @@ public class UpdateHandler : IUpdateHandler
             // UpdateType.Poll:
             { Message: { } message } => BotOnMessageReceived(message, cancellationToken),
             { EditedMessage: { } message } => BotOnMessageReceived(message, cancellationToken),
-            { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),            
+            { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),
             _ => UnknownUpdateHandlerAsync(update, cancellationToken)
         };
 
@@ -68,22 +69,28 @@ public class UpdateHandler : IUpdateHandler
         {
             const string usage = "Бот-обормот";
 
-            InlineKeyboardMarkup inlineKeyboard = new(
-                new[]
-                {
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("Статус MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")
-                    },
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("Рестарт MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.UPDATE}")
-                    },
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("Перезагрузка сервера", $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.UPDATE}")
-                    }
-                });
+            using ServerContext _context = new();
+            InlineKeyboardMarkup inlineKeyboard;
+            lock (ServerContext.DbLocker)
+            {
+                inlineKeyboard = new(
+                    _context.SystemCommands.AsEnumerable().Select(x => new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData(x.Name, x.Id.ToString()) }).ToArray()
+                //new []
+                //{
+                //    InlineKeyboardButton.WithCallbackData("Статус MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")
+                //},
+                //new []
+                //{
+                //    InlineKeyboardButton.WithCallbackData("Рестарт MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.UPDATE}")
+                //},
+                //new []
+                //{
+                //    InlineKeyboardButton.WithCallbackData("Перезагрузка сервера", $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.UPDATE}")
+                //}
+                );
+            }
+            // _context.SystemCommands.AsEnumerable().Select(x=>new []{ InlineKeyboardButton.WithCallbackData("Статус MQTT", $"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}") }).ToArray()
+
 
 
             return await botClient.SendTextMessageAsync(
