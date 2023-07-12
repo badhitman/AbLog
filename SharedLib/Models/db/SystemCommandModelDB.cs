@@ -9,17 +9,12 @@ namespace SharedLib;
 /// <summary>
 /// Системная команда
 /// </summary>
-public class SystemCommandModelDB
+public class SystemCommandModelDB : EntryModel
 {
-    /// <summary>
-    /// Ключ/идентификатор
-    /// </summary>
-    [Key]
-    public int Id { get; set; }
-
     /// <summary>
     /// Файл запуска
     /// </summary>
+    [Required]
     public string FileName { get; set; } = default!;
 
     /// <summary>
@@ -31,4 +26,9 @@ public class SystemCommandModelDB
     /// Команда отключена?
     /// </summary>
     public bool IsDisabled { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool IsCorrect => !string.IsNullOrWhiteSpace(FileName) && !string.IsNullOrWhiteSpace(Name);
 }

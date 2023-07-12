@@ -70,6 +70,11 @@ public class ServerContext : DbContext
     /// </summary>
     public DbSet<ContentionsModelDB> Contentions { get; set; }
 
+    /// <summary>
+    /// Системные команды
+    /// </summary>
+    public DbSet<SystemCommandModelDB> SystemCommands { get; set; }
+
     /// <inheritdoc/>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

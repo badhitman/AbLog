@@ -336,9 +336,6 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandDelete(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
 
-
-
-
             case GlobalStatic.Routes.SHOT:
 
                 break;
