@@ -53,9 +53,9 @@ public class SystemCommandsLocalService : ISystemCommandsService
     public Task<ResponseBaseModel> CommandUpdateOrCreate(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        if (string.IsNullOrWhiteSpace(comm.FileName))
+        if (string.IsNullOrWhiteSpace(comm.FileName) || string.IsNullOrWhiteSpace(comm.Name))
         {
-            res.AddError("Поле 'FileName' обязательно для заполнения. error {24FCBE74-127A-473E-9577-1EA58C9CA7E8}");
+            res.AddError("Поля 'Name' и 'FileName' обязательны для заполнения. error {24FCBE74-127A-473E-9577-1EA58C9CA7E8}");
             return Task.FromResult(res);
         }
 
@@ -116,14 +116,18 @@ public class SystemCommandsLocalService : ISystemCommandsService
             }
 
             Process? p = Process.Start(new ProcessStartInfo() { FileName = com_db.FileName, Arguments = com_db.Arguments ?? "" });
+
+            if (p is null)
+            {
+                res.AddError("Process is null. error {F9D53DCB-BE75-4D66-8A85-99F0EA6908C1}");
+
+                return Task.FromResult(res);
+            }
+
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.FileName = Path.GetTempFileName();
             p.Start();
-            // Do not wait for the child process to exit before
-            // reading to the end of its redirected stream.
-            // p.WaitForExit();
-            // Read the output stream first and then wait.
             string output = p.StandardOutput.ReadToEnd();
             p.WaitForExit();
             res.AddSuccess($"Команда выполнена:\n{output}");

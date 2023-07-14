@@ -8,8 +8,36 @@
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Системные команды</h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary">Эти команды будут доступны через TelegramBot в соответсвии с назначинеыми разрешениями</h6>
+        <h5 class="card-title">Системное меню</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">Эти команды будут доступны в системном меню TelegramBot (права: система)</h6>
+        <div class="d-flex flex-row-reverse mb-3">
+            <form class="row row-cols-lg-auto g-3 align-items-center">
+                <div class="col-12">
+                    <label class="visually-hidden" for="inlineFormInputGroupTitle">Название</label>
+                    <div class="input-group">
+                        <input @bind-value="createCommand.Name" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupTitle" placeholder="Наименование">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="inlineFormInputGroupFilename">Имя файла</label>
+                    <div class="input-group">
+                        <input @bind-value="createCommand.FileName" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupFilename" placeholder="Имя файла">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="visually-hidden" for="inlineFormInputGroupArguments">Аргументы</label>
+                    <div class="input-group">
+                        <input @bind-value="createCommand.Arguments" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupArguments" placeholder="Аргументы">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button disabled="@(!CanAddingSystemCommand)" @onclick="AddNewCommand" type="button" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
         <MudTable Items="@SystemCommands" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@IsBusyProgress" CommitEditTooltip="Commit Edit"
                   OnCommitEditClick="SaveElement"
                   RowEditPreview="BeckupEditItem" RowEditCancel="ResetItemToOriginalValues"
@@ -17,32 +45,7 @@
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Консольные команды операционной системы</MudText>
                 <MudSpacer />
-                <form class="row row-cols-lg-auto g-3 align-items-center">
-                    <div class="col-12">
-                        <label class="visually-hidden" for="inlineFormInputGroupTitle">Название</label>
-                        <div class="input-group">
-                            <input @bind-value="createCommand.Name" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupTitle" placeholder="Наименование">
-                        </div>
-                    </div>
 
-                    <div class="col-12">
-                        <label class="visually-hidden" for="inlineFormInputGroupFilename">Имя файла</label>
-                        <div class="input-group">
-                            <input @bind-value="createCommand.FileName" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupFilename" placeholder="Имя файла">
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <label class="visually-hidden" for="inlineFormInputGroupArguments">Аргументы</label>
-                        <div class="input-group">
-                            <input @bind-value="createCommand.Arguments" @bind-value:event="oninput" type="text" class="form-control" id="inlineFormInputGroupArguments" placeholder="Аргументы">
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <button disabled="@(!CanAddingSystemCommand)" @onclick="AddNewCommand" type="button" class="btn btn-primary">Добавить</button>
-                    </div>
-                </form>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Title</MudTh>
@@ -55,7 +58,7 @@
                 <MudTd>@context.FileName</MudTd>
                 <MudTd>@context.Arguments</MudTd>
                 <MudTd>
-                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example" @onclick:stopPropagation="true" @onclick:preventDefault="true">
                         @if (context.IsDisabled)
                         {
                             <button type="button" disabled class="btn btn-outline-secondary">Отключено</button>
@@ -65,6 +68,7 @@
                             <button type="button" disabled class="btn btn-outline-success">Включено</button>
                         }
                         <button @onclick="@(async () => { await RunCommand(context.Id); })" class="btn btn-outline-primary">Запустисть</button>
+                        <SystemCommandDeleteButtonsComponent CommandId="context.Id" UpdateCommandsList="@(async () => { await UpdateCommandsList(); StateHasChanged(); })" />
                     </div>
                 </MudTd>
             </RowTemplate>

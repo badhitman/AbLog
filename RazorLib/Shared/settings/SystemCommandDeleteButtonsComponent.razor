@@ -1,0 +1,33 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inject ISystemCommandsService _comm
+
+<button @onclick="@DeleteCommand" class="btn btn@(IsInitDelete?"":"-outline")-danger">@(IsInitDelete ? "Подтвердить удаление" : "Удалить")</button>
+@if (IsInitDelete)
+{
+    <button @onclick="() => { IsInitDelete = false; }" class="btn btn-outline-primary">Отменить удаление</button>
+}
+<ShowMessagesComponent @ref="showMessages" />
+@code {
+    [Parameter, EditorRequired]
+    public int CommandId { get; set; }
+
+    [Parameter, EditorRequired]
+    public Action UpdateCommandsList { get; set; } = default!;
+
+    ShowMessagesComponent? showMessages;
+    bool IsInitDelete = false;
+
+    async Task DeleteCommand()
+    {
+        if (!IsInitDelete)
+        {
+            IsInitDelete = true;
+            return;
+        }
+
+        ResponseBaseModel res = await _comm.CommandDelete(CommandId);
+        showMessages?.ShowMessages(res.Messages);
+    }
+}

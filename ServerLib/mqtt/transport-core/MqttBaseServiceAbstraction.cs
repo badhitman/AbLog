@@ -164,23 +164,19 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     }
 
     /// <inheritdoc/>
-    public async Task<BoolResponseModel> StatusService(int limit_try_if_not_connected = 5)
+    public Task<BoolResponseModel> StatusService()
     {
         BoolResponseModel res = new()
         {
             Response = _mqttClient.IsConnected
         };
 
-        while (limit_try_if_not_connected > 0 && res.Response != true)
-        {
-            await _mqttClient.ConnectAsync(MqttClientOptions);
-            res.Response = _mqttClient.IsConnected;
-        }
-
         res.AddInfo(_mqttClient.IsConnected ? "Клиент подключён" : "Клиент не подключён");
 
-        return res;
+        return Task.FromResult(res);
     }
+
+    // public Task<BoolResponseModel> StatusService(int limit_try_if_not_connected = 0);
 
     /// <inheritdoc/>
     public async Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default)
