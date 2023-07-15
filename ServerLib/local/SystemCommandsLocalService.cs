@@ -52,6 +52,7 @@ public class SystemCommandsLocalService : ISystemCommandsService
     /// <inheritdoc/>
     public Task<ResponseBaseModel> CommandUpdateOrCreate(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
     {
+        comm.Name = comm.Name.Trim();
         ResponseBaseModel res = new();
         if (string.IsNullOrWhiteSpace(comm.FileName) || string.IsNullOrWhiteSpace(comm.Name))
         {
@@ -64,11 +65,22 @@ public class SystemCommandsLocalService : ISystemCommandsService
         lock (ServerContext.DbLocker)
         {
             SystemCommandModelDB? control_com = _context.SystemCommands
-                        .FirstOrDefault(x => x.Id != comm.Id && x.FileName == comm.FileName && x.Arguments == comm.Arguments);
+                .Where(x => x.Id != comm.Id)
+                        .FirstOrDefault(x => x.FileName == comm.FileName && x.Arguments == comm.Arguments);
 
             if (control_com is not null)
             {
                 res.AddError($"Такая команда уже существует: #{control_com.Id}");
+                return Task.FromResult(res);
+            }
+
+            control_com = _context.SystemCommands
+                .Where(x => x.Id != comm.Id)
+                        .FirstOrDefault(x => x.Name == comm.Name);
+
+            if (control_com is not null)
+            {
+                res.AddError($"Такое имя команды уже существует: #{control_com.Id}");
                 return Task.FromResult(res);
             }
 

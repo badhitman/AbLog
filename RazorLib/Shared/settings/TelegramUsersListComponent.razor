@@ -1,0 +1,66 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject ISnackbar _snackbar;
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Пользователи</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">Права доступа</h6>
+        <MudTable ServerData="@(new Func<TableState, Task<TableData<UserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Telegram users</MudText>
+                <MudSpacer />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Пользователь</MudTh>
+                <MudTh>Права</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </div>
+</div>
+@code {
+    private int totalItems;
+    private MudTable<UserModelDB>? table;
+
+    private string? searchString = null;
+
+    /// <summary>
+    /// Here we simulate getting the paged, filtered and ordered data from the server
+    /// </summary>
+    private Task<TableData<UserModelDB>> ServerReload(TableState state)
+    {
+        IEnumerable<UserModelDB> data = new List<UserModelDB>()
+                    {
+                        new UserModelDB() { Id=1, Name="user 1", LastName="UserName_1" },
+                        new UserModelDB() { Id=2, Name="user 2", LastName="UserName_2" },
+                        new UserModelDB() { Id=3, Name="user 3", LastName="UserName_3" }
+                    };
+
+        totalItems = data.Count();
+
+        //pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return Task.FromResult(new TableData<UserModelDB>() { TotalItems = totalItems, Items = data });
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table?.ReloadServerData();
+    }
+}

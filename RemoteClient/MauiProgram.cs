@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
+using System.Reflection;
 using Newtonsoft.Json;
 using MQTTnet.Client;
 using ab.context;
@@ -27,12 +28,21 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
         builder.Services.AddMudServices();
+        //
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        string[] ManifestResourceNames = assembly.GetManifestResourceNames();
+        string resourceName = ManifestResourceNames.First(s => s.EndsWith("conf.json", StringComparison.CurrentCultureIgnoreCase));
 
-        string folder_exe = Path.GetDirectoryName(Environment.ProcessPath)!;
-        string file_conf_path = Path.Combine(folder_exe, "wwwroot", "conf.json");
-        using FileStream conf_file = File.Open(file_conf_path, FileMode.Open);
-        builder.Configuration.AddJsonStream(conf_file);
-        
+        using (var stream = assembly.GetManifestResourceStream(resourceName))
+        {
+            if (stream == null)
+            {
+                throw new InvalidOperationException("Could not load manifest resource stream.");
+            }
+            builder.Configuration.AddJsonStream(stream);
+        }
+
+
         ClientConfigModel settings = new();
         builder.Configuration.Bind(settings);
         builder.Services.AddSingleton(settings);

@@ -49,31 +49,9 @@
                         </div>
                     </EditForm>
                 </div>
-                <hr />
-                <MudTable ServerData="@(new Func<TableState, Task<TableData<UserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
-                    <ToolBarContent>
-                        <MudText Typo="Typo.h6">Пользователи Telegram</MudText>
-                        <MudSpacer />
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Пользователь</MudTh>
-                        <MudTh>Права</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Id">@context.Id</MudTd>
-                        <MudTd DataLabel="Name">@context.Name</MudTd>
-                    </RowTemplate>
-                    <NoRecordsContent>
-                        <MudText>No matching records found</MudText>
-                    </NoRecordsContent>
-                    <LoadingContent>
-                        <MudText>Loading...</MudText>
-                    </LoadingContent>
-                    <PagerContent>
-                        <MudTablePager />
-                    </PagerContent>
-                </MudTable>
             </form>
+            <br />
+            <TelegramUsersListComponent />
             <br />
             <SystemCommandsListComponent />
         }
@@ -81,11 +59,7 @@
 </div>
 <ShowMessagesComponent @ref="showMessages" />
 @code {
-    //private IEnumerable<UserModelDB>? pagedData;
-    private MudTable<UserModelDB>? table;
     ShowMessagesComponent? showMessages;
-    private int totalItems;
-    private string? searchString = null;
 
     TelegramBotConfigModel _conf = new();
     TelegramBotConfigModel _conf_self = new();
@@ -149,29 +123,5 @@
         }
         _conf_self = GlobalStatic.CreateDeepCopy(_conf);
         IsBusyProgress = false;
-    }
-
-    /// <summary>
-    /// Here we simulate getting the paged, filtered and ordered data from the server
-    /// </summary>
-    private Task<TableData<UserModelDB>> ServerReload(TableState state)
-    {
-        IEnumerable<UserModelDB> data = new List<UserModelDB>()
-                    {
-                        new UserModelDB() { Id=1, Name="user 1", LastName="UserName_1" },
-                        new UserModelDB() { Id=2, Name="user 2", LastName="UserName_2" },
-                        new UserModelDB() { Id=3, Name="user 3", LastName="UserName_3" }
-                    };
-
-        totalItems = data.Count();
-
-        //pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-        return Task.FromResult(new TableData<UserModelDB>() { TotalItems = totalItems, Items = data });
-    }
-
-    private void OnSearch(string text)
-    {
-        searchString = text;
-        table?.ReloadServerData();
     }
 }
