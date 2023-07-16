@@ -29,7 +29,10 @@ public class UserModelDB : UniversalModelDB
     /// </summary>
     public string FirstName { get; set; } = default!;
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    public DateTime LastUpdate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// 

@@ -142,3 +142,14 @@ public class ResponseBaseModel
     /// </summary>
     public void AddMessages(IEnumerable<ResultMessage> messages) => Messages.AddRange(messages);
 }
+
+/// <summary>
+/// 
+/// </summary>
+public class UserResponseModel: ResponseBaseModel
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public UserModelDB? User { get; set; }
+}
