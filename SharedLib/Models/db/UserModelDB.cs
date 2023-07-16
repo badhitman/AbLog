@@ -2,11 +2,14 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using Microsoft.EntityFrameworkCore;
+
 namespace SharedLib;
 
 /// <summary>
 /// Пользователь системы
 /// </summary>
+[Index(nameof(TelegramId), IsUnique = true)]
 public class UserModelDB : UniversalModelDB
 {
     /// <summary>

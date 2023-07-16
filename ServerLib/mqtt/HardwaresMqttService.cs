@@ -68,7 +68,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{GlobalStatic.Routes.HTTP}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {

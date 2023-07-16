@@ -145,17 +145,21 @@
                 StateHasChanged();
                 return;
             }
-            elementBeforeEdit = new()
-                {
-                    Id = sender.Id,
-                    FileName = sender.FileName,
-                    Arguments = sender.Arguments,
-                    IsDisabled = sender.IsDisabled
-                };
+            //
+            elementBeforeEdit = GlobalStatic.CreateDeepCopy<SystemCommandModelDB>(sender);
             await UpdateCommandsList();
             IsBusyProgress = false;
             StateHasChanged();
         });
+    }
+
+    void BeckupEditItem(object element)
+    {
+        SystemCommandModelDB sender = (SystemCommandModelDB)element;
+
+        elementBeforeEdit = GlobalStatic.CreateDeepCopy<SystemCommandModelDB>(sender);
+        
+        AddEditionEvent($"RowEditPreview event: made a backup of Element [{((SystemCommandModelDB)element).FileName} {((SystemCommandModelDB)element).Arguments}]");
     }
 
     async Task RunCommand(int command_id)
@@ -164,22 +168,6 @@
         ResponseBaseModel run_cmd_res = await _comm.CommandRun(command_id);
         IsBusyProgress = false;
         showMessages?.ShowMessages(run_cmd_res.Messages);
-    }
-
-    void BeckupEditItem(object element)
-    {
-        SystemCommandModelDB sender = (SystemCommandModelDB)element;
-
-        elementBeforeEdit = new()
-            {
-                Id = sender.Id,
-                FileName = sender.FileName,
-                Arguments = sender.Arguments,
-                IsDisabled = sender.IsDisabled,
-                Name = sender.Name
-            };
-
-        AddEditionEvent($"RowEditPreview event: made a backup of Element [{((SystemCommandModelDB)element).FileName} {((SystemCommandModelDB)element).Arguments}]");
     }
 
     private void ResetItemToOriginalValues(object element)

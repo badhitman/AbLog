@@ -7,10 +7,10 @@ namespace SharedLib;
 /// <summary>
 /// 
 /// </summary>
-public class SimpleIdNoiseModel : NoiseModel
+public class LongIdNoiseModel : NoiseModel
 {
     /// <summary>
     /// 
     /// </summary>
-    public int Id { get; set; }
+    public long Id { get; set; }
 }

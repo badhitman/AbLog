@@ -8,7 +8,7 @@ using SharedLib;
 namespace ABLog;
 
 /// <summary>
-/// Управляющие блоки
+/// Команды (системные)
 /// </summary>
 [ApiController]
 [Route("/api/[controller]")]

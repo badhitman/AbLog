@@ -5,12 +5,12 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// Пользователь
 /// </summary>
-public class SimpleIdNoiseModel : NoiseModel
+public class UserResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// 
+    /// Пользователь
     /// </summary>
-    public int Id { get; set; }
+    public UserModelDB? User { get; set; }
 }

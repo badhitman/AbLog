@@ -132,6 +132,7 @@ public class UpdateHandler : IUpdateHandler
             callbackQueryId: callbackQuery.Id,
             text: $"Received {callbackQuery.Data}",
             cancellationToken: cancellationToken);
+
         string output = "< --- >";
 
         if (callbackQuery.Data?.StartsWith(SystemCommandPrefix, StringComparison.OrdinalIgnoreCase) == true)

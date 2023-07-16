@@ -208,6 +208,10 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
+        public const string Users = "users";
+        /// <summary>
+        /// 
+        /// </summary>
         public const string Hardwares = "hardwares";
         /// <summary>
         /// 

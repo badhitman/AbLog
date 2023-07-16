@@ -12,6 +12,24 @@ namespace SharedLib;
 public class ResponseBaseModel
 {
     /// <summary>
+    /// Базовая модель ответа сервера rest/api
+    /// </summary>
+    public ResponseBaseModel() { }
+
+    /// <summary>
+    /// Базовая модель ответа сервера rest/api
+    /// </summary>
+    public ResponseBaseModel(string msg, ResultTypeEnum msgType = ResultTypeEnum.Success)
+    {
+        if (!string.IsNullOrWhiteSpace(msg))
+        {
+            AddMessage(msgType, msg);
+        }
+    }
+
+
+
+    /// <summary>
     /// Результат обработки запроса.
     /// True - если удачно бз ошибок. False  - если возникли ошибки
     /// </summary>
@@ -45,47 +63,6 @@ public class ResponseBaseModel
     /// Создать ответ с Warning
     /// </summary>
     public static ResponseBaseModel CreateWarning(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Warning, Text = msg } } };
-
-    /// <summary>
-    /// Базовая модель ответа сервера rest/api
-    /// </summary>
-    public ResponseBaseModel() { }
-
-    /// <summary>
-    /// Базовая модель ответа сервера rest/api
-    /// </summary>
-    public ResponseBaseModel(string msg, ResultTypeEnum msgType = ResultTypeEnum.Success)
-    {
-        if (!string.IsNullOrWhiteSpace(msg))
-        {
-            AddMessage(msgType, msg);
-        }
-    }
-
-    /// <summary>
-    /// Базовая модель ответа сервера rest/api
-    /// </summary>
-    public static implicit operator ResponseBaseModel(Exception ex)
-    {
-        ResponseBaseModel res = CreateError(System.Text.RegularExpressions.Regex.Replace(ex.Message, @"ORA-\d+:\s?", string.Empty));
-
-        if (!string.IsNullOrWhiteSpace(ex.StackTrace))
-        {
-            res.AddError(ex.StackTrace);
-        }
-
-        Exception? ie = ex.InnerException;
-        while (ie != null)
-        {
-            res.AddError(ie.Message);
-            if (!string.IsNullOrWhiteSpace(ie.StackTrace))
-            {
-                res.AddError(ie.StackTrace);
-            }
-            ie = ie.InnerException;
-        }
-        return res;
-    }
 
     /// <summary>
     /// Добавить сообщение: Успех
@@ -141,15 +118,31 @@ public class ResponseBaseModel
     /// Добавить сообщения
     /// </summary>
     public void AddMessages(IEnumerable<ResultMessage> messages) => Messages.AddRange(messages);
-}
 
-/// <summary>
-/// 
-/// </summary>
-public class UserResponseModel: ResponseBaseModel
-{
+
+
     /// <summary>
-    /// 
+    /// Базовая модель ответа сервера rest/api
     /// </summary>
-    public UserModelDB? User { get; set; }
+    public static implicit operator ResponseBaseModel(Exception ex)
+    {
+        ResponseBaseModel res = CreateError(System.Text.RegularExpressions.Regex.Replace(ex.Message, @"ORA-\d+:\s?", string.Empty));
+
+        if (!string.IsNullOrWhiteSpace(ex.StackTrace))
+        {
+            res.AddError(ex.StackTrace);
+        }
+
+        Exception? ie = ex.InnerException;
+        while (ie != null)
+        {
+            res.AddError(ie.Message);
+            if (!string.IsNullOrWhiteSpace(ie.StackTrace))
+            {
+                res.AddError(ie.StackTrace);
+            }
+            ie = ie.InnerException;
+        }
+        return res;
+    }
 }

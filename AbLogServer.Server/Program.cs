@@ -1,17 +1,15 @@
 using System.Text.Json.Serialization;
 using System.Runtime.Versioning;
+using Telegram.Bot.Services;
 using Newtonsoft.Json;
 using MQTTnet.Client;
+using Telegram.Bot;
 using ab.context;
 using SharedLib;
 using ServerLib;
 using NLog.Web;
 using MQTTnet;
 using NLog;
-using Telegram.Bot.Polling;
-using Telegram.Bot;
-using Microsoft.Extensions.DependencyInjection;
-using Telegram.Bot.Services;
 
 namespace AbLogServer;
 
@@ -43,6 +41,7 @@ public class Program
             builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
             builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
             builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
+            builder.Services.AddSingleton<IUsersService, UsersLocalService>();
             builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
 
@@ -88,7 +87,7 @@ public class Program
             TelegramBotConfigModel tbot_settings = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_json_config_raw) ?? new();
             builder.Services.AddSingleton(x => mqtt_settings);
 
-            if(tbot_settings.IsConfigured && tbot_settings.AutoStart && !string.IsNullOrEmpty(tbot_settings.TelegramBotToken))
+            if (tbot_settings.IsConfigured && tbot_settings.AutoStart && !string.IsNullOrEmpty(tbot_settings.TelegramBotToken))
             {
                 builder.Services.AddHttpClient("telegram_bot_client")
                 .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>

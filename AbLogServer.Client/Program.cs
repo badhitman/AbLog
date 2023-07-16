@@ -53,10 +53,13 @@ public class Program
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
         builder.Services.AddRefitClient<IRefitSystemCommandsService>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+        builder.Services.AddRefitClient<IRefitUsersService>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
         builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRefitService>();
         builder.Services.AddSingleton<IHardwaresService, HardwaresRefitService>();
         builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsRefitService>();
+        builder.Services.AddSingleton<IUsersService, UsersRefitService>();
         builder.Services.AddSingleton<IToolsService, ToolsRefitService>();
 
         await builder.Build().RunAsync();

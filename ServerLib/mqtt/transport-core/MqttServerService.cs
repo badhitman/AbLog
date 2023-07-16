@@ -25,6 +25,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
 {
     readonly IHardwaresService _hardwares_service;
     readonly ISystemCommandsService _sys_com_service;
+    readonly IUsersService _users_service;
     readonly HttpClient _http_client;
     readonly IServiceCollection _services;
 
@@ -33,9 +34,10 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .CreateSubscribeOptionsBuilder()
                 .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.AB_LOG_SYSTEM); })
                 .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.Cameras); })
-                .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.HTTP); })
                 .WithTopicFilter(f => { f.WithTopic(GlobalStatic.Routes.SHOT); })
 
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}"); })
+                //
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.ENTRIES}"); })
@@ -51,6 +53,10 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}"); })
 
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}/{GlobalStatic.Routes.LIST}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}"); })
+
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}"); })
@@ -60,7 +66,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
         : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
         _logger = logger;
@@ -68,6 +74,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
         _http_client = http_client;
         _services = services;
         _sys_com_service = sys_com_service;
+        _users_service = users_service;
     }
 
     /// <summary>
@@ -84,7 +91,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
         switch (e.ApplicationMessage.Topic)
         {
-            case GlobalStatic.Routes.HTTP:
+            case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}":
                 HardwareGetHttpRequestModel? req_http = JsonConvert.DeserializeObject<HardwareGetHttpRequestModel>(payload_json);
                 if (req_http is null)
                 {
@@ -334,6 +341,16 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
 
                 await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandDelete(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                break;
+
+            case $"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}/{GlobalStatic.Routes.LIST}":
+
+                break;
+            case $"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}":
+
+                break;
+            case $"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}":
+
                 break;
 
             case GlobalStatic.Routes.SHOT:

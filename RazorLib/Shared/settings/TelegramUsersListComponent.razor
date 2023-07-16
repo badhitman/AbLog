@@ -3,30 +3,51 @@
 
 @inherits BlazorBusyComponentBaseModel
 
+@inject IUsersService _users;
 @inject ISnackbar _snackbar;
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Пользователи</h5>
         <h6 class="card-subtitle mb-2 text-body-secondary">Права доступа</h6>
-        <MudTable ServerData="@(new Func<TableState, Task<TableData<UserModelDB>>>(ServerReload))" Dense="true" Hover="true" @ref="table">
+        <MudTable Loading="IsBusyProgress" ServerData="@(new Func<TableState, Task<TableData<UserModelDB>>>(ServerReload))" Dense="true" Hover="true"
+                  OnCommitEditClick="SaveElement"
+                  RowEditPreview="BeckupEditItem" RowEditCancel="ResetItemToOriginalValues" @ref="table">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">Telegram users</MudText>
                 <MudSpacer />
+                <MudFab Title="Обновить список пользователей" OnClick="Reload" Color="Color.Primary" StartIcon="@(Icons.Material.Filled.Refresh)" Size="Size.Small" />
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Пользователь</MudTh>
                 <MudTh>Права</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Name">@context.Name</MudTd>
-            </RowTemplate>
+                <MudTd>@($"{context.Name} {context.FirstName} {context.LastName}")</MudTd>
+                    <MudTd>права</MudTd>
+                </RowTemplate>
+                <RowEditingTemplate>
+                    <MudTd>
+                        <span>@($"{context.Name} {context.FirstName} {context.LastName}")</span>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="@context.Email" Required />
+                </MudTd>
+                <MudTd>
+                    <MudCheckBox Label="@(context.CommandsAllowed ? "Команды (выключить?)" : "Команды (отключить?)")" @bind-Checked="@context.CommandsAllowed" />
+                </MudTd>
+                <MudTd>
+                    <MudCheckBox Label="@(context.AlarmSubscriber ? "Уведомления (отключить?)" : "Уведомления (включить?)")" @bind-Checked="@context.AlarmSubscriber" />
+                </MudTd>
+                <MudTd>
+                    <MudCheckBox Label="@(context.IsDisabled ? "Отключен (включить?)" : "Включен (отключить?)")" @bind-Checked="@context.IsDisabled" />
+                </MudTd>
+            </RowEditingTemplate>
             <NoRecordsContent>
-                <MudText>No matching records found</MudText>
+                <MudText>Ни одного пользователя нет</MudText>
             </NoRecordsContent>
             <LoadingContent>
-                <MudText>Loading...</MudText>
+                <MudText>Загрузка...</MudText>
             </LoadingContent>
             <PagerContent>
                 <MudTablePager />
@@ -34,33 +55,94 @@
         </MudTable>
     </div>
 </div>
+<ShowMessagesComponent @ref="showMessages" />
+
 @code {
     private int totalItems;
     private MudTable<UserModelDB>? table;
-
+    ShowMessagesComponent? showMessages;
     private string? searchString = null;
+
+    UserModelDB elementBeforeEdit = new();
+    private List<string> editEvents = new();
+
+    UsersPaginationResponseModel rest = new();
+
+    async Task Reload()
+    {
+        if (table is not null)
+            await table.ReloadServerData();
+    }
+
+    void SaveElement(MouseEventArgs element)
+    {
+        UserModelDB? sender = rest.Users?.FirstOrDefault(x => x.Id == elementBeforeEdit.Id);
+
+        if (sender is null)
+        {
+            _snackbar.Add("sender is null. error {71B240C3-2A60-45AB-B7AF-C0A8F4CF7CAB}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+
+        InvokeAsync(async () =>
+        {
+            IsBusyProgress = true;
+            StateHasChanged();
+            ResponseBaseModel upd_command = await _users.UpdateUser(sender.TelegramId, new UpdateUserModel()
+                {
+                    Email = sender.Email,
+                    IsDisabled = sender.IsDisabled,
+                    AllowAlerts = sender.AlarmSubscriber,
+                    AllowHardwareControl = sender.CommandsAllowed
+                });
+            showMessages?.ShowMessages(upd_command.Messages);
+            if (!upd_command.IsSuccess)
+            {
+                IsBusyProgress = false;
+                StateHasChanged();
+                return;
+            }
+            elementBeforeEdit = GlobalStatic.CreateDeepCopy(sender);
+            await Reload();
+            IsBusyProgress = false;
+            StateHasChanged();
+        });
+    }
+
+    void BeckupEditItem(object element)
+    {
+        UserModelDB sender = (UserModelDB)element;
+        elementBeforeEdit = GlobalStatic.CreateDeepCopy<UserModelDB>(sender);
+        AddEditionEvent($"RowEditPreview event: made a backup of Element [{sender.Name} {sender.FirstName} {sender.LastName}]");
+    }
 
     /// <summary>
     /// Here we simulate getting the paged, filtered and ordered data from the server
     /// </summary>
-    private Task<TableData<UserModelDB>> ServerReload(TableState state)
+    private async Task<TableData<UserModelDB>> ServerReload(TableState state)
     {
-        IEnumerable<UserModelDB> data = new List<UserModelDB>()
-                    {
-                        new UserModelDB() { Id=1, Name="user 1", LastName="UserName_1" },
-                        new UserModelDB() { Id=2, Name="user 2", LastName="UserName_2" },
-                        new UserModelDB() { Id=3, Name="user 3", LastName="UserName_3" }
-                    };
+        IsBusyProgress = true;
+        UsersPaginationResponseModel rest = await _users.UsersGetList(new UserListGetModel() { PageNum = state.Page, PageSize = state.PageSize });
+        totalItems = rest.TotalRowsCount;
+        IsBusyProgress = false;
 
-        totalItems = data.Count();
-
-        //pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-        return Task.FromResult(new TableData<UserModelDB>() { TotalItems = totalItems, Items = data });
+        return new TableData<UserModelDB>() { TotalItems = totalItems, Items = rest.Users };
     }
 
-    private void OnSearch(string text)
+    private void ResetItemToOriginalValues(object element)
     {
-        searchString = text;
-        table?.ReloadServerData();
+        UserModelDB sender = (UserModelDB)element;
+        sender.Email = elementBeforeEdit.Email;
+        sender.AlarmSubscriber = elementBeforeEdit.AlarmSubscriber;
+        sender.CommandsAllowed = elementBeforeEdit.CommandsAllowed;
+        sender.IsDisabled = elementBeforeEdit.IsDisabled;
+
+        AddEditionEvent($"RowEditCancel event: Editing of Element [{((SystemCommandModelDB)element).FileName} {((SystemCommandModelDB)element).Arguments}] canceled");
+    }
+
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
     }
 }
