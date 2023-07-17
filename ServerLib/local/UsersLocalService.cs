@@ -76,11 +76,12 @@ public class UsersLocalService : IUsersService
                 return Task.FromResult(res);
             }
 
-            if (user_db.Email == req.Email && user_db.IsDisabled == req.IsDisabled && user_db.AlarmSubscriber == req.AllowAlerts && user_db.CommandsAllowed == req.AllowHardwareControl)
+            if (user_db.Email == req.Email && user_db.AllowSystemCommands == req.AllowSystemCommands && user_db.IsDisabled == req.IsDisabled && user_db.AlarmSubscriber == req.AllowAlerts && user_db.CommandsAllowed == req.AllowHardwareControl)
             {
                 res.AddInfo("Изменений нет");
                 return Task.FromResult(res);
             }
+            user_db.AllowSystemCommands = req.AllowSystemCommands;
             user_db.IsDisabled = req.IsDisabled;
             user_db.Email = req.Email;
             user_db.AlarmSubscriber = req.AllowAlerts;

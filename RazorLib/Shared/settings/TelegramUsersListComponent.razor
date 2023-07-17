@@ -35,16 +35,16 @@
                 </MudTd>
                 <MudTd>@context.Email</MudTd>
                 <MudTd>
-                    @if (context.CommandsAllowed)
-                    {
-                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
-                            <MudText>Команды</MudText>
-                        </MudBadge>
-                    }
                     @if (context.AllowSystemCommands)
                     {
                         <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
                             <MudText>Система</MudText>
+                        </MudBadge>
+                    }
+                    @if (context.CommandsAllowed)
+                    {
+                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                            <MudText>Команды</MudText>
                         </MudBadge>
                     }
                     @if (context.AlarmSubscriber)
