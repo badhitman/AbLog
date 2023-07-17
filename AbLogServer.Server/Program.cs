@@ -44,9 +44,13 @@ public class Program
             builder.Services.AddSingleton<IUsersService, UsersLocalService>();
             builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
+            builder.Services.AddSingleton<IEmailService, EmailLocalService>();
 
             builder.Services.AddControllersWithViews()
-                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+                .AddJsonOptions(x => { 
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             builder.Services.AddRazorPages();
 
             builder.Logging.ClearProviders();

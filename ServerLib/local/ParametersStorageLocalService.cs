@@ -58,8 +58,11 @@ public class ParametersStorageLocalService : IParametersStorageService
     #region Email
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
+    public virtual Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
     {
+        if (!connect_config.IsConfigured)
+            return Task.FromResult(ResponseBaseModel.CreateError("Настройки не заполнены. Заполните поля: email, login, pasword, host"));
+
         using ParametersContext _context = new();
         ParametersStorageModelDB p = _context.SetStoredParameter(nameof(EmailConfigModel), JsonConvert.SerializeObject(connect_config));
         ResponseBaseModel res = new();
@@ -68,13 +71,16 @@ public class ParametersStorageLocalService : IParametersStorageService
     }
 
     /// <inheritdoc/>
-    public Task<EmailConfigResponseModel> GetEmailConfig()
+    public virtual Task<EmailConfigResponseModel> GetEmailConfig()
     {
         EmailConfigResponseModel res = new();
         using ParametersContext _context = new();
         string _emailConfig = _context.GetStoredParameter(nameof(EmailConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_emailConfig))
+        {
+            res.AddWarning("Конфигурация не настроена");
             return Task.FromResult(res);
+        }
 
         res.Conf = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig) ?? new();
 
@@ -102,8 +108,10 @@ public class ParametersStorageLocalService : IParametersStorageService
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_mqttConfig))
+        {
+            res.AddError("string.IsNullOrWhiteSpace(_mqttConfig). error {5A7CC5FA-7D1D-4FB7-BB6C-BD317F964440}");
             return Task.FromResult(res);
-
+        }
         res.Conf = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
 
         return Task.FromResult(res);

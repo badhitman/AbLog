@@ -2,6 +2,7 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
 namespace SharedLib;
@@ -14,26 +15,31 @@ public class EmailConfigModel
     /// <summary>
     /// Email адрес
     /// </summary>
+    [Required]
     public string Email { get; set; } = default!;
 
     /// <summary>
     /// Логин
     /// </summary>
+    [Required]
     public string Login { get; set; } = default!;
 
     /// <summary>
     /// Пароль
     /// </summary>
+    [Required]
     public string Password { get; set; } = default!;
 
 
     /// <summary>
     /// Адрес хоста SMTP (исходящая почта)
     /// </summary>
+    [Required]
     public string? HostSmtp { get; set; }
     /// <summary>
     /// Порт хоста SMTP (исходящая почта)
     /// </summary>
+    [Required]
     public int PortSmtp { get; set; } = 465;
     /// <summary>
     /// Использовать SSL SMTP (исходящая почта)

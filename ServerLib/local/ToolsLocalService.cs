@@ -19,16 +19,18 @@ public class ToolsLocalService : IToolsService
     readonly IMqttBaseService _mqttClientService;
     readonly MqttFactory _mqtt_fact;
     readonly HttpClient _http_client;
+    readonly IEmailService _email;
 
     /// <summary>
     /// 
     /// </summary>
-    public ToolsLocalService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client)
+    public ToolsLocalService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client, IEmailService email)
     {
         _mqttClientService = mqttClientService;
         _parameter_storage = parameter_storage;
         _mqtt_fact = mqtt_fact;
         _http_client = http_client;
+        _email = email;
     }
 
     /// <inheritdoc/>
@@ -41,7 +43,7 @@ public class ToolsLocalService : IToolsService
     public Task<BoolResponseModel> StatusMqtt() => _mqttClientService.StatusService();
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null)
+    public virtual async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null)
     {
         ResponseBaseModel res = new();
         conf ??= (await _parameter_storage.GetEmailConfig()).Conf;
@@ -51,9 +53,7 @@ public class ToolsLocalService : IToolsService
             return res;
         }
 
-        using EmailLocalService emailService = new();
-        res = await emailService.ConnectSmtpAsync(conf);
-        return res;
+        return await _email.ConnectSmtpAsync(conf);
     }
 
     /// <inheritdoc/>

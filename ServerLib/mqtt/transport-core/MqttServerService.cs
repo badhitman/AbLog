@@ -28,6 +28,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
     readonly IUsersService _users_service;
     readonly HttpClient _http_client;
     readonly IServiceCollection _services;
+    readonly IEmailService _email;
 
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
@@ -50,8 +51,12 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}"); })
 
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}"); })
-                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}"); })
+
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}"); })
 
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}/{GlobalStatic.Routes.LIST}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}"); })
@@ -66,7 +71,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, CancellationToken cancellation_token = default)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IEmailService email, CancellationToken cancellation_token = default)
         : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
         _logger = logger;
@@ -75,6 +80,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
         _services = services;
         _sys_com_service = sys_com_service;
         _users_service = users_service;
+        _email = email;
     }
 
     /// <summary>
@@ -90,16 +96,19 @@ public class MqttServerService : MqttBaseServiceAbstraction
         string salt = Guid.NewGuid().ToString();
 
         PortHardwareCheckRequestModel? req_port_check;
+        TelegramBotConfigResponseModel tbc_res;
+        EmailConfigResponseModel ec_res;
         HardwareGetHttpRequestModel? req_http;
         SystemCommandModelDB? req_sys_com_db;
         TelegramBotConfigModel? req_conf_tbot;
+        EmailConfigModel? req_conf_email;
         UserListGetModel? req_users_list;
+        UpdateUserModel? req_user_upd;
         SimpleIdNoiseModel? req_nid;
         LongIdNoiseModel? req_nlid;
         HardwareBaseModel? req_hw;
         NoiseModel? req_noise;
         EntryModel? req_e;
-        UpdateUserModel? req_user_upd;
 
         switch (e.ApplicationMessage.Topic)
         {
@@ -246,7 +255,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. C39195BC-C94E-442C-9724-3FABEF157648")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
                 }
-                TelegramBotConfigResponseModel tbc_res = new();
+                tbc_res = new();
                 try
                 {
                     using ParametersContext _context = new();
@@ -257,7 +266,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                         await PublishMessage(JsonConvert.SerializeObject(tbc_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                         break;
                     }
-                    await PublishMessage(JsonConvert.SerializeObject(JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig) ?? new()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    tbc_res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig);
+                    await PublishMessage(JsonConvert.SerializeObject(tbc_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 }
                 catch (Exception ex)
                 {
@@ -265,7 +275,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 }
 
                 break;
-            case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}":
+            case $"{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}":
                 req_conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
                 if (req_conf_tbot is null)
                 {
@@ -302,6 +312,83 @@ public class MqttServerService : MqttBaseServiceAbstraction
                         { nameof(_me.IsBot), _me.IsBot }
                     };
                     await PublishMessage(JsonConvert.SerializeObject(res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                }
+                catch (Exception ex)
+                {
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError(ex.Message)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                }
+
+                break;
+
+            case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}":
+                req_conf_email = JsonConvert.DeserializeObject<EmailConfigModel>(payload_json);
+                if (req_conf_email is null)
+                {
+                    _logger.LogError("req_conf_email is null. 75046E18-6180-47DB-A8D5-F0D0AF67F35A");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 75046E18-6180-47DB-A8D5-F0D0AF67F35A")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                try
+                {
+                    using (ParametersContext _context = new())
+                    {
+                        ParametersStorageModelDB p = _context.SetStoredParameter(nameof(EmailConfigModel), JsonConvert.SerializeObject(req_conf_email));
+                    };
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateSuccess("Данные успешно сохранены")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                }
+                catch (Exception ex)
+                {
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError($"{ex.Message} // error {{17D29B87-313F-46FF-9E57-3D8167653046}}")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                }
+                break;
+            case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}":
+                req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                if (req_noise is null)
+                {
+                    _logger.LogError("req is null. 1EC03B3C-645D-4F9C-A0FC-199522559D50");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 1EC03B3C-645D-4F9C-A0FC-199522559D50")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+                ec_res = new();
+                try
+                {
+                    using ParametersContext _context = new();
+                    string _emailConfig = _context.GetStoredParameter(nameof(EmailConfigModel), "").StoredValue;
+                    if (string.IsNullOrWhiteSpace(_emailConfig))
+                    {
+                        ec_res.AddError("Конфигурация не обнаружена error {03DD8049-0772-44D1-BDBB-C25AA690F62B}");
+                        await PublishMessage(JsonConvert.SerializeObject(ec_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                        break;
+                    }
+                    ec_res.Conf = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig);
+                    await PublishMessage(JsonConvert.SerializeObject(ec_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                }
+                catch (Exception ex)
+                {
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError($"{ex} error {{A0B806CF-BD77-40D5-AC5A-38EEDD2FCB7F}}")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                }
+
+                break;
+            case $"{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}":
+                req_conf_email = JsonConvert.DeserializeObject<EmailConfigModel>(payload_json);
+                if (req_conf_email is null)
+                {
+                    _logger.LogError("req is null. 6814E514-AB2A-495E-93C7-B2E71787338F");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 02232606-6FE8-4A7D-9F3D-DF6F7C77349D")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                if (!req_conf_email.IsConfigured)
+                {
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("Email конфигурация не заполнена")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
+
+                try
+                {
+                    ResponseBaseModel e_cli = await _email.ConnectSmtpAsync(req_conf_email);
+                    await PublishMessage(JsonConvert.SerializeObject(e_cli), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 }
                 catch (Exception ex)
                 {

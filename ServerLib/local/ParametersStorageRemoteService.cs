@@ -4,7 +4,6 @@
 
 using Newtonsoft.Json;
 using SharedLib;
-using System.Diagnostics;
 
 namespace ServerLib;
 
@@ -26,12 +25,10 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
     public override async Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
     {
         SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(connect_config, $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}");
-        ResponseBaseModel? res = new();
-        if (!rpc.IsSuccess)
-        {
-            res.AddMessages(rpc.Messages);
+        ResponseBaseModel res = new();
+        res.AddMessages(rpc.Messages);
+        if (!res.IsSuccess)
             return res;
-        }
 
         if (string.IsNullOrEmpty(rpc.Response))
         {
@@ -39,23 +36,14 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
             return res;
         }
 
-        //res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(rpc.Response);
-        if (res is null)
-        {
-            res = new();
-            res.AddError("res is null error {A0306C7E-7055-4CD2-9143-10923DFD685B}");
-        }
-
         return res;
-
-        //return base.SaveTelegramBotConfig(connect_config);
     }
 
     /// <inheritdoc/>
     public override async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig()
     {
         SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}");
-        TelegramBotConfigResponseModel? res = new();
+        TelegramBotConfigResponseModel res = new();
         if (!rpc.IsSuccess)
         {
             res.AddMessages(rpc.Messages);
@@ -68,11 +56,56 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
             return res;
         }
 
-        res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(rpc.Response);
-        if(res.Conf is null)
+        res = JsonConvert.DeserializeObject<TelegramBotConfigResponseModel>(rpc.Response) ?? new();
+        if (res.Conf is null)
         {
             res.Conf = new();
             res.AddError("res.Conf is null error {A0306C7E-7055-4CD2-9143-10923DFD685B}");
+        }
+
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public override async Task<EmailConfigResponseModel> GetEmailConfig()
+    {
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}");
+        EmailConfigResponseModel res = new();
+        if (!rpc.IsSuccess)
+        {
+            res.AddMessages(rpc.Messages);
+            return res;
+        }
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {8B807537-270E-452C-8D6A-C4EF5FAF8DF6}");
+            return res;
+        }
+
+        res = JsonConvert.DeserializeObject<EmailConfigResponseModel>(rpc.Response) ?? new();
+        if (res.Conf is null)
+        {
+            res.Conf = new();
+            res.AddError("res.Conf is null error {EEE8D541-56D2-49F8-BFD2-B543A71BF204}");
+        }
+
+        return res;
+    }
+
+    /// <inheritdoc/>
+    public override async Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
+    {
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(connect_config, $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}");
+        ResponseBaseModel res = new();
+        res.AddMessages(rpc.Messages);
+        if (!res.IsSuccess)
+            return res;
+
+        if (string.IsNullOrEmpty(rpc.Response))
+        {
+            res.AddError("string.IsNullOrEmpty(rpc.Response). error {8AA0A955-7E07-4689-88D3-14AE2B8FDA64}");
+            return res;
         }
 
         return res;

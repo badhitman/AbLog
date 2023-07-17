@@ -37,21 +37,27 @@
                 <MudTd>
                     @if (context.AllowSystemCommands)
                     {
-                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
-                            <MudText>Система</MudText>
-                        </MudBadge>
+                        <MudTooltip Text="Разрешён доступ к системному меню">
+                            <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                                <MudText>Система</MudText>
+                            </MudBadge>
+                        </MudTooltip>
                     }
                     @if (context.CommandsAllowed)
                     {
-                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
-                            <MudText>Команды</MudText>
-                        </MudBadge>
+                        <MudTooltip Text="Разрешено управлять устройствами">
+                            <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                                <MudText>Команды</MudText>
+                            </MudBadge>
+                        </MudTooltip>
                     }
                     @if (context.AlarmSubscriber)
                     {
-                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
-                            <MudText>Оповещения</MudText>
-                        </MudBadge>
+                        <MudTooltip Text="Рассылка уведомлений/оповещений">
+                            <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                                <MudText>Оповещения</MudText>
+                            </MudBadge>
+                        </MudTooltip>
                     }
                     <MudBadge Dot="true" Color="@(context.IsDisabled ? Color.Secondary : Color.Success)" Class="mx-6 my-4">
                         <MudText>
