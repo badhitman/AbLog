@@ -139,7 +139,7 @@
         IsBusyProgress = false;
         Users = rest.Users ?? Enumerable.Empty<UserModelDB>();
         StateHasChanged();
-        
+
         return new TableData<UserModelDB>() { TotalItems = totalItems, Items = rest.Users };
     }
 
