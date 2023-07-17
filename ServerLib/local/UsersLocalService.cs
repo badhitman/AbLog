@@ -46,26 +46,30 @@ public class UsersLocalService : IUsersService
         UsersPaginationResponseModel res = new()
         {
             TotalRowsCount = query.Count(),
+            PageSize = req.PageSize,
+            PageNum = req.PageNum
         };
-        int pages_all_count = (int)Math.Ceiling((double)(res.TotalRowsCount / req.PageSize));
+        int pages_all_count = (int)Math.Ceiling((double)res.TotalRowsCount / (double)req.PageSize);
 
-        if (req.PageSize > pages_all_count)
-            req.PageSize = pages_all_count;
+        res.Users = query
+            .Skip((req.PageNum) * req.PageSize)
+            .Take(req.PageSize)
+            .ToArray();
 
-        res.Users = _db.Users.Skip((req.PageNum - 1) * req.PageSize).Take(req.PageSize).AsEnumerable();
+        res.AddInfo($"Пользователи: {res.Users.Count()} из {res.TotalRowsCount}");
 
         return Task.FromResult(res);
     }
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> UpdateUser(long telegram_id, UpdateUserModel req, CancellationToken cancellation_token = default)
+    public Task<ResponseBaseModel> UpdateUser(UpdateUserModel req, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
         using ServerContext _db = new();
         UserModelDB? user_db;
         lock (ServerContext.DbLocker)
         {
-            user_db = _db.Users.FirstOrDefault(x => x.TelegramId == telegram_id);
+            user_db = _db.Users.FirstOrDefault(x => x.TelegramId == req.TelegramId);
             if (user_db is null)
             {
                 res.AddError("user_db is null. error {D0694672-D5EE-43F4-A158-CCC7C2748729}");

@@ -7,7 +7,6 @@ using SharedLib;
 
 namespace RazorLib;
 
-
 /// <summary>
 /// 
 /// </summary>
@@ -43,13 +42,19 @@ public class UsersRefitService : IUsersService
         UsersPaginationResponseModel res = new();
         Refit.ApiResponse<UsersPaginationResponseModel> rest = await _refit_user.UsersGetList(req, cancellation_token);
 
+        if (rest.Content is null)
+        {
+            res.AddError("rest.Content is null // error {AC8EAA5B-66AF-45B5-9E66-2D8438053296}");
+            return res;
+        }
+
         return rest.Content;
     }
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> UpdateUser(long telegram_id, UpdateUserModel req, CancellationToken cancellation_token = default)
+    public async Task<ResponseBaseModel> UpdateUser(UpdateUserModel req, CancellationToken cancellation_token = default)
     {
-        Refit.ApiResponse<ResponseBaseModel> rest = await _refit_user.UserUpdate(telegram_id, req, cancellation_token);
+        Refit.ApiResponse<ResponseBaseModel> rest = await _refit_user.UserUpdate(req, cancellation_token);
 
         if (rest.Content is null)
         {

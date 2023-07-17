@@ -2,11 +2,11 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using MQTTnet.Adapter;
 using MQTTnet.Client;
+using Telegram.Bot;
 using SharedLib;
 using MQTTnet;
-using Telegram.Bot;
-using MQTTnet.Adapter;
 
 namespace ServerLib;
 
@@ -66,14 +66,14 @@ public class ToolsLocalService : IToolsService
             res.AddError("Конфигурация не установлена");
             return res;
         }
-        MqttClientOptionsBuilderTlsParameters obtp = new()
-        {
-            AllowUntrustedCertificates = true,
-            IgnoreCertificateChainErrors = true,
-            IgnoreCertificateRevocationErrors = true
-        };
+        //MqttClientOptionsBuilderTlsParameters obtp = new()
+        //{
+        //    AllowUntrustedCertificates = true,
+        //    IgnoreCertificateChainErrors = true,
+        //    IgnoreCertificateRevocationErrors = true
+        //};
         MqttClientOptions mqttClientOptions = new MqttClientOptionsBuilder()
-           .WithTls(obtp)
+           .WithTls()
            .WithClientId(conf.ClientId)
            .WithTcpServer(conf.Server, conf.Port)
            .WithCredentials(conf.Username, conf.Password)
@@ -92,7 +92,7 @@ public class ToolsLocalService : IToolsService
                 await _mqtt.DisconnectAsync();
             }
         }
-        catch(MqttConnectingFailedException mcf)
+        catch (MqttConnectingFailedException mcf)
         {
             res.AddError($"Failed to connect {mcf.Message}");
         }

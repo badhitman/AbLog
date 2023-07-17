@@ -20,29 +20,3 @@ public class UserListGetModel
     /// </summary>
     public bool IncludeDisabledUsers { get; set; }
 }
-
-/// <summary>
-/// 
-/// </summary>
-public class UpdateUserModel
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    public string? Email { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool IsDisabled { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool AllowAlerts { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool AllowHardwareControl { get; set; }
-}

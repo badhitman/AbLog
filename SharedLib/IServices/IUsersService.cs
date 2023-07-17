@@ -22,5 +22,5 @@ public interface IUsersService
     /// <summary>
     /// Установть настройки пользователю
     /// </summary>
-    public Task<ResponseBaseModel> UpdateUser(long telegram_id, UpdateUserModel req, CancellationToken cancellation_token = default);
+    public Task<ResponseBaseModel> UpdateUser(UpdateUserModel req, CancellationToken cancellation_token = default);
 }

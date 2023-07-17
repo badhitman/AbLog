@@ -28,6 +28,6 @@ public interface IRefitUsersService
     /// <summary>
     /// Пользователи
     /// </summary>
-    [Put($"/api/{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}/{{telegram_id}}")]
-    public Task<ApiResponse<ResponseBaseModel>> UserUpdate([AliasAs(nameof(telegram_id))] long telegram_id, UpdateUserModel req, CancellationToken cancellation_token = default);
+    [Put($"/api/{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}")]
+    public Task<ApiResponse<ResponseBaseModel>> UserUpdate(UpdateUserModel req, CancellationToken cancellation_token = default);
 }

@@ -2,16 +2,16 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Runtime.Versioning;
 using Newtonsoft.Json;
 using MQTTnet.Client;
+using Telegram.Bot;
 using System.Text;
+using ab.context;
 using SharedLib;
 using MQTTnet;
-using ab.context;
-using Telegram.Bot;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ServerLib;
 
@@ -89,10 +89,22 @@ public class MqttServerService : MqttBaseServiceAbstraction
         string payload_json = Encoding.UTF8.GetString(payload_bytes);
         string salt = Guid.NewGuid().ToString();
 
+        PortHardwareCheckRequestModel? req_port_check;
+        HardwareGetHttpRequestModel? req_http;
+        SystemCommandModelDB? req_sys_com_db;
+        TelegramBotConfigModel? req_conf_tbot;
+        UserListGetModel? req_users_list;
+        SimpleIdNoiseModel? req_nid;
+        LongIdNoiseModel? req_nlid;
+        HardwareBaseModel? req_hw;
+        NoiseModel? req_noise;
+        EntryModel? req_e;
+        UpdateUserModel? req_user_upd;
+
         switch (e.ApplicationMessage.Topic)
         {
             case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}":
-                HardwareGetHttpRequestModel? req_http = JsonConvert.DeserializeObject<HardwareGetHttpRequestModel>(payload_json);
+                req_http = JsonConvert.DeserializeObject<HardwareGetHttpRequestModel>(payload_json);
                 if (req_http is null)
                 {
                     _logger.LogError("req is null. error 1EB8300D-9436-44B0-9413-31BAA01018F2");
@@ -104,7 +116,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 break;
 
             case $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}":
-                NoiseModel? req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
+                req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
                 if (req_noise is null)
                 {
                     _logger.LogError("req is null. error 1C55124E-8DF4-4CCC-A9FF-8CC2C0AF6B65");
@@ -137,7 +149,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetTreeNestedEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}":
-                SimpleIdNoiseModel? req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
+                req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
                 if (req_nid is null)
                 {
                     _logger.LogError("req is null. error 98C12EAC-73A9-4946-8850-7B075613833E");
@@ -148,7 +160,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.UPDATE}":
-                HardwareBaseModel? req_hw = JsonConvert.DeserializeObject<HardwareBaseModel>(payload_json);
+                req_hw = JsonConvert.DeserializeObject<HardwareBaseModel>(payload_json);
                 if (req_hw is null)
                 {
                     _logger.LogError("req is null. error F7657C6A-2601-49BE-8F65-F302F5B1B4A3");
@@ -182,7 +194,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwarePortGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}":
-                PortHardwareCheckRequestModel? req_port_check = JsonConvert.DeserializeObject<PortHardwareCheckRequestModel>(payload_json);
+                req_port_check = JsonConvert.DeserializeObject<PortHardwareCheckRequestModel>(payload_json);
                 if (req_port_check is null)
                 {
                     _logger.LogError("req is null. error 2CB7CA8A-18B3-4FDF-84F0-CD8BBEA4BA45");
@@ -193,7 +205,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.CheckPortHardware(req_port_check)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}":
-                EntryModel? req_e = JsonConvert.DeserializeObject<EntryModel>(payload_json);
+                req_e = JsonConvert.DeserializeObject<EntryModel>(payload_json);
                 if (req_e is null)
                 {
                     _logger.LogError("req is null. 2415B593-DAD5-4B61-849F-7B95A174739F");
@@ -205,8 +217,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 break;
 
             case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}":
-                TelegramBotConfigModel? conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
-                if (conf_tbot is null)
+                req_conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
+                if (req_conf_tbot is null)
                 {
                     _logger.LogError("req is null. 720D6445-7D3F-4BE7-AF9E-0C57D48DB5AC");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 720D6445-7D3F-4BE7-AF9E-0C57D48DB5AC")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -217,7 +229,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 {
                     using (ParametersContext _context = new())
                     {
-                        ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(conf_tbot));
+                        ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(req_conf_tbot));
                     };
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateSuccess("Данные успешно сохранены")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 }
@@ -254,8 +266,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
                 break;
             case $"{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}":
-                conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
-                if (conf_tbot is null)
+                req_conf_tbot = JsonConvert.DeserializeObject<TelegramBotConfigModel>(payload_json);
+                if (req_conf_tbot is null)
                 {
                     _logger.LogError("req is null. 6814E514-AB2A-495E-93C7-B2E71787338F");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 6814E514-AB2A-495E-93C7-B2E71787338F")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
@@ -264,15 +276,15 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
                 DictionaryResponseModel res = new();
 
-                if (string.IsNullOrEmpty(conf_tbot?.TelegramBotToken))
+                if (string.IsNullOrEmpty(req_conf_tbot?.TelegramBotToken))
                 {
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("TelegramBotToken не может быть пустым")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
                 }
 
-                TelegramBotClientOptions options = new(conf_tbot.TelegramBotToken);
+                TelegramBotClientOptions options = new(req_conf_tbot.TelegramBotToken);
 
-                if (!conf_tbot!.IsConfigured)
+                if (!req_conf_tbot!.IsConfigured)
                 {
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("Конфигурация не установлена")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
@@ -310,15 +322,15 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandsGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}":
-                SystemCommandModelDB? req_sys_com_bd = JsonConvert.DeserializeObject<SystemCommandModelDB>(payload_json);
-                if (req_sys_com_bd is null)
+                req_sys_com_db = JsonConvert.DeserializeObject<SystemCommandModelDB>(payload_json);
+                if (req_sys_com_db is null)
                 {
                     _logger.LogError("req_sys_com_bd is null. error 23C49BF0-411D-4511-8006-5C4241D83EED");
                     await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_sys_com_bd is null. error 23C49BF0-411D-4511-8006-5C4241D83EED")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                     break;
                 }
 
-                await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandUpdateOrCreate(req_sys_com_bd)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                await PublishMessage(JsonConvert.SerializeObject(await _sys_com_service.CommandUpdateOrCreate(req_sys_com_db)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.START}":
                 req_nid = JsonConvert.DeserializeObject<SimpleIdNoiseModel>(payload_json);
@@ -344,13 +356,37 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 break;
 
             case $"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}/{GlobalStatic.Routes.LIST}":
+                req_users_list = JsonConvert.DeserializeObject<UserListGetModel>(payload_json);
+                if (req_users_list is null)
+                {
+                    _logger.LogError("req_users_list is null. error 3B1F2351-AB5D-4CC0-BF9B-7AF0BDCB3A9A");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_users_list is null. error 3B1F2351-AB5D-4CC0-BF9B-7AF0BDCB3A9A")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
 
+                await PublishMessage(JsonConvert.SerializeObject(await _users_service.UsersGetList(req_users_list)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}":
+                req_nlid = JsonConvert.DeserializeObject<LongIdNoiseModel>(payload_json);
+                if (req_nlid is null)
+                {
+                    _logger.LogError("req_nlid is null. error BEA29037-C0F4-41B8-85FE-CA095C423F52");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_nlid is null. error BEA29037-C0F4-41B8-85FE-CA095C423F52")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
 
+                await PublishMessage(JsonConvert.SerializeObject(await _users_service.GetUser(req_nlid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
             case $"{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}":
+                req_user_upd = JsonConvert.DeserializeObject<UpdateUserModel>(payload_json);
+                if (req_user_upd is null)
+                {
+                    _logger.LogError("req_user_upd is null. error 78A0819A-D991-452C-8682-87E79C02E405");
+                    await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req_user_upd is null. error 78A0819A-D991-452C-8682-87E79C02E405")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
+                    break;
+                }
 
+                await PublishMessage(JsonConvert.SerializeObject(await _users_service.UpdateUser(req_user_upd)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 break;
 
             case GlobalStatic.Routes.SHOT:
