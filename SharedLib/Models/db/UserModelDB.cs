@@ -30,6 +30,11 @@ public class UserModelDB : UniversalModelDB
     /// <summary>
     /// 
     /// </summary>
+    public bool AllowSystemCommands { get; set; } = true;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public string FirstName { get; set; } = default!;
 
     /// <summary>

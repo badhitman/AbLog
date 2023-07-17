@@ -17,7 +17,7 @@
                 <MudSpacer />
                 @if (IsBusyProgress)
                 {
-                    <MudProgressCircular Class="me-4" Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
+                    <MudProgressCircular Class="me-2" Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
                 }
                 else
                 {
@@ -34,7 +34,31 @@
                     @($"{(string.IsNullOrWhiteSpace(context.Name) ? "" : $"@{context.Name} - ")}{context.FirstName} {context.LastName}")
                 </MudTd>
                 <MudTd>@context.Email</MudTd>
-                <MudTd>права</MudTd>
+                <MudTd>
+                    @if (context.CommandsAllowed)
+                    {
+                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                            <MudText>Команды</MudText>
+                        </MudBadge>
+                    }
+                    @if (context.AllowSystemCommands)
+                    {
+                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                            <MudText>Система</MudText>
+                        </MudBadge>
+                    }
+                    @if (context.AlarmSubscriber)
+                    {
+                        <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                            <MudText>Оповещения</MudText>
+                        </MudBadge>
+                    }
+                    <MudBadge Dot="true" Color="@(context.IsDisabled ? Color.Secondary : Color.Success)" Class="mx-6 my-4">
+                        <MudText>
+                            @(context.IsDisabled ? "Заблокирован" : "Активен")
+                        </MudText>
+                    </MudBadge>
+                </MudTd>
             </RowTemplate>
             <RowEditingTemplate>
                 <MudTd>
@@ -42,6 +66,9 @@
                 </MudTd>
                 <MudTd>
                     <MudTextField InputType="InputType.Email" @bind-Value="@context.Email" />
+                </MudTd>
+                <MudTd>
+                    <MudCheckBox Label="@(context.AllowSystemCommands ? "Система (запретить?)" : "Система (разрешить?)")" @bind-Checked="@context.AllowSystemCommands" />
                 </MudTd>
                 <MudTd>
                     <MudCheckBox Label="@(context.CommandsAllowed ? "Команды (запретить?)" : "Команды (разрешить?)")" @bind-Checked="@context.CommandsAllowed" />
@@ -102,6 +129,7 @@
                     TelegramId = sender.TelegramId,
                     Email = sender.Email,
                     IsDisabled = sender.IsDisabled,
+                    AllowSystemCommands = sender.AllowSystemCommands,
                     AllowAlerts = sender.AlarmSubscriber,
                     AllowHardwareControl = sender.CommandsAllowed
                 });
@@ -150,6 +178,7 @@
         sender.AlarmSubscriber = elementBeforeEdit.AlarmSubscriber;
         sender.CommandsAllowed = elementBeforeEdit.CommandsAllowed;
         sender.IsDisabled = elementBeforeEdit.IsDisabled;
+        sender.AllowSystemCommands = elementBeforeEdit.AllowSystemCommands;
         sender.TelegramId = elementBeforeEdit.TelegramId;
         sender.LastName = elementBeforeEdit.LastName;
         sender.FirstName = elementBeforeEdit.FirstName;

@@ -18,6 +18,11 @@ public class UpdateUserModel
     /// <summary>
     /// 
     /// </summary>
+    public bool AllowSystemCommands { get; set; } = true;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public bool IsDisabled { get; set; }
 
     /// <summary>
