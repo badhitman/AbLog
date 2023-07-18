@@ -29,6 +29,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
     readonly HttpClient _http_client;
     readonly IServiceCollection _services;
     readonly IEmailService _email;
+    readonly IServiceProvider _service_provider;
 
     /// <inheritdoc/>
     public override MqttClientSubscribeOptions MqttSubscribeOptions => _mqttFactory
@@ -71,7 +72,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IEmailService email, CancellationToken cancellation_token = default)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IEmailService email, IServiceProvider service_provider, CancellationToken cancellation_token = default)
         : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
     {
         _logger = logger;
@@ -81,6 +82,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
         _sys_com_service = sys_com_service;
         _users_service = users_service;
         _email = email;
+        _service_provider = service_provider;
     }
 
     /// <summary>
@@ -284,7 +286,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     break;
                 }
 
-                DictionaryResponseModel res = new();
+                TelegramBotCheckResponseModel res = new();
 
                 if (string.IsNullOrEmpty(req_conf_tbot?.TelegramBotToken))
                 {
@@ -304,13 +306,23 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 {
                     TelegramBotClient tbot_cli = new(options, _http_client);
                     Telegram.Bot.Types.User _me = await tbot_cli.GetMeAsync();
-                    res.DictionaryResponse = new Dictionary<string, object?>
+                    res.FirstName = _me.FirstName;
+                    res.LastName = _me.LastName;
+                    res.Username = _me.Username;
+                    res.Id = _me.Id;
+                                        
+                    ITelegramBotClient? tbc = _service_provider.GetService<ITelegramBotClient>();
+                    if (tbc is not null)
                     {
-                        { nameof(_me.FirstName), _me.FirstName },
-                        { nameof(_me.Username), _me.Username },
-                        { nameof(_me.Id), _me.Id },
-                        { nameof(_me.IsBot), _me.IsBot }
-                    };
+                        Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync();
+                        res.ServiceIsRunning = new()
+                        {
+                            FirstName = _demon_me.FirstName,
+                            LastName = _demon_me.LastName,
+                            Username = _demon_me.Username,
+                            Id = _demon_me.Id
+                        };
+                    }
                     await PublishMessage(JsonConvert.SerializeObject(res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
                 }
                 catch (Exception ex)

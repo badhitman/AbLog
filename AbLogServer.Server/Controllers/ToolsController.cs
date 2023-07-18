@@ -66,5 +66,5 @@ public class ToolsController : ControllerBase
     /// Проверить токен TelegramBot
     /// </summary>
     [HttpPost($"{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}")]
-    public async Task<DictionaryResponseModel> TelegramBotConfigTestConnection(TelegramBotConfigModel? telegram_bot_conf) => await _tools_service.TestTelegramBotConnect(telegram_bot_conf);
+    public async Task<TelegramBotCheckResponseModel> TelegramBotConfigTestConnection(TelegramBotConfigModel? telegram_bot_conf) => await _tools_service.TestTelegramBotConnect(telegram_bot_conf);
 }

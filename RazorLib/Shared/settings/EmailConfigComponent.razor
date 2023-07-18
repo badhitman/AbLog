@@ -11,70 +11,81 @@
     <div class="card-body">
         <h5 class="card-title">Исходящая почта для отправки системных уведомлений клиенту</h5>
         <hr />
-        <form>
-            <div class="mb-3">
-                <div class="row">
-                    <div class="col">
-                        <label for="exampleInputEmail" class="form-label">Email</label>
-                        <input @bind="connect_config.Email" type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp validationServerUsernameFeedback" required>
-                    </div>
-                    <div class="col">
-                        <label for="exampleInputLogin" class="form-label">Логин</label>
-                        <input @bind="connect_config.Login" type="text" class="form-control" id="exampleInputLogin" aria-describedby="loginHelp" required>
-                    </div>
-                    <div class="col">
-                        <label for="exampleInputPassword" class="form-label">Пароль</label>
-                        <div class="input-group">
-                            <input @bind="connect_config.Password" type="@(ShowPassword ? "text" : "password")" class="form-control" id="exampleInputPassword" required>
-                            <button @onclick="() => { ShowPassword = !ShowPassword; }" class="btn btn@(ShowPassword ? "" : "-outline")-secondary" type="button">@(ShowPassword ? "Скрыть" : "Показать")</button>
+        @if (IsBusyProgress || TestConnectProcess)
+        {
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <form>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col">
+                            <label for="exampleInputEmail" class="form-label">Email</label>
+                            <input @bind="connect_config.Email" type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp validationServerUsernameFeedback" required>
+                        </div>
+                        <div class="col">
+                            <label for="exampleInputLogin" class="form-label">Логин</label>
+                            <input @bind="connect_config.Login" type="text" class="form-control" id="exampleInputLogin" aria-describedby="loginHelp" required>
+                        </div>
+                        <div class="col">
+                            <label for="exampleInputPassword" class="form-label">Пароль</label>
+                            <div class="input-group">
+                                <input @bind="connect_config.Password" type="@(ShowPassword ? "text" : "password")" class="form-control" id="exampleInputPassword" required>
+                                <button @onclick="() => { ShowPassword = !ShowPassword; }" class="btn btn@(ShowPassword ? "" : "-outline")-secondary" type="button">@(ShowPassword ? "Скрыть" : "Показать")</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">SMTP</h5>
-                        <div>
-                            <label class="form-label"><span class="text-info">host:port</span></label>
-                            <div class="input-group mb-3">
-                                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control border-info border-end-0" required @bind-value="connect_config.HostSmtp" @bind-value:event="oninput" placeholder="SMTP Host" aria-label="SMTP Server host">
-                                <span class="input-group-text px-1 border-info border-start-0 border-end-0">:</span>
-                                <input disabled="@(TestConnectProcess || IsBusyProgress)" type="number" class="form-control border-info border-start-0" @bind-value="connect_config.PortSmtp" @bind-value:event="oninput" style="max-width: 100px;" placeholder="Port" aria-label="Smtp Server port">
+                <div class="mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">SMTP</h5>
+                            <div>
+                                <label class="form-label"><span class="text-info">host:port</span></label>
+                                <div class="input-group mb-3">
+                                    <input disabled="@(TestConnectProcess || IsBusyProgress)" type="text" class="form-control border-info border-end-0" required @bind-value="connect_config.HostSmtp" @bind-value:event="oninput" placeholder="SMTP Host" aria-label="SMTP Server host">
+                                    <span class="input-group-text px-1 border-info border-start-0 border-end-0">:</span>
+                                    <input disabled="@(TestConnectProcess || IsBusyProgress)" type="number" class="form-control border-info border-start-0" @bind-value="connect_config.PortSmtp" @bind-value:event="oninput" style="max-width: 100px;" placeholder="Port" aria-label="Smtp Server port">
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <label class="form-label"><span class="text-primary">(ssl mode: @(connect_config.UseSslSmtp))</span> | <span class="text-@(connect_config.LogsSmtp ? "white" : "secondary")">логирование @(connect_config.LogsSmtp ? "включено" : "отключено")</span></label>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text border-primary">SSL</span>
-                                <select disabled="@(TestConnectProcess || IsBusyProgress)" class="form-select border-primary border-start-0" @bind="connect_config.UseSslSmtp">
-                                    @foreach (SecureSocketOptionsEnum sso in (SecureSocketOptionsEnum[])Enum.GetValues(typeof(SecureSocketOptionsEnum)))
-                                    {
-                                        <option value="@sso">@sso.ToFriendlyString()</option>
-                                    }
-                                </select>
-                                <div class="input-group-text">
-                                    <input disabled="@(TestConnectProcess || IsBusyProgress)" class="form-check-input mt-0" type="checkbox" @bind="connect_config.LogsSmtp" aria-label="логировать smtp" name="@(nameof(connect_config.LogsSmtp))" id="@(nameof(connect_config.LogsSmtp))">
-                                    <label class="form-check-label ms-1 text-@(connect_config.LogsSmtp ? "dark" : "secondary")" for="@(nameof(connect_config.LogsSmtp))">
-                                        logs
-                                    </label>
+                            <div>
+                                <label class="form-label"><span class="text-primary">(ssl mode: @(connect_config.UseSslSmtp))</span> | <span class="text-@(connect_config.LogsSmtp ? "white" : "secondary")">логирование @(connect_config.LogsSmtp ? "включено" : "отключено")</span></label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text border-primary">SSL</span>
+                                    <select disabled="@(TestConnectProcess || IsBusyProgress)" class="form-select border-primary border-start-0" @bind="connect_config.UseSslSmtp">
+                                        @foreach (SecureSocketOptionsEnum sso in (SecureSocketOptionsEnum[])Enum.GetValues(typeof(SecureSocketOptionsEnum)))
+                                        {
+                                            <option value="@sso">@sso.ToFriendlyString()</option>
+                                        }
+                                    </select>
+                                    <div class="input-group-text">
+                                        <input disabled="@(TestConnectProcess || IsBusyProgress)" class="form-check-input mt-0" type="checkbox" @bind="connect_config.LogsSmtp" aria-label="логировать smtp" name="@(nameof(connect_config.LogsSmtp))" id="@(nameof(connect_config.LogsSmtp))">
+                                        <label class="form-check-label ms-1 text-@(connect_config.LogsSmtp ? "dark" : "secondary")" for="@(nameof(connect_config.LogsSmtp))">
+                                            logs
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
-                    <button disabled="@(!CanSave)" @onclick="SaveConfig" type="button" class="btn btn-outline-primary">Сохранить</button>
-                    @if (CanSave)
-                    {
-                        <button @onclick="() => connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign)" type="button" class="btn btn-outline-primary">Отмена</button>
-                    }
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <div class="btn-group me-md-2" role="group" aria-label="Basic outlined example">
+                        <button disabled="@(!CanSave)" @onclick="SaveConfig" type="button" class="btn btn-outline-primary">Сохранить</button>
+                        @if (CanSave)
+                        {
+                            <button @onclick="() => connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign)" type="button" class="btn btn-outline-primary">Отмена</button>
+                        }
+                    </div>
+                    <button disabled="@(!connect_config.IsConfigured)" @onclick="TectConfigConnect" class="btn btn-primary" type="button">Тест подключения</button>
                 </div>
-                <button disabled="@(!connect_config.IsConfigured)" @onclick="TectConfigConnect" class="btn btn-primary" type="button">Тест подключения</button>
-            </div>
-        </form>
+            </form>
+        }
     </div>
 </div>
 

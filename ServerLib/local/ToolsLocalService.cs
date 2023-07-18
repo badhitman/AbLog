@@ -7,6 +7,7 @@ using MQTTnet.Client;
 using Telegram.Bot;
 using SharedLib;
 using MQTTnet;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ServerLib;
 
@@ -20,17 +21,19 @@ public class ToolsLocalService : IToolsService
     readonly MqttFactory _mqtt_fact;
     readonly HttpClient _http_client;
     readonly IEmailService _email;
+    readonly IServiceProvider _service_provider;
 
     /// <summary>
     /// 
     /// </summary>
-    public ToolsLocalService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client, IEmailService email)
+    public ToolsLocalService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client, IEmailService email, IServiceProvider service_provider)
     {
         _mqttClientService = mqttClientService;
         _parameter_storage = parameter_storage;
         _mqtt_fact = mqtt_fact;
         _http_client = http_client;
         _email = email;
+        _service_provider = service_provider;
     }
 
     /// <inheritdoc/>
@@ -105,9 +108,9 @@ public class ToolsLocalService : IToolsService
     }
 
     /// <inheritdoc/>
-    public virtual async Task<DictionaryResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null)
+    public virtual async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null)
     {
-        DictionaryResponseModel res = new();
+        TelegramBotCheckResponseModel res = new();
         conf ??= (await _parameter_storage.GetTelegramBotConfig()).Conf;
 
         if (string.IsNullOrEmpty(conf?.TelegramBotToken))
@@ -128,13 +131,25 @@ public class ToolsLocalService : IToolsService
         {
             TelegramBotClient tbot_cli = new(options, _http_client);
             Telegram.Bot.Types.User _me = await tbot_cli.GetMeAsync();
-            res.DictionaryResponse = new Dictionary<string, object?>
+
+            res.FirstName = _me.FirstName;
+            res.LastName = _me.LastName;
+            res.Username = _me.Username;
+            res.Id = _me.Id;
+
+            ITelegramBotClient? tbc = _service_provider.GetService<ITelegramBotClient>();
+            
+            if (tbc is not null)
             {
-                { nameof(_me.FirstName), _me.FirstName },
-                { nameof(_me.Username), _me.Username },
-                { nameof(_me.Id), _me.Id },
-                { nameof(_me.IsBot), _me.IsBot }
-            };
+                Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync();
+                res.ServiceIsRunning = new()
+                {
+                    FirstName = _demon_me.FirstName,
+                    LastName = _demon_me.LastName,
+                    Username = _demon_me.Username,
+                    Id = _demon_me.Id
+                };
+            }
         }
         catch (Exception ex)
         {

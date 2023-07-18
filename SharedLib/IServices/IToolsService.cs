@@ -37,7 +37,7 @@ public interface IToolsService
     /// <summary>
     /// Тест TelegramBot токена
     /// </summary>
-    public Task<DictionaryResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null);
+    public Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null);
 
     /// <summary>
     /// 

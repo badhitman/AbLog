@@ -41,7 +41,7 @@ public interface IRefitToolsService
     /// Проверить подключение к TelegramBot
     /// </summary>
     [Post($"/api/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}")]
-    public Task<ApiResponse<DictionaryResponseModel>> TelegramBotConfigTest(TelegramBotConfigModel? telegram_bot_conf);
+    public Task<ApiResponse<TelegramBotCheckResponseModel>> TelegramBotConfigTest(TelegramBotConfigModel? telegram_bot_conf);
 
     /// <summary>
     /// Проверить подключение к Mqtt

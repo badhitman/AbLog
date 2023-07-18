@@ -28,11 +28,14 @@
                         <ValidationSummary />
                         <div class="mb-3">
                             <label for="exampleInputToken" class="form-label">Ключ бота</label>
-                            <input @bind-value="_conf.TelegramBotToken" type="text" @bind-value:event="oninput" class="form-control" id="exampleInputToken" aria-describedby="tokenHelp">
+                            <div class="input-group mb-3">
+                                <input @bind-value="_conf.TelegramBotToken" type="@(ShowToken ? "text" : "password")" @bind-value:event="oninput" class="form-control" id="exampleInputToken" aria-describedby="tokenHelp">
+                                <button @onclick="() => { ShowToken = !ShowToken; }" class="btn btn@(ShowToken ? "" : "-outline")-secondary" type="button">@(ShowToken ? "Скрыть" : "Показать")</button>
+                            </div>
                             <div id="tokenHelp" class="form-text">Токен TelegramBot</div>
                         </div>
                         <div class="mb-3">
-                            <div title="Постоянное подключение (автоподключение при старте)" class="form-check form-check-inline form-switch">
+                            <div title="Для запуска бота" class="form-check form-check-inline form-switch">
                                 <input checked="@_conf.AutoStart" @bind-value="_conf.AutoStart" @bind-value:event="oninput" class="form-check-input" type="checkbox" id="inlineCheckboxCommandsAllowed">
                                 <label class="form-check-label" for="inlineCheckboxCommandsAllowed">Постоянное подключение (автоподключение при старте)</label>
                             </div>
@@ -63,7 +66,7 @@
 
     TelegramBotConfigModel _conf = new();
     TelegramBotConfigModel _conf_self = new();
-
+    bool ShowToken = false;
     bool CanSave => _conf != _conf_self;
 
     void ResetForm()
@@ -97,11 +100,19 @@
 
     async Task TestTelegramBotConfig()
     {
-        DictionaryResponseModel _conf_bot = await _tools.TestTelegramBotConnect(_conf);
+        TelegramBotCheckResponseModel _conf_bot = await _tools.TestTelegramBotConnect(_conf);
         showMessages?.ShowMessages(_conf_bot.Messages);
-        if (_conf_bot.DictionaryResponse?.Any() == true)
+        if (_conf_bot.Id > 0)
         {
-            _snackbar.Add(string.Join("<br/>", _conf_bot.DictionaryResponse.Select(x => $"[<b>{x.Key}</b>:{x.Value}]")), Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            _snackbar.Add($"[{nameof(_conf_bot.Id)}:{_conf_bot.Id}]\n[{nameof(_conf_bot.FirstName)}:{_conf_bot.FirstName}]\n[{nameof(_conf_bot.LastName)}:{_conf_bot.LastName}]\n[{nameof(_conf_bot.Username)}:{_conf_bot.Username}]", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            if (_conf_bot.ServiceIsRunning is null)
+            {
+                _snackbar.Add("Служба не запущена. Запуск службы выполняется при старте приложения (если включён автостарт бота). Остановить бота можно перезапуском приложения (предварительно отключите автостарт)", Severity.Normal, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            }
+            else
+            {
+                _snackbar.Add($"Служба запущена:\n[{nameof(_conf_bot.ServiceIsRunning.FirstName)}:{_conf_bot.ServiceIsRunning.FirstName}]\n[{nameof(_conf_bot.ServiceIsRunning.LastName)}:{_conf_bot.ServiceIsRunning.LastName}]\n[{nameof(_conf_bot.ServiceIsRunning.Username)}:{_conf_bot.ServiceIsRunning.Username}]\n[{nameof(_conf_bot.ServiceIsRunning.Id)}:{_conf_bot.ServiceIsRunning.Id}]", Severity.Success, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            }
         }
         else
         {

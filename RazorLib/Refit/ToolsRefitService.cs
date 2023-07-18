@@ -109,10 +109,10 @@ public class ToolsRefitService : IToolsService
     }
 
     /// <inheritdoc/>
-    public virtual async Task<DictionaryResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null)
+    public virtual async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null)
     {
-        DictionaryResponseModel res = new();
-        ApiResponse<DictionaryResponseModel> rest = await _refit_tools.TelegramBotConfigTest(conf);
+        TelegramBotCheckResponseModel res = new();
+        ApiResponse<TelegramBotCheckResponseModel> rest = await _refit_tools.TelegramBotConfigTest(conf);
                 
         if (rest.Content is null || !rest.IsSuccessStatusCode)
             res.AddError($"rest.Content is null || !rest.IsSuccessStatusCode {{FA1F8616-B93B-445F-B92B-A37FE4F24C7F}}");
