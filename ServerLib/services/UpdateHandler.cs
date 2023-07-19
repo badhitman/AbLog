@@ -1,14 +1,13 @@
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using System.Diagnostics;
 using Telegram.Bot.Types;
 using ab.context;
 using SharedLib;
-using System.Text.RegularExpressions;
-using System.Threading;
-using Telegram.Bot.Types.Enums;
 
 namespace Telegram.Bot.Services;
 
@@ -17,10 +16,11 @@ namespace Telegram.Bot.Services;
 /// </summary>
 public class UpdateHandler : IUpdateHandler
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly ILogger<UpdateHandler> _logger;
+    readonly ITelegramBotClient _botClient;
+    readonly ILogger<UpdateHandler> _logger;
 
     const string SystemCommandPrefix = "sys:";
+    const string GetProcesses = "get-processes";
 
     /// <summary>
     /// 
@@ -93,13 +93,10 @@ public class UpdateHandler : IUpdateHandler
                     }).ToList();
             }
 
+            kb_rows.Insert(0, new[] { InlineKeyboardButton.WithCallbackData("Процессы", $"{SystemCommandPrefix}{GetProcesses}") });
+
             inlineKeyboard = new(
-                _context.SystemCommands
-                .Where(x => !x.IsDisabled)
-                .AsEnumerable()
-                .Select(x => new InlineKeyboardButton[] {
-                        InlineKeyboardButton.WithCallbackData(x.Name, $"{SystemCommandPrefix}{x.Id}")
-                }).ToArray()
+                kb_rows
             );
 
             return await botClient.SendTextMessageAsync(
@@ -132,7 +129,7 @@ public class UpdateHandler : IUpdateHandler
                chatAction: ChatAction.Typing,
                cancellationToken: cancellationToken);
 
-        UserResponseModel check_user = CheckTelegramUser(callbackQuery.Message?.From);
+        UserResponseModel check_user = CheckTelegramUser(callbackQuery.From);
         if (!check_user.IsSuccess || check_user.User?.IsDisabled == true)
             return;
 
@@ -142,10 +139,50 @@ public class UpdateHandler : IUpdateHandler
             cancellationToken: cancellationToken);
 
         string output = "< --- >";
-
+        string pre_out;
+        //{SystemCommandPrefix}{GetProcesses}
         if (callbackQuery.Data?.StartsWith(SystemCommandPrefix, StringComparison.OrdinalIgnoreCase) == true)
         {
             string sys_com_id = callbackQuery.Data[SystemCommandPrefix.Length..];
+
+            if (GetProcesses.Equals(sys_com_id))
+            {
+                Process[] localAll = Process.GetProcesses().OrderBy(x => x.ProcessName).ToArray();
+                output = "Все процессы:\n";
+                foreach (Process process in localAll)
+                {
+                    pre_out = $"\n> <b>{process.Id}</b> <code>{process.ProcessName}</code> <u>{GlobalStatic.SizeDataAsString(process.WorkingSet64)}</u>";
+                    if (output.Length + pre_out.Length <= 4000)
+                    {
+                        output += $"{pre_out}";
+                    }
+                    else
+                    {
+                        await _botClient.SendTextMessageAsync(
+                                chatId: callbackQuery.Message!.Chat.Id,
+                                text: $"{output.Trim()}\n\n... продолжение следует",
+                                parseMode: ParseMode.Html,
+                                cancellationToken: cancellationToken);
+
+                        output = $"продолжение:...\n{pre_out}";
+                    }
+                }
+                try
+                {
+                    await _botClient.SendTextMessageAsync(
+                                chatId: callbackQuery.Message!.Chat.Id,
+                                text: $"{output.Trim()}",
+                                parseMode: ParseMode.Html,
+                                cancellationToken: cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("error {28A0BE62-063B-40F0-998E-2638B53580AB}", ex);
+                }
+
+                return;
+            }
+
             if (!Regex.IsMatch(sys_com_id, @"^\d+$") || int.TryParse(sys_com_id, out int sc_id))
                 return;
 
@@ -166,8 +203,8 @@ public class UpdateHandler : IUpdateHandler
             p.StartInfo.Arguments = sys_cmd_db.Arguments;
             p.Start();
 
-            output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
+            output = await p.StandardOutput.ReadToEndAsync();
+            await p.WaitForExitAsync(cancellationToken);
             if (output.Length > 4000)
                 output = output[0..4000];
         }
@@ -175,6 +212,7 @@ public class UpdateHandler : IUpdateHandler
         await _botClient.SendTextMessageAsync(
             chatId: callbackQuery.Message!.Chat.Id,
             text: $"Received {callbackQuery.Data}:\n\n{output}",
+            parseMode: ParseMode.Html,
             cancellationToken: cancellationToken);
     }
 

@@ -59,6 +59,14 @@
                             </MudBadge>
                         </MudTooltip>
                     }
+                    @if (context.AllowChangeMqttConfig)
+                    {
+                        <MudTooltip Text="Разрешено менять настройки MQTT">
+                            <MudBadge Dot="true" Color="Color.Success" Class="mx-6 my-4">
+                                <MudText>MQTT</MudText>
+                            </MudBadge>
+                        </MudTooltip>
+                    }
                     <MudBadge Dot="true" Color="@(context.IsDisabled ? Color.Secondary : Color.Success)" Class="mx-6 my-4">
                         <MudText>
                             @(context.IsDisabled ? "Заблокирован" : "Активен")
