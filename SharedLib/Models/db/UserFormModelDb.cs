@@ -22,5 +22,5 @@ public class UserFormModelDb : EntryModel
     /// <summary>
     /// 
     /// </summary>
-    public UserFormPropertyModelDb[]? Properties { get; set; }
+    public List<UserFormPropertyModelDb>? Properties { get; set; }
 }

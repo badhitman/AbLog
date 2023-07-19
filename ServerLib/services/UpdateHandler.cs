@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Telegram.Bot.Types;
 using ab.context;
 using SharedLib;
+using Microsoft.EntityFrameworkCore;
 
 namespace Telegram.Bot.Services;
 
@@ -21,6 +22,7 @@ public class UpdateHandler : IUpdateHandler
 
     const string SystemCommandPrefix = "sys:";
     const string GetProcesses = "get-processes";
+    const string SetupMQTT = "mqtt-setup";
 
     /// <summary>
     /// 
@@ -70,40 +72,106 @@ public class UpdateHandler : IUpdateHandler
 
         Task<Message> action = messageText.Split(' ')[0] switch
         {
+            "/start" => GetStartMessage(check_user.User, message, cancellationToken),
             "/throw" => FailingHandler(_botClient, message, cancellationToken),
-            _ => Usage(_botClient, message, cancellationToken)
+            _ => Usage(_botClient, check_user.User, message, cancellationToken)
         };
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
 
-        static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static async Task<Message> Usage(ITelegramBotClient botClient, UserModelDB User, Message message, CancellationToken cancellationToken)
         {
             string usage = "Бот-обормот";
 
-            using ServerContext _context = new();
-            InlineKeyboardMarkup inlineKeyboard;
-            List<InlineKeyboardButton[]> kb_rows;
-            lock (ServerContext.DbLocker)
-            {
-                kb_rows = _context.SystemCommands
-                    .Where(x => !x.IsDisabled)
-                    .AsEnumerable()
-                    .Select(x => new InlineKeyboardButton[] {
-                        InlineKeyboardButton.WithCallbackData(x.Name, $"{SystemCommandPrefix}{x.Id}")
-                    }).ToList();
-            }
-
-            kb_rows.Insert(0, new[] { InlineKeyboardButton.WithCallbackData("Процессы", $"{SystemCommandPrefix}{GetProcesses}") });
-
-            inlineKeyboard = new(
-                kb_rows
-            );
+            //using ServerContext _context = new();
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: usage,
-                replyMarkup: inlineKeyboard,
                 cancellationToken: cancellationToken);
+        }
+
+        async Task<Message> GetStartMessage(UserModelDB User, Message message, CancellationToken cancellationToken)
+        {
+            if (message.Text?.Equals("/start") == true)
+                try
+                {
+                    await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancellationToken: cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("error {C1BAB78B-5075-4A75-BA55-49DB319A0AD2}", ex);
+                }
+
+            string usage = "Бот-обормот";
+
+            using ServerContext _context = new();
+            lock (ServerContext.DbLocker)
+            {
+                UserFormModelDb? actual_form = _context.UsersForms.Include(x => x.Properties).FirstOrDefault(x => x.OwnerUserId == User.Id);
+                if (actual_form is not null)
+                {
+                    _context.Remove(actual_form);
+                    _context.SaveChanges();
+                }
+            }
+
+            if (User.MessageId != default && User.ChatId != default)
+            {
+                try
+                {
+                    User.ChatId = default;
+                    User.MessageId = default;
+                    lock (ServerContext.DbLocker)
+                    {
+                        _context.Update(User);
+                        _context.SaveChanges();
+                    }
+                    await _botClient.DeleteMessageAsync(User.ChatId, User.MessageId, cancellationToken: cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("error {B8F28B15-5E87-444C-8718-9FA44724CF23}", ex);
+                }
+            }
+
+            List<InlineKeyboardButton[]> kb_rows = new();
+
+            if (User.AllowSystemCommands)
+            {
+                lock (ServerContext.DbLocker)
+                {
+                    kb_rows = _context.SystemCommands
+                        .Where(x => !x.IsDisabled)
+                        .AsEnumerable()
+                        .Select(x => new InlineKeyboardButton[] {
+                        InlineKeyboardButton.WithCallbackData($"> {x.Name}", $"{SystemCommandPrefix}{x.Id}")
+                        }).ToList();
+                }
+
+                kb_rows.Insert(0, new[] { InlineKeyboardButton.WithCallbackData("Процессы", $"{GetProcesses}") });
+            }
+
+            if (User.AllowChangeMqttConfig)
+            {
+                kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("Настроить MQTT", $"{SetupMQTT}") });
+            }
+
+            Message msg_res = await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: usage,
+            replyMarkup: kb_rows.Any() ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
+            cancellationToken: cancellationToken);
+
+            User.ChatId = msg_res.Chat.Id;
+            User.MessageId = msg_res.MessageId;
+            lock (ServerContext.DbLocker)
+            {
+                _context.Update(User);
+                _context.SaveChanges();
+            }
+
+            return msg_res;
         }
 
 #pragma warning disable RCS1163 // Unused parameter.
@@ -138,50 +206,42 @@ public class UpdateHandler : IUpdateHandler
             text: $"Received {callbackQuery.Data}",
             cancellationToken: cancellationToken);
 
-        string output = "< --- >";
-        string pre_out;
-        //{SystemCommandPrefix}{GetProcesses}
-        if (callbackQuery.Data?.StartsWith(SystemCommandPrefix, StringComparison.OrdinalIgnoreCase) == true)
+        string output = "< --- >", pre_out;
+
+        if (callbackQuery.Data?.Equals(SetupMQTT) == true)
         {
-            string sys_com_id = callbackQuery.Data[SystemCommandPrefix.Length..];
 
-            if (GetProcesses.Equals(sys_com_id))
+        }
+        else if (callbackQuery.Data?.Equals(GetProcesses) == true)
+        {
+            Process[] localAll = Process.GetProcesses().OrderBy(x => x.ProcessName).ToArray();
+            output = "Все процессы:\n";
+            long total_mem_used = 0;
+            foreach (Process process in localAll)
             {
-                Process[] localAll = Process.GetProcesses().OrderBy(x => x.ProcessName).ToArray();
-                output = "Все процессы:\n";
-                foreach (Process process in localAll)
+                total_mem_used += process.WorkingSet64;
+                pre_out = $"\n~ <b>{process.Id}</b> <code>{process.ProcessName}</code> <u>{GlobalStatic.SizeDataAsString(process.WorkingSet64)}</u>";
+                if (output.Length + pre_out.Length <= 4000)
                 {
-                    pre_out = $"\n> <b>{process.Id}</b> <code>{process.ProcessName}</code> <u>{GlobalStatic.SizeDataAsString(process.WorkingSet64)}</u>";
-                    if (output.Length + pre_out.Length <= 4000)
-                    {
-                        output += $"{pre_out}";
-                    }
-                    else
-                    {
-                        await _botClient.SendTextMessageAsync(
-                                chatId: callbackQuery.Message!.Chat.Id,
-                                text: $"{output.Trim()}\n\n... продолжение следует",
-                                parseMode: ParseMode.Html,
-                                cancellationToken: cancellationToken);
-
-                        output = $"продолжение:...\n{pre_out}";
-                    }
+                    output += $"{pre_out}";
                 }
-                try
+                else
                 {
                     await _botClient.SendTextMessageAsync(
-                                chatId: callbackQuery.Message!.Chat.Id,
-                                text: $"{output.Trim()}",
-                                parseMode: ParseMode.Html,
-                                cancellationToken: cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("error {28A0BE62-063B-40F0-998E-2638B53580AB}", ex);
-                }
+                            chatId: callbackQuery.Message!.Chat.Id,
+                            text: $"{output.Trim()}\n\n... продолжение следует",
+                            parseMode: ParseMode.Html,
+                            cancellationToken: cancellationToken);
 
-                return;
+                    output = $"продолжение:...\n{pre_out}";
+                }
             }
+
+            output += $"\n------------\ntotal mem.: <b>{GlobalStatic.SizeDataAsString(total_mem_used)}</b>";
+        }
+        else if (callbackQuery.Data?.StartsWith(SystemCommandPrefix, StringComparison.OrdinalIgnoreCase) == true)
+        {
+            string sys_com_id = callbackQuery.Data[SystemCommandPrefix.Length..];
 
             if (!Regex.IsMatch(sys_com_id, @"^\d+$") || int.TryParse(sys_com_id, out int sc_id))
                 return;

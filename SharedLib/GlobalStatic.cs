@@ -147,8 +147,10 @@ public static class GlobalStatic
             return SizeFile.ToString() + " bytes";
         else if (SizeFile < 1024 * 1024)
             return Math.Round((double)SizeFile / 1024, 2).ToString() + " KB";
-        else
+        else if (SizeFile < 1024 * 1024 * 1024)
             return Math.Round((double)SizeFile / 1024 / 1024, 2).ToString() + " MB";
+        else
+            return Math.Round((double)SizeFile / 1024 / 1024 / 1024, 3).ToString() + " GB";
     }
 
     /// <summary>
