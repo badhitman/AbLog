@@ -77,7 +77,11 @@ else
     [Parameter]
     public Action? UpdateFormEvent { get; set; }
 
-    string http_schema_prefix => "http://";
+    const string http_schema_prefix = "http://";
+    bool InitDelete = false;
+    bool ShowPass = false;
+    HardwareBaseModel hw = new();
+    ShowMessagesComponent? showMessages;
 
     async Task InitDeleteAsync()
     {
@@ -98,13 +102,6 @@ else
 
         _nav.NavigateTo("/hardwares-page");
     }
-
-    bool InitDelete = false;
-
-    bool ShowPass = false;
-
-    HardwareBaseModel hw = new();
-    ShowMessagesComponent? showMessages;
 
     async Task OnValidSubmitHandle()
     {

@@ -7,25 +7,20 @@ namespace SharedLib;
 /// <summary>
 /// 
 /// </summary>
-public class UserFormModelDb : EntryModel
+public class FormPropertyModel
 {
     /// <summary>
     /// 
     /// </summary>
-    public string FormMapCode { get; set; } = default!;
+    public string Code { get; set; } = default!;
 
     /// <summary>
     /// 
     /// </summary>
-    public UserModelDB? OwnerUser { get; set; }
+    public string Name { get; set; } = default!;
 
     /// <summary>
     /// 
     /// </summary>
-    public int OwnerUserId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public List<UserFormPropertyModelDb>? Properties { get; set; }
+    public string[] AllowedValues { get; set; } = Array.Empty<string>();
 }

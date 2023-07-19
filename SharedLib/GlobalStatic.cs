@@ -358,4 +358,31 @@ public static class GlobalStatic
         /// </summary>
         public const string TelegramBot = "telegram-bot";
     }
+
+    #region forms maps
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static Dictionary<string, FormMapModel> FormsMaps => new()
+    {
+        { nameof(MqttConfigModel) , MqttConfigForm }
+    };
+
+    /// <summary>
+    /// 
+    /// </summary>
+    static FormMapModel MqttConfigForm => new()
+    {
+        Name = "Конфигурация MQTT",
+        Properties = new[]
+        {
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Username), Name = "Логин" },
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Password), Name = "Пароль" },
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Server), Name = "Сервер" },
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Port), Name = "Порт" }
+        }
+    };
+
+    #endregion
 }

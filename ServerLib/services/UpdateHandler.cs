@@ -214,6 +214,17 @@ public class UpdateHandler : IUpdateHandler
         if (callbackQuery.Data.Equals(SetupMQTT) == true && check_user.User.AllowChangeMqttConfig)
         {
             output = "SetupMQTT";
+            UserFormModelDb form = new()
+            {
+                OwnerUser = check_user.User,
+                OwnerUserId = check_user.User.Id,
+                FormMapCode = nameof(MqttConfigModel)
+            };
+            lock (ServerContext.DbLocker)
+            {
+                _db.Add(form);
+                _db.SaveChanges();
+            }
         }
         else if (callbackQuery.Data.Equals(GetProcesses) == true && check_user.User.AllowSystemCommands)
         {
@@ -336,7 +347,7 @@ public class UpdateHandler : IUpdateHandler
         using ServerContext context = new();
         lock (ServerContext.DbLocker)
         {
-            res.User = context.Users.FirstOrDefault(x => x.TelegramId == from.Id);
+            res.User = context.Users.Include(x => x.UserForm).FirstOrDefault(x => x.TelegramId == from.Id);
             if (res.User is null)
             {
                 res.User = new()
@@ -347,6 +358,9 @@ public class UpdateHandler : IUpdateHandler
                     TelegramId = from.Id,
                     AlarmSubscriber = false,
                     CommandsAllowed = false,
+                    AllowChangeMqttConfig = false,
+                    AllowSystemCommands = false,
+                    LastUpdate = DateTime.Now,
                     IsDisabled = true
                 };
                 context.Add(res.User);
