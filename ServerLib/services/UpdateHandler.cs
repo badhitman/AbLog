@@ -1,5 +1,6 @@
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Exceptions;
@@ -8,7 +9,6 @@ using System.Diagnostics;
 using Telegram.Bot.Types;
 using ab.context;
 using SharedLib;
-using Microsoft.EntityFrameworkCore;
 
 namespace Telegram.Bot.Services;
 
@@ -118,16 +118,18 @@ public class UpdateHandler : IUpdateHandler
 
             if (User.MessageId != default && User.ChatId != default)
             {
+                long chat_id = User.ChatId;
+                int message_id = User.MessageId;
+                User.ChatId = default;
+                User.MessageId = default;
+                lock (ServerContext.DbLocker)
+                {
+                    _context.Update(User);
+                    _context.SaveChanges();
+                }
                 try
                 {
-                    User.ChatId = default;
-                    User.MessageId = default;
-                    lock (ServerContext.DbLocker)
-                    {
-                        _context.Update(User);
-                        _context.SaveChanges();
-                    }
-                    await _botClient.DeleteMessageAsync(User.ChatId, User.MessageId, cancellationToken: cancellationToken);
+                    await _botClient.DeleteMessageAsync(chat_id, message_id, cancellationToken: cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -189,7 +191,7 @@ public class UpdateHandler : IUpdateHandler
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
 
-        if (callbackQuery.Message is null || callbackQuery.From.IsBot)
+        if (callbackQuery.Message is null || callbackQuery.From.IsBot || callbackQuery.Data is null)
             return;
 
         await _botClient.SendChatActionAsync(
@@ -198,7 +200,7 @@ public class UpdateHandler : IUpdateHandler
                cancellationToken: cancellationToken);
 
         UserResponseModel check_user = CheckTelegramUser(callbackQuery.From);
-        if (!check_user.IsSuccess || check_user.User?.IsDisabled == true)
+        if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled == true)
             return;
 
         await _botClient.AnswerCallbackQueryAsync(
@@ -207,12 +209,13 @@ public class UpdateHandler : IUpdateHandler
             cancellationToken: cancellationToken);
 
         string output = "< --- >", pre_out;
+        using ServerContext _db = new();
 
-        if (callbackQuery.Data?.Equals(SetupMQTT) == true)
+        if (callbackQuery.Data.Equals(SetupMQTT) == true && check_user.User.AllowChangeMqttConfig)
         {
-
+            output = "SetupMQTT";
         }
-        else if (callbackQuery.Data?.Equals(GetProcesses) == true)
+        else if (callbackQuery.Data.Equals(GetProcesses) == true && check_user.User.AllowSystemCommands)
         {
             Process[] localAll = Process.GetProcesses().OrderBy(x => x.ProcessName).ToArray();
             output = "Все процессы:\n";
@@ -239,7 +242,7 @@ public class UpdateHandler : IUpdateHandler
 
             output += $"\n------------\ntotal mem.: <b>{GlobalStatic.SizeDataAsString(total_mem_used)}</b>";
         }
-        else if (callbackQuery.Data?.StartsWith(SystemCommandPrefix, StringComparison.OrdinalIgnoreCase) == true)
+        else if (callbackQuery.Data.StartsWith(SystemCommandPrefix, StringComparison.OrdinalIgnoreCase) == true && check_user.User.AllowSystemCommands)
         {
             string sys_com_id = callbackQuery.Data[SystemCommandPrefix.Length..];
 
@@ -249,7 +252,6 @@ public class UpdateHandler : IUpdateHandler
             SystemCommandModelDB? sys_cmd_db;
             lock (ServerContext.DbLocker)
             {
-                using ServerContext _db = new();
                 sys_cmd_db = _db.SystemCommands.FirstOrDefault(x => x.Id == sc_id);
             }
 
@@ -269,18 +271,36 @@ public class UpdateHandler : IUpdateHandler
                 output = output[0..4000];
         }
 
-        await _botClient.SendTextMessageAsync(
-            chatId: callbackQuery.Message!.Chat.Id,
-            text: $"Received {callbackQuery.Data}:\n\n{output}",
-            parseMode: ParseMode.Html,
-            cancellationToken: cancellationToken);
+        try
+        {
+            await _botClient.EditMessageTextAsync(
+                chatId: check_user.User.ChatId,
+                messageId: check_user.User.MessageId,
+                text: $"Received {callbackQuery.Data}:\n\n{output}",
+                parseMode: ParseMode.Html,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("error {B55C5A58-3D2A-4782-92FA-CC16D2FBFEBB}", ex);
+
+            Message msg = await _botClient.SendTextMessageAsync(
+                chatId: check_user.User.ChatId,
+                text: $"Received {callbackQuery.Data}:\n\n{output}",
+                parseMode: ParseMode.Html,
+                cancellationToken: cancellationToken);
+
+            lock (ServerContext.DbLocker)
+            {
+                check_user.User.ChatId = msg.Chat.Id;
+                check_user.User.MessageId = msg.MessageId;
+                _db.Update(check_user.User);
+                _db.SaveChanges();
+            }
+        }
     }
 
-#pragma warning disable IDE0060 // Remove unused parameter
-#pragma warning disable RCS1163 // Unused parameter.
     private Task UnknownUpdateHandlerAsync(Update update, CancellationToken cancellationToken)
-#pragma warning restore RCS1163 // Unused parameter.
-#pragma warning restore IDE0060 // Remove unused parameter
     {
         _logger.LogInformation("Unknown update type: {UpdateType}", update.Type);
         return Task.CompletedTask;

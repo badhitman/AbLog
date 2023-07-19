@@ -27,7 +27,11 @@
             <HeaderContent>
                 <MudTh>Пользователь</MudTh>
                 <MudTh>Email</MudTh>
-                <MudTh>Права</MudTh>
+                <MudTh></MudTh>
+                <MudTh></MudTh>
+                <MudTh></MudTh>
+                <MudTh></MudTh>
+                <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>
@@ -43,6 +47,8 @@
                             </MudBadge>
                         </MudTooltip>
                     }
+                </MudTd>
+                <MudTd>
                     @if (context.CommandsAllowed)
                     {
                         <MudTooltip Text="Разрешено управлять устройствами">
@@ -51,6 +57,8 @@
                             </MudBadge>
                         </MudTooltip>
                     }
+                </MudTd>
+                <MudTd>
                     @if (context.AlarmSubscriber)
                     {
                         <MudTooltip Text="Рассылка уведомлений/оповещений">
@@ -59,6 +67,8 @@
                             </MudBadge>
                         </MudTooltip>
                     }
+                </MudTd>
+                <MudTd>
                     @if (context.AllowChangeMqttConfig)
                     {
                         <MudTooltip Text="Разрешено менять настройки MQTT">
@@ -67,6 +77,8 @@
                             </MudBadge>
                         </MudTooltip>
                     }
+                </MudTd>
+                <MudTd>
                     <MudBadge Dot="true" Color="@(context.IsDisabled ? Color.Secondary : Color.Success)" Class="mx-6 my-4">
                         <MudText>
                             @(context.IsDisabled ? "Заблокирован" : "Активен")
