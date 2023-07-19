@@ -80,6 +80,16 @@ public class ServerContext : DbContext
     /// </summary>
     public DbSet<UserModelDB> Users { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public DbSet<UserFormModelDb> UsersForms { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public DbSet<UserFormPropertyModelDb> UsersFormsProperties { get; set; }
+
     /// <inheritdoc/>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

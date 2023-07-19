@@ -28,9 +28,24 @@ public class UserModelDB : UniversalModelDB
     public bool IsDisabled { get; set; } = true;
 
     /// <summary>
-    /// 
+    /// Разрешён доступ к системному меню комманд
     /// </summary>
     public bool AllowSystemCommands { get; set; } = true;
+
+    /// <summary>
+    /// Разрешается менять настройки MQTT
+    /// </summary>
+    public bool AllowChangeMqttConfig { get; set; } = true;
+
+    /// <summary>
+    /// Telegram chat id
+    /// </summary>
+    public long ChatId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public int MessageId { get; set; }
 
     /// <summary>
     /// 
@@ -46,4 +61,9 @@ public class UserModelDB : UniversalModelDB
     /// 
     /// </summary>
     public string? LastName { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public UserFormModelDb? UserForm { get; set; }
 }

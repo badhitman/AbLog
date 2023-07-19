@@ -74,16 +74,19 @@
                     <MudTextField InputType="InputType.Email" @bind-Value="@context.Email" />
                 </MudTd>
                 <MudTd>
-                    <MudCheckBox Label="@(context.AllowSystemCommands ? "Система (запретить?)" : "Система (разрешить?)")" @bind-Checked="@context.AllowSystemCommands" />
+                    <MudCheckBox Label="@(context.AllowSystemCommands ? "Системные команды разрешены (запретить?)" : "Системные команды запрещены (разрешить?)")" @bind-Checked="@context.AllowSystemCommands" />
                 </MudTd>
                 <MudTd>
-                    <MudCheckBox Label="@(context.CommandsAllowed ? "Команды (запретить?)" : "Команды (разрешить?)")" @bind-Checked="@context.CommandsAllowed" />
+                    <MudCheckBox Label="@(context.CommandsAllowed ? "Управление устройствами разрешены (запретить?)" : "Управление устройствами запрещены (разрешить?)")" @bind-Checked="@context.CommandsAllowed" />
                 </MudTd>
                 <MudTd>
-                    <MudCheckBox Label="@(context.AlarmSubscriber ? "Уведомления (запретить?)" : "Уведомления (разрешить?)")" @bind-Checked="@context.AlarmSubscriber" />
+                    <MudCheckBox Label="@(context.AlarmSubscriber ? "Уведомления включены (запретить?)" : "Уведомления отключены (разрешить?)")" @bind-Checked="@context.AlarmSubscriber" />
                 </MudTd>
                 <MudTd>
-                    <MudCheckBox Label="@(context.IsDisabled ? "Заблокирован (разблокировать?)" : "Активный (заблокировать?)")" @bind-Checked="@context.IsDisabled" />
+                    <MudCheckBox Label="@(context.AllowChangeMqttConfig ? "Разрешено настраивать MQTT (запретить?)" : "Без доступа к настркам MQTT (разрешить?)")" @bind-Checked="@context.AllowChangeMqttConfig" />
+                </MudTd>
+                <MudTd>
+                    <MudCheckBox Label="@(context.IsDisabled ? "Пользователь заблокирован (разблокировать?)" : "Активный пользователь (заблокировать?)")" @bind-Checked="@context.IsDisabled" />
                 </MudTd>
             </RowEditingTemplate>
             <NoRecordsContent>
@@ -137,7 +140,8 @@
                     IsDisabled = sender.IsDisabled,
                     AllowSystemCommands = sender.AllowSystemCommands,
                     AllowAlerts = sender.AlarmSubscriber,
-                    AllowHardwareControl = sender.CommandsAllowed
+                    AllowHardwareControl = sender.CommandsAllowed,
+                    AllowChangeMqttConfig = sender.AllowChangeMqttConfig
                 });
             showMessages?.ShowMessages(upd_command.Messages);
             if (!upd_command.IsSuccess)

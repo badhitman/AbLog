@@ -82,17 +82,25 @@ public class UpdateHandler : IUpdateHandler
 
             using ServerContext _context = new();
             InlineKeyboardMarkup inlineKeyboard;
+            List<InlineKeyboardButton[]> kb_rows;
             lock (ServerContext.DbLocker)
             {
-                inlineKeyboard = new(
-                    _context.SystemCommands
+                kb_rows = _context.SystemCommands
                     .Where(x => !x.IsDisabled)
                     .AsEnumerable()
                     .Select(x => new InlineKeyboardButton[] {
                         InlineKeyboardButton.WithCallbackData(x.Name, $"{SystemCommandPrefix}{x.Id}")
-                    }).ToArray()
-                );
+                    }).ToList();
             }
+
+            inlineKeyboard = new(
+                _context.SystemCommands
+                .Where(x => !x.IsDisabled)
+                .AsEnumerable()
+                .Select(x => new InlineKeyboardButton[] {
+                        InlineKeyboardButton.WithCallbackData(x.Name, $"{SystemCommandPrefix}{x.Id}")
+                }).ToArray()
+            );
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,

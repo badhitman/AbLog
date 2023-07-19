@@ -34,4 +34,9 @@ public class UpdateUserModel
     /// 
     /// </summary>
     public bool AllowHardwareControl { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool AllowChangeMqttConfig { get; set; }
 }
