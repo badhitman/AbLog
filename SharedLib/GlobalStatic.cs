@@ -377,10 +377,10 @@ public static class GlobalStatic
         Name = "Конфигурация MQTT",
         Properties = new[]
         {
-            new FormPropertyModel() { Code = nameof(MqttConfigModel.Username), Name = "Логин" },
-            new FormPropertyModel() { Code = nameof(MqttConfigModel.Password), Name = "Пароль" },
             new FormPropertyModel() { Code = nameof(MqttConfigModel.Server), Name = "Сервер" },
-            new FormPropertyModel() { Code = nameof(MqttConfigModel.Port), Name = "Порт" }
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Port), Name = "Порт" },
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Username), Name = "Логин" },
+            new FormPropertyModel() { Code = nameof(MqttConfigModel.Password), Name = "Пароль" }
         }
     };
 

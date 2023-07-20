@@ -224,6 +224,8 @@ public class UpdateHandler : IUpdateHandler
             {
                 _db.Add(form);
                 _db.SaveChanges();
+                check_user.User.UserForm = form;
+                _db.SaveChanges();
             }
         }
         else if (callbackQuery.Data.Equals(GetProcesses) == true && check_user.User.AllowSystemCommands)
