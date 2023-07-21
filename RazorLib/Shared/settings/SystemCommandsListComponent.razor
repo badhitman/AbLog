@@ -59,15 +59,21 @@
                 <MudTd>@context.Arguments</MudTd>
                 <MudTd>
                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example" @onclick:stopPropagation="true" @onclick:preventDefault="true">
-                        @if (context.IsDisabled)
-                        {
-                            <button type="button" disabled class="btn btn-outline-secondary">Отключено</button>
-                        }
-                        else
-                        {
-                            <button type="button" disabled class="btn btn-outline-success">Включено</button>
-                        }
-                        <button @onclick="@(async () => { await RunCommand(context.Id); })" class="btn btn-outline-primary">Запустисть</button>
+                        <MudTooltip Text="@(context.IsDisabled ? "Отключённая команда не выводится пользователям в системном меню TelegramBot" : "Команда доступна пользователям в системном меню TelegramBot")">
+                            @if (context.IsDisabled)
+                            {
+
+                                <button type="button" disabled class="btn btn-outline-secondary">Отключено</button>
+
+                            }
+                            else
+                            {
+                                <button type="button" disabled class="btn btn-outline-success">Включено</button>
+                            }
+                        </MudTooltip>
+                        <MudTooltip Text="Выполненить команду на сервере">
+                            <button @onclick="@(async () => { await RunCommand(context.Id); })" class="btn btn-outline-primary">Запустисть</button>
+                        </MudTooltip>
                         <SystemCommandDeleteButtonsComponent CommandId="context.Id" UpdateCommandsList="@(async () => { await UpdateCommandsList(); StateHasChanged(); })" />
                     </div>
                 </MudTd>
@@ -87,7 +93,10 @@
                 </MudTd>
             </RowEditingTemplate>
             <NoRecordsContent>
-                <MudText>Нет ни одной заиси...</MudText>
+                <MudText>
+                    <p>Нет ни одной команды...</p>
+                    <p>Добавить: [<span @onclick="CreateDefaultCommandReboot" style="cursor: pointer;" class="link-primary">/usr/bin/sudo reboot</span>] ?</p>
+                </MudText>
             </NoRecordsContent>
             <LoadingContent>
                 <MudText>Загрузка...</MudText>
@@ -158,7 +167,7 @@
         SystemCommandModelDB sender = (SystemCommandModelDB)element;
 
         elementBeforeEdit = GlobalStatic.CreateDeepCopy<SystemCommandModelDB>(sender);
-        
+
         AddEditionEvent($"RowEditPreview event: made a backup of Element [{((SystemCommandModelDB)element).FileName} {((SystemCommandModelDB)element).Arguments}]");
     }
 
@@ -235,5 +244,17 @@
         {
             SystemCommands = elements.SystemCommands;
         }
+    }
+
+    async Task CreateDefaultCommandReboot()
+    {
+        createCommand = new SystemCommandModelDB()
+            {
+                Name = "Reboot",
+                FileName = "/usr/bin/sudo",
+                Arguments = "reboot",
+                IsDisabled = false
+            };
+        await AddNewCommand();
     }
 }

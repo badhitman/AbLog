@@ -21,7 +21,9 @@
                 }
                 else
                 {
-                    <MudFab Title="Обновить список пользователей" OnClick="Reload" Color="Color.Primary" StartIcon="@(Icons.Material.Filled.Refresh)" Size="Size.Small" />
+                    <MudTooltip Text="Обновить список пользователей">
+                        <MudFab OnClick="Reload" Color="Color.Primary" StartIcon="@(Icons.Material.Filled.Refresh)" Size="Size.Small" />
+                    </MudTooltip>
                 }
             </ToolBarContent>
             <HeaderContent>

@@ -58,7 +58,7 @@ else
             @if (hw.Id > 0)
             {
                 <div class="btn-group me-md-2" role="group" aria-label="Basic example">
-                    <button @onclick="InitDeleteAsync" class="btn btn-@(InitDelete?"":"outline-")danger" type="button">@(InitDelete ? "Подтвердить удаление" : "Удалить")</button>
+                    <button @onclick="InitDeleteAsync" class="btn btn-@(InitDelete ? "" : "outline-")danger" type="button">@(InitDelete ? "Подтвердить удаление" : "Удалить")</button>
                     @if (InitDelete)
                     {
                         <button @onclick="() => InitDelete = false" class="btn btn-outline-warning" type="button">Отменить удаление</button>

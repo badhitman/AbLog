@@ -46,6 +46,8 @@ public class Program
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
             builder.Services.AddSingleton<IEmailService, EmailLocalService>();
 
+            builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
+
             builder.Services.AddControllersWithViews()
                 .AddJsonOptions(x => { 
                     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

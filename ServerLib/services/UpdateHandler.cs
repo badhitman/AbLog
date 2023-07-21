@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Telegram.Bot.Types;
 using ab.context;
 using SharedLib;
+using ServerLib;
 
 namespace Telegram.Bot.Services;
 
@@ -17,20 +18,22 @@ namespace Telegram.Bot.Services;
 /// </summary>
 public class UpdateHandler : IUpdateHandler
 {
-    readonly ITelegramBotClient _botClient;
+    readonly ITelegramBotFormFillingServive _form_fill;
     readonly ILogger<UpdateHandler> _logger;
+    readonly ITelegramBotClient _botClient;
 
     const string SystemCommandPrefix = "sys:";
     const string GetProcesses = "get-processes";
-    const string SetupMQTT = "mqtt-setup";
+    //const string SetupMQTT = "mqtt-setup";
 
     /// <summary>
     /// 
     /// </summary>
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingServive form_fill)
     {
         _botClient = botClient;
         _logger = logger;
+        _form_fill = form_fill;
     }
 
     /// <summary>
@@ -156,7 +159,7 @@ public class UpdateHandler : IUpdateHandler
 
             if (User.AllowChangeMqttConfig)
             {
-                kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("Настроить MQTT", $"{SetupMQTT}") });
+                kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("Настроить MQTT", nameof(MqttConfigModel)) });
             }
 
             Message msg_res = await _botClient.SendTextMessageAsync(
@@ -203,6 +206,12 @@ public class UpdateHandler : IUpdateHandler
         if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled == true)
             return;
 
+        if (check_user.User.UserForm is not null)
+        {
+            await _form_fill.FormFillingHandle(check_user.User.UserForm, null, cancellationToken);
+            return;
+        }
+
         await _botClient.AnswerCallbackQueryAsync(
             callbackQueryId: callbackQuery.Id,
             text: $"Received {callbackQuery.Data}",
@@ -210,23 +219,45 @@ public class UpdateHandler : IUpdateHandler
 
         string output = "< --- >", pre_out;
         using ServerContext _db = new();
-
-        if (callbackQuery.Data.Equals(SetupMQTT) == true && check_user.User.AllowChangeMqttConfig)
+        UserFormModelDb form;
+        if (callbackQuery.Data.Equals(nameof(MqttConfigModel)) == true)
         {
-            output = "SetupMQTT";
-            UserFormModelDb form = new()
-            {
-                OwnerUser = check_user.User,
-                OwnerUserId = check_user.User.Id,
-                FormMapCode = nameof(MqttConfigModel)
-            };
+            if (!check_user.User.AllowChangeMqttConfig)
+                return;
+
             lock (ServerContext.DbLocker)
             {
+                if (check_user.User.UserForm is not null && _db.UsersForms.Any(x => x.Id == check_user.User.UserForm.Id))
+                {
+                    _db.Remove(check_user.User.UserForm);
+                    _db.SaveChanges();
+                }
+                FormMetadataModel form_metadata = FormFillingFlowsStatic.FormFillingFlows[nameof(MqttConfigModel)];
+                form = new()
+                {
+                    OwnerUserId = check_user.User.Id,
+                    FormMapCode = nameof(MqttConfigModel)
+                };
+
                 _db.Add(form);
                 _db.SaveChanges();
-                check_user.User.UserForm = form;
+                form.Properties = form_metadata.MqttConfigFormPropertyes.Select(x => new UserFormPropertyModelDb() { Code = x.Code, Name = x.Title, OwnerFormId = form.Id }).ToList();
+                _db.AddRange(form.Properties);
                 _db.SaveChanges();
+                check_user.User.UserForm = _db.UsersForms.Include(x => x.OwnerUser).FirstOrDefault(x => x.OwnerUserId == check_user.User.Id);
             }
+
+            form.Properties.ForEach(x => x.OwnerForm = form);
+            form.OwnerUser = check_user.User;
+
+            if (check_user.User.UserForm is null)
+            {
+                _logger.LogError($"check_user.User.UserForm is null. error C0AB0CE4-5442-4617-A324-A8E3A4D0E414");
+                return;
+            }
+
+            await _form_fill.FormFillingHandle(check_user.User.UserForm, null, cancellationToken);
+            return;
         }
         else if (callbackQuery.Data.Equals(GetProcesses) == true && check_user.User.AllowSystemCommands)
         {

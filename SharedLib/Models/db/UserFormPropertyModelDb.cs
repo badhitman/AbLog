@@ -12,6 +12,11 @@ public class UserFormPropertyModelDb : EntryModel
     /// <summary>
     /// 
     /// </summary>
+    public string Code { get; set; } = default!;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public UserFormModelDb? OwnerForm { get; set; }
     /// <summary>
     /// 

@@ -3,10 +3,14 @@
 
 @inject ISystemCommandsService _comm
 
-<button @onclick="@DeleteCommand" class="btn btn@(IsInitDelete?"":"-outline")-danger">@(IsInitDelete ? "Подтвердить удаление" : "Удалить")</button>
+<MudTooltip Text="@(IsInitDelete ? "Подтверждаю намерение удалить команду без возможности восстановления" : "Удалить команду навсегда")">
+    <button @onclick="@DeleteCommand" class="btn btn@(IsInitDelete?"":"-outline")-danger">@(IsInitDelete ? "Подтвердить удаление" : "Удалить")</button>
+</MudTooltip>
 @if (IsInitDelete)
 {
-    <button @onclick="() => { IsInitDelete = false; }" class="btn btn-outline-primary">Отменить удаление</button>
+    <MudTooltip Text="Отменить процедуру удаления команды">
+        <button @onclick="() => { IsInitDelete = false; }" class="btn btn-outline-primary">Отменить удаление</button>
+    </MudTooltip>
 }
 <ShowMessagesComponent @ref="showMessages" />
 @code {

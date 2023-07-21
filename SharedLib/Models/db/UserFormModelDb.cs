@@ -2,13 +2,21 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using System.ComponentModel.DataAnnotations;
+
 namespace SharedLib;
 
 /// <summary>
 /// 
 /// </summary>
-public class UserFormModelDb : EntryModel
+public class UserFormModelDb
 {
+    /// <summary>
+    /// Ключ/идентификатор
+    /// </summary>
+    [Key]
+    public int Id { get; set; }
+
     /// <summary>
     /// 
     /// </summary>
