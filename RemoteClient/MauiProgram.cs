@@ -47,11 +47,15 @@ public static class MauiProgram
         builder.Configuration.Bind(settings);
         builder.Services.AddSingleton(settings);
         builder.Services.AddHttpClient<ToolsRemoteService>();
+
         builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRemoteService>();
-        builder.Services.AddSingleton<IHardwaresService, HardwaresMqttService>();
         builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsMqttService>();
-        builder.Services.AddSingleton<IUsersService, UsersMqttService>();
+        builder.Services.AddSingleton<IHardwaresService, HardwaresMqttService>();
+        builder.Services.AddSingleton<IMqttBaseService, MqttClientService>();
         builder.Services.AddSingleton<IEmailService, EmailLocalService>();
+        builder.Services.AddSingleton<IUsersService, UsersMqttService>();
+        builder.Services.AddScoped<IToolsService, ToolsRemoteService>();
+
 
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
@@ -62,9 +66,6 @@ public static class MauiProgram
         builder.Services.AddTransient(x => mqttFactory);
         IMqttClient mqttClient = mqttFactory.CreateMqttClient();
         builder.Services.AddSingleton(x => mqttClient);
-
-        builder.Services.AddScoped<IToolsService, ToolsRemoteService>();
-        builder.Services.AddSingleton<IMqttBaseService, MqttClientService>();
 
         MauiApp maui_app = builder.Build();
 

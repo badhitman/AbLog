@@ -17,6 +17,8 @@ namespace AbLogServer;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
+[SupportedOSPlatform("iOS")]
+[SupportedOSPlatform("MacCatalyst")]
 public class Program
 {
     public static async Task Main(string[] args)
@@ -38,18 +40,21 @@ public class Program
 
             builder.Services.AddHttpClient<ToolsLocalService>();
             builder.Services.AddHttpClient<MqttServerService>();
+
+            builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
             builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
             builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
-            builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
-            builder.Services.AddSingleton<IUsersService, UsersLocalService>();
+            builder.Services.AddSingleton<IMqttBaseService, MqttServerService>();
             builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
-            builder.Services.AddScoped<IToolsService, ToolsLocalService>();
             builder.Services.AddSingleton<IEmailService, EmailLocalService>();
+            builder.Services.AddSingleton<IUsersService, UsersLocalService>();
+            builder.Services.AddScoped<IToolsService, ToolsLocalService>();
 
             builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
 
             builder.Services.AddControllersWithViews()
-                .AddJsonOptions(x => { 
+                .AddJsonOptions(x =>
+                {
                     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                     x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
@@ -87,11 +92,9 @@ public class Program
             builder.Services.AddTransient(x => mqttFactory);
             IMqttClient mqttClient = mqttFactory.CreateMqttClient();
             builder.Services.AddSingleton(x => mqttClient);
-            builder.Services.AddSingleton<IMqttBaseService, MqttServerService>();
 
             _json_config_raw = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
             TelegramBotConfigModel tbot_settings = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_json_config_raw) ?? new();
-            builder.Services.AddSingleton(x => mqtt_settings);
 
             if (tbot_settings.IsConfigured && tbot_settings.AutoStart && !string.IsNullOrEmpty(tbot_settings.TelegramBotToken))
             {

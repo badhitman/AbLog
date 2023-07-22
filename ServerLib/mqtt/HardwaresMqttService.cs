@@ -17,23 +17,27 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
+[SupportedOSPlatform("iOS")]
+[SupportedOSPlatform("MacCatalyst")]
 public class HardwaresMqttService : IHardwaresService
 {
     readonly IMqttBaseService _mqtt;
+    readonly MqttConfigModel _mqtt_conf;
 
     /// <summary>
     /// Устройства IMqttClient
     /// </summary>
-    public HardwaresMqttService(IMqttBaseService mqtt)
+    public HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf)
     {
         _mqtt = mqtt;
+        _mqtt_conf = mqtt_conf;
     }
 
     /// <inheritdoc/>
     public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
     {
         HardwaresResponseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -68,7 +72,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -102,7 +106,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -136,7 +140,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -170,7 +174,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = port_id }, $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = port_id }, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -204,7 +208,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(port_id_name, $"{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(port_id_name, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -238,7 +242,7 @@ public class HardwaresMqttService : IHardwaresService
             return res;
         }
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.DELETE}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = hardware_id }, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.DELETE}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -267,7 +271,7 @@ public class HardwaresMqttService : IHardwaresService
     {
         EntriesResponseModel res = new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.ENTRIES}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.ENTRIES}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -296,7 +300,7 @@ public class HardwaresMqttService : IHardwaresService
     {
         EntriesNestedResponseModel res = new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.NESTED_ENTRIES}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.NESTED_ENTRIES}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -325,7 +329,7 @@ public class HardwaresMqttService : IHardwaresService
     {
         HardwareResponseModel res = new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(hardware, $"{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(hardware, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {

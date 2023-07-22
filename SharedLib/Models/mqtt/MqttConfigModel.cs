@@ -6,9 +6,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SharedLib;
 
-
-
-
 /// <summary>
 /// Конфигурация MQTT
 /// </summary>
@@ -31,6 +28,11 @@ public class MqttConfigModel
     /// </summary>
     [Required]
     public uint MessageMaxSizeBytes { get; set; } = 1000000;
+
+    /// <summary>
+    /// Префикс mqtt топиков
+    /// </summary>
+    public string? PrefixMqtt { get; set; }
 
     /// <summary>
     /// Логин пользователя для авторизации на сервере MQTT
@@ -83,6 +85,7 @@ public class MqttConfigModel
             l.MessageMaxSizeBytes == r.MessageMaxSizeBytes &&
             ((l.Username?.Equals(r.Username) == true) || (l.Username is null && r.Username is null)) &&
             ((l.Password?.Equals(r.Password) == true) || (l.Password is null && r.Password is null)) &&
+            ((l.PrefixMqtt?.Equals(r.PrefixMqtt) == true) || (l.PrefixMqtt is null && r.PrefixMqtt is null)) &&
             ((l.Secret?.Equals(r.Secret) == true) || (l.Secret is null && r.Secret is null));
     }
 
@@ -109,5 +112,5 @@ public class MqttConfigModel
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode() => $"{Server}{Port}{Username}{Password}{Secret}{MessageMaxSizeBytes}{ClientId}{AutoStart}".GetHashCode();
+    public override int GetHashCode() => $"{Server}{Port}{Username}{Password}{Secret}{MessageMaxSizeBytes}{ClientId}{AutoStart}{PrefixMqtt}".GetHashCode();
 }

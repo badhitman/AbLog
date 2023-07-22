@@ -14,6 +14,8 @@ namespace SharedLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
+[SupportedOSPlatform("iOS")]
+[SupportedOSPlatform("MacCatalyst")]
 public static class CipherService
 {
     static readonly Encoding encoding = Encoding.UTF8;

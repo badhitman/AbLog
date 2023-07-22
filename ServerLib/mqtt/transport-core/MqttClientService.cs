@@ -16,6 +16,8 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
+[SupportedOSPlatform("iOS")]
+[SupportedOSPlatform("MacCatalyst")]
 public class MqttClientService : MqttBaseServiceAbstraction
 {
     /// <inheritdoc/>

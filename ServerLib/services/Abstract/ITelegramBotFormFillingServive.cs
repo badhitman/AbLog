@@ -1,4 +1,5 @@
-﻿using SharedLib;
+﻿using Telegram.Bot.Types;
+using SharedLib;
 
 namespace ServerLib;
 
@@ -10,5 +11,7 @@ public interface ITelegramBotFormFillingServive
     /// <summary>
     /// 
     /// </summary>
-    public Task FormFillingHandle(UserFormModelDb form, string? set_value, CancellationToken cancellation_token = default);
+    public Task<Message> FormFillingHandle(UserFormModelDb form, int message_id, TypeValueTelegramBotHandle type_handler, string? set_value, CancellationToken cancellation_token = default);
+
+
 }

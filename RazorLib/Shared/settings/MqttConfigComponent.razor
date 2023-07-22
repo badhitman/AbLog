@@ -9,7 +9,7 @@
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Удалённый доступ клиента к системе</h5>
+        <h5 class="card-title">Настройки подключения к MQTT</h5>
         <hr />
         <EditForm EditContext="editContext" OnSubmit="SaveConfMqtt">
             <DataAnnotationsValidator />
@@ -25,7 +25,7 @@
                     <label for="exampleInputPort" class="form-label">Порт</label>
                     <input @bind-value="conf.Port" @bind-value:event="oninput" type="number" class="form-control" id="exampleInputPort" aria-describedby="portHelp">
                     <div id="portHelp" class="form-text">MQTT</div>
-                </div>                
+                </div>
                 <div class="col-sm">
                     <label for="exampleInputMaxSize" class="form-label">Размер пакета</label>
                     <input @bind-value="conf.MessageMaxSizeBytes" @bind-value:event="oninput" type="number" class="form-control" id="exampleInputMaxSize" aria-describedby="maxSizeHelp">
@@ -48,7 +48,7 @@
                 </div>
                 <div class="col">
                     <label for="exampleInputClientId" class="form-label">Идентификатор клиента</label>
-                    <input @bind-value="conf.ClientId" @bind-value:event="oninput" type="tel" class="form-control" id="exampleInputClientId" aria-describedby="clientIdHelp">
+                    <input @bind-value="conf.ClientId" @bind-value:event="oninput" type="text" class="form-control" id="exampleInputClientId" aria-describedby="clientIdHelp">
                     <div id="clientIdHelp" class="form-text">Имя клиента (не логин).</div>
                 </div>
             </div>
@@ -68,6 +68,21 @@
                             <button @onclick="() => { ShowSecret = !ShowSecret; }" class="btn btn@(ShowSecret ? "" : "-outline")-secondary" type="button">@(ShowSecret ? "Скрыть" : "Показать")</button>
                         </div>
                         <div id="secretHelp" class="form-text">Парольная фраза для защиты трафика MQTT сообщений</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    Префикс MQTT имён топиков
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Префикс</span>
+                            <input @bind-value="conf.PrefixMqtt" @bind-value:event="oninput" type="text" class="form-control" id="exampleInputPrefix" aria-describedby="prefixHelp">
+
+                        </div>
+                        <div id="prefixHelp" class="form-text">Для разделения разных групп пользователей друг от друга в рамках одного общего MQTT сервера</div>
                     </div>
                 </div>
             </div>
@@ -158,7 +173,10 @@
     {
         bool? validate = editContext?.Validate();
         if (validate != true)
+        {
+            _snackbar.Add("Форма не заполнена!", Severity.Warning, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
+        }
 
         IsBusyProgress = true;
         ResponseBaseModel res = await _storage.SaveMqttConfig(conf);

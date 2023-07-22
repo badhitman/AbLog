@@ -14,23 +14,27 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
+[SupportedOSPlatform("iOS")]
+[SupportedOSPlatform("MacCatalyst")]
 public class SystemCommandsMqttService : ISystemCommandsService
 {
     readonly IMqttBaseService _mqtt;
+    readonly MqttConfigModel _mqtt_conf;
 
     /// <summary>
     /// Устройства IMqttClient
     /// </summary>
-    public SystemCommandsMqttService(IMqttBaseService mqtt)
+    public SystemCommandsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf)
     {
         _mqtt = mqtt;
+        _mqtt_conf = mqtt_conf;
     }
 
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> CommandDelete(int comm_id, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = comm_id }, $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = comm_id }, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -58,7 +62,7 @@ public class SystemCommandsMqttService : ISystemCommandsService
     public async Task<ResponseBaseModel> CommandRun(int comm_id, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = comm_id }, $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.START}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new SimpleIdNoiseModel() { Id = comm_id }, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.START}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -86,7 +90,7 @@ public class SystemCommandsMqttService : ISystemCommandsService
     public async Task<SystemCommandsResponseModel> CommandsGetAll(CancellationToken cancellation_token = default)
     {
         SystemCommandsResponseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -114,7 +118,7 @@ public class SystemCommandsMqttService : ISystemCommandsService
     public async Task<ResponseBaseModel> CommandUpdateOrCreate(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(comm, $"{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(comm, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.System}/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {

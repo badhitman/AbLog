@@ -76,7 +76,7 @@ public class ToolsLocalService : IToolsService
         //    IgnoreCertificateRevocationErrors = true
         //};
         MqttClientOptions mqttClientOptions = new MqttClientOptionsBuilder()
-           .WithTls()
+           .WithTls(p => p.CertificateValidationHandler = e => { return true; })
            .WithClientId(conf.ClientId)
            .WithTcpServer(conf.Server, conf.Port)
            .WithCredentials(conf.Username, conf.Password)
@@ -138,7 +138,7 @@ public class ToolsLocalService : IToolsService
             res.Id = _me.Id;
 
             ITelegramBotClient? tbc = _service_provider.GetService<ITelegramBotClient>();
-            
+
             if (tbc is not null)
             {
                 Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync();

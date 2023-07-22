@@ -13,12 +13,14 @@ public class ToolsRemoteService : ToolsLocalService
 {
 
     readonly IMqttBaseService _mqtt;
+    readonly MqttConfigModel _mqtt_conf;
 
     /// <inheritdoc/>
-    public ToolsRemoteService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client, IMqttBaseService mqtt, IEmailService _email, IServiceProvider service_provider)
+    public ToolsRemoteService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client, IMqttBaseService mqtt, IEmailService _email, IServiceProvider service_provider, MqttConfigModel mqtt_conf)
         : base(mqttClientService, parameter_storage, mqtt_fact, http_client, _email, service_provider)
     {
         _mqtt = mqtt;
+        _mqtt_conf = mqtt_conf;
     }
 
     /// <inheritdoc/>
@@ -27,7 +29,7 @@ public class ToolsRemoteService : ToolsLocalService
         TelegramBotCheckResponseModel res = new();
         conf ??= new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}");
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}");
 
         if (!rpc.IsSuccess)
         {
@@ -57,7 +59,7 @@ public class ToolsRemoteService : ToolsLocalService
         ResponseBaseModel res = new();
         conf ??= new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}");
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}");
 
         if (!rpc.IsSuccess)
         {

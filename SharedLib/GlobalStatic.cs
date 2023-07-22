@@ -100,6 +100,8 @@ public static class GlobalStatic
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("android")]
+    [SupportedOSPlatform("iOS")]
+    [SupportedOSPlatform("MacCatalyst")]
     public static IPAddress IpAddress => Dns.GetHostEntry(Dns.GetHostName()).AddressList.Last();
 
     /// <summary>
@@ -108,6 +110,8 @@ public static class GlobalStatic
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("android")]
+    [SupportedOSPlatform("iOS")]
+    [SupportedOSPlatform("MacCatalyst")]
     public static IEnumerable<NetworkInterfaceModel> GetNetworkInterfaces()
     {
         NetworkInterfaceType[] filter = new NetworkInterfaceType[] { NetworkInterfaceType.Loopback, NetworkInterfaceType.Unknown };

@@ -19,6 +19,8 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
+[SupportedOSPlatform("iOS")]
+[SupportedOSPlatform("MacCatalyst")]
 public abstract class MqttBaseServiceAbstraction : IMqttBaseService
 {
     /// <summary>
@@ -49,7 +51,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     /// 
     /// </summary>
     protected MqttClientOptions MqttClientOptions => new MqttClientOptionsBuilder()
-                .WithTls()
+                .WithTls(p => p.CertificateValidationHandler = e => { return true; })
                 .WithMaximumPacketSize(_mqtt_settings.MessageMaxSizeBytes)
                 .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500)
                 .WithClientId(_mqtt_settings.ClientId)
@@ -234,8 +236,8 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
         string response_topic = Guid.NewGuid().ToString();
 
         MqttClientSubscribeOptions subscr_opt = _mqttFactory.CreateSubscribeOptionsBuilder()
-                               .WithTopicFilter(f => { f.WithTopic(response_topic); })
-                               .Build();
+            .WithTopicFilter(f => { f.WithTopic(response_topic); })
+            .Build();
 
         MqttClientSubscribeResult? subscr_res = await _mqttClient.SubscribeAsync(subscr_opt, cancellation_token);
         byte[] request_bytes = await CipherService.EncryptAsync(JsonConvert.SerializeObject(request), _mqtt_settings.Secret ?? CipherService.DefaultSecret, msg_id);
