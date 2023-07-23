@@ -31,4 +31,14 @@ public class HttpResponseModel : TextedResponseModel
     /// HTTP Sattus code
     /// </summary>
     public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public async Task<HtmlDomModel> GetDom()
+    {
+        HtmlDomModel res = new();
+        await res.Reload(TextPayload ?? "");
+        return res;
+    }
 }

@@ -6,6 +6,7 @@
 @inject ClientConfigModel _conf
 @inject IHardwaresService _hardwares
 @inject ISnackbar _snackbar
+@inject ILogger<HtmlInputTranslatorComponent> _logger
 
 @switch (NodeData.NodeName)
 {
@@ -44,6 +45,7 @@
             {
                 if (!string.IsNullOrWhiteSpace(InputName) && FormContext?.DataContext.ContainsKey(InputName) != true)
                     InputValue = GetSelectedOption(NodeData.TreeItems);
+
                 <CascadingValue Value="InputName" Name="InputName">
                     <CascadingValue Value="InputValue" Name="InputValue">
                         @foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
@@ -87,7 +89,17 @@
             if (!string.IsNullOrWhiteSpace(_static_input_value) || string.IsNullOrWhiteSpace(InputName) || FormContext is null)
                 return _static_input_value;
 
-            string? res = FormContext.DataContext?.GetValueOrDefault(InputName)?.ToString();
+            string? res = null;
+
+            try
+            {
+                res = FormContext.DataContext?.GetValueOrDefault(InputName)?.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("error {EC4EC565-39A2-4BFB-B7CC-9F128E84F06A}", ex);
+            }
+
             if (res is null)
                 res = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
 
@@ -133,7 +145,7 @@
         base.OnAfterRender(firstRender);
     }
 
-    string? GetSelectedOption(HashSet<TreeItemDataModel> options_or_optgroups)
+    string? GetSelectedOption(HtmlDomModel options_or_optgroups)
     {
         string? res = "";
 

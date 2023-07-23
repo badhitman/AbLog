@@ -65,42 +65,18 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
         }
 
         form.Properties.ForEach(x => html_response += $"\n<{(string.IsNullOrEmpty(x.PropValue) ? "u" : "b")}>{x.Name}</{(string.IsNullOrEmpty(x.PropValue) ? "u" : "b")}>:<code>{x.PropValue}</code>");
-        
-
-        //IReplyMarkup kb = new ReplyKeyboardRemove();
 
         if (next_prop is null)
         {
             html_response += $"\n♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦\n";
             html_response += "\nФорма заполнена - её можно применить/записать!\nЧто бы вернуться в начальное меню - /start";
-            //    kb = new InlineKeyboardMarkup(new[] { new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData(ApplyButtonTitle) }, new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData(ReInitButtonTitle) } });
         }
         else
-        {//♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦ ♦
+        {
             html_response += $"\n** * ** * ** * ** * ** * **\n";
             html_response += $"{next_prop.Name} (введите значение):\n";
-            //    kb = new ReplyKeyboardRemove();
         }
 
-        //List<KeyboardButton> keyboardButtons = new();
-
-
-        /*
-         ReplyKeyboardMarkup replyKeyboardMarkup = new(
-                new[]
-                {
-                        new KeyboardButton[] { "1.1", "1.2" },
-                        new KeyboardButton[] { "2.1", "2.2" },
-                })
-            {
-                ResizeKeyboard = true
-            };
-         */
-
-        /*
-         List<InlineKeyboardButton[]> kb_rows = new();
-         replyMarkup: kb_rows.Any() ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
-         */
         InlineKeyboardMarkup? kb = next_prop is null
                         ? new InlineKeyboardMarkup(new[] { new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData("Применить", nameof(MqttConfigModel)) } })
                         : null;

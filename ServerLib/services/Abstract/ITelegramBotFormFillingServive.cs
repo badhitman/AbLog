@@ -12,6 +12,4 @@ public interface ITelegramBotFormFillingServive
     /// 
     /// </summary>
     public Task<Message> FormFillingHandle(UserFormModelDb form, int message_id, TypeValueTelegramBotHandle type_handler, string? set_value, CancellationToken cancellation_token = default);
-
-
 }

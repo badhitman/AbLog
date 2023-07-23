@@ -51,6 +51,7 @@ public class Program
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
 
             builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
+            builder.Services.AddSingleton<ITelegramBotHardwareViewServive, TelegramBotHardwareViewServive>();
 
             builder.Services.AddControllersWithViews()
                 .AddJsonOptions(x =>

@@ -210,6 +210,11 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
+        public const string AbPrefix = "ab:";
+
+        /// <summary>
+        /// 
+        /// </summary>
         public const string System = "system";
         /// <summary>
         /// 
@@ -301,6 +306,14 @@ public static class GlobalStatic
         /// 
         /// </summary>
         public const string STOP = "stop";
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string ON = "on";
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string OFF = "off";
         /// <summary>
         /// 
         /// </summary>

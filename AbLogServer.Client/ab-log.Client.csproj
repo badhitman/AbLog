@@ -23,7 +23,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\RazorLib\razor-lib.csproj" />
-		<ProjectReference Include="..\SharedLib\shared-lib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

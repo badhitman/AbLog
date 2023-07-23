@@ -21,19 +21,20 @@
         break;
     case "option":
         string? opt_val = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
-        @*bool IsSelected = InputValue?.Equals(opt_val, StringComparison.OrdinalIgnoreCase) == true;
+        bool IsSelected = NodeData.Attributes?.Any(x => x.Key.Equals("selected", StringComparison.OrdinalIgnoreCase)) == true;
         if (IsSelected)
         {
+            InputValue = opt_val;
             <option selected value="@opt_val">
                 @NodeData.Text
             </option>
         }
         else
-        {*@
+        {
             <option value="@opt_val">
                 @NodeData.Text
             </option>
-        //}
+        }
         break;
     default:
         <HtmlNodeTranslatorComponent NodeData="NodeData" />
@@ -46,7 +47,7 @@
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }
-    
+
     [CascadingParameter(Name = "InputName")]
     public string? InputName { get; set; }
 
