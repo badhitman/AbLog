@@ -36,17 +36,23 @@
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/scripts-page">
-                    <span class="oi oi-script" aria-hidden="true"></span> @(IsShort ? "" : "Скрипты")
+                    <MudTooltip Text="Эксперементальная версия">
+                        <span style="color:orangered;" class="oi oi-script" aria-hidden="true"></span> @(IsShort ? "" : "Скрипты")
+                    </MudTooltip>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/triggers-page">
-                    <span class="oi oi-pulse" aria-hidden="true"></span> @(IsShort ? "" : "Тригеры")
+                    <MudTooltip Text="Эксперементальная версия">
+                        <span style="color:orangered;" class="oi oi-pulse" aria-hidden="true"></span> @(IsShort ? "" : "Тригеры")
+                    </MudTooltip>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/cameras-page">
-                    <span class="oi oi-camera-slr" aria-hidden="true"></span> @(IsShort ? "" : "Камеры")
+                    <MudTooltip Text="Эксперементальная версия">
+                        <span style="color:orangered;" class="oi oi-camera-slr" aria-hidden="true"></span> @(IsShort ? "" : "Камеры")
+                    </MudTooltip>
                 </NavLink>
             </div>
         }
@@ -54,10 +60,6 @@
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
     [Parameter, EditorRequired]
     public Action ModeChangeHandle { get; set; } = default!;
 
@@ -66,6 +68,10 @@
 #else
     bool IsDebug = false;
 #endif
+
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     /// <summary>
     /// блокировка таймера

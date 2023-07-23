@@ -1,19 +1,28 @@
 ﻿@using RazorLib.Shared.navs.pills
 @using RazorLib.Shared.html
 
-<PillsSetComponent>
-    <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
-        <CascadingValue Value="@ReloadPage">
-            <HtmlRootTranslatorComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" />
-        </CascadingValue>
-    </PillComponent>
-    <PillComponent Tooltip="Парсинг исходного HTML в DOM" Title="Дерево">
-        <HtmlTreeDomComponent HtmlSource="@HtmlSource" />
-    </PillComponent>
-    <PillComponent Tooltip="Исходный HTML" Title="Исходники">
-        <HtmlShowComponent Html="@HtmlSource" />
-    </PillComponent>
-</PillsSetComponent>
+@if (IsDebug)
+{
+    <PillsSetComponent>
+        <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
+            <CascadingValue Value="@ReloadPage">
+                <HtmlRootTranslatorComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" />
+            </CascadingValue>
+        </PillComponent>
+        <PillComponent Tooltip="Парсинг исходного HTML в DOM" Title="Дерево">
+            <HtmlTreeDomComponent HtmlSource="@HtmlSource" />
+        </PillComponent>
+        <PillComponent Tooltip="Исходный HTML" Title="Исходники">
+            <HtmlShowComponent Html="@HtmlSource" />
+        </PillComponent>
+    </PillsSetComponent>
+}
+else
+{
+    <CascadingValue Value="@ReloadPage">
+        <HtmlRootTranslatorComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" />
+    </CascadingValue>
+}
 
 @code {
     [Parameter, EditorRequired]
@@ -21,6 +30,12 @@
 
     [Parameter, EditorRequired]
     public string? HtmlSource { get; set; }
+
+#if DEBUG
+    bool IsDebug = true;
+#else
+    bool IsDebug = false;
+#endif
 
     public HtmlRootTranslatorComponent? refHtmlRoot { get; private set; }
 }
