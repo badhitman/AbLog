@@ -353,13 +353,31 @@ public class UpdateHandler : IUpdateHandler
         {
             callbackQuery.Data = callbackQuery.Data[(GlobalStatic.Routes.Port.Length + 1)..];
             Match match = Regex.Match(callbackQuery.Data, @"^(?<pt_id>\d+)");
-            callbackQuery.Data = callbackQuery.Data[(match.Groups["pt_id"].Value.Length)..];
+            callbackQuery.Data = callbackQuery.Data[match.Groups["pt_id"].Value.Length..];
             if (callbackQuery.Data.StartsWith(":"))
                 callbackQuery.Data = callbackQuery.Data[1..];
+            if (callbackQuery.Data.StartsWith("&"))
+                callbackQuery.Data = callbackQuery.Data[1..];
+
+            string cmd_set = $"cmd={match.Groups["pt_id"].Value}:";
+            if (callbackQuery.Data.StartsWith(cmd_set))
+                callbackQuery.Data = callbackQuery.Data[cmd_set.Length..];
+
             res_msg = await _hardware_view.HardwarePortViewHandle(check_user.User.ChatId, check_user.User.MessageId, callbackQuery.Data, int.Parse(match.Groups["pt_id"].Value), cancellationToken);
+
+            if (res_msg.MessageId != check_user.User.MessageId)
+            {
+                check_user.User.MessageId = res_msg.MessageId;
+                lock (ServerContext.DbLocker)
+                {
+                    _db.Update(check_user.User);
+                    _db.SaveChanges();
+                }
+            }
+
             return;
         }
-        
+
         try
         {
             await _botClient.EditMessageTextAsync(
@@ -389,38 +407,11 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    async Task<Message> GetStartMessage(UserModelDB User, Message message, string? caption = null, CancellationToken cancellationToken = default)
+    async Task<Message> GetStartMessage(UserModelDB User, Message message_request, string? caption = null, CancellationToken cancellationToken = default)
     {
-        using ServerContext _context = new();
-        if (message.Text?.Equals("/start") == true)
-        {
-            try
-            {
-                await _botClient.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancellationToken: cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("error {C1BAB78B-5075-4A75-BA55-49DB319A0AD2}", ex);
-            }
-
-            try
-            {
-                await _botClient.DeleteMessageAsync(User.ChatId, User.MessageId, cancellationToken: cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("error {9A2662C7-4B8A-462F-A55E-312381474081}", ex);
-            }
-            User.MessageId = default;
-            lock (ServerContext.DbLocker)
-            {
-                _context.Update(User);
-                _context.SaveChanges();
-            }
-        }
-
         string usage = caption ?? "Бот-обормот";
 
+        using ServerContext _context = new();
         lock (ServerContext.DbLocker)
         {
             UserFormModelDb? actual_form = _context.UsersForms.Include(x => x.Properties).FirstOrDefault(x => x.OwnerUserId == User.Id);
@@ -431,29 +422,7 @@ public class UpdateHandler : IUpdateHandler
             }
         }
 
-        if (User.MessageId != default && User.ChatId != default)
-        {
-            long chat_id = User.ChatId;
-            int message_id = User.MessageId;
-            User.ChatId = default;
-            User.MessageId = default;
-            lock (ServerContext.DbLocker)
-            {
-                _context.Update(User);
-                _context.SaveChanges();
-            }
-            try
-            {
-                await _botClient.DeleteMessageAsync(chat_id, message_id, cancellationToken: cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("error {B8F28B15-5E87-444C-8718-9FA44724CF23}", ex);
-            }
-        }
-
         List<InlineKeyboardButton[]> kb_rows = new();
-
         if (User.AllowSystemCommands)
         {
             lock (ServerContext.DbLocker)
@@ -468,18 +437,14 @@ public class UpdateHandler : IUpdateHandler
 
             kb_rows.Insert(0, new[] { InlineKeyboardButton.WithCallbackData("Процессы", GetProcesses) });
         }
-
         if (User.AllowChangeMqttConfig)
         {
             kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("MQTT - настроить", nameof(UserFormModelDb)) });
             kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("MQTT - состояние", GetMQTT) });
             kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("MQTT - перезапуск", RestartMQTT) });
         }
-
-        // else if (callbackQuery.Data.StartsWith(AbPrefix) && User.CommandsAllowed)
         if (User.CommandsAllowed)
         {
-            //kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("Устройство", AbPrefix) });
             HardwareModelDB[] hardwares;
             lock (ServerContext.DbLocker)
             {
@@ -491,13 +456,21 @@ public class UpdateHandler : IUpdateHandler
             }
         }
 
-        Message msg_res = await _botClient.SendTextMessageAsync(
-        chatId: message.Chat.Id,
-        text: usage,
+        long chat_id_old = User.ChatId;
+        int message_id_old = User.MessageId;
+        User.ChatId = default;
+        User.MessageId = default;
+        lock (ServerContext.DbLocker)
+        {
+            _context.Update(User);
+            _context.SaveChanges();
+        }
+
+        Message msg_res = await _botClient.SendTextMessageAsync(message_request.Chat.Id, usage,
         parseMode: ParseMode.Html,
         replyMarkup: kb_rows.Any() ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
-        cancellationToken: cancellationToken); ;
-
+        cancellationToken: cancellationToken);
+        //
         User.ChatId = msg_res.Chat.Id;
         User.MessageId = msg_res.MessageId;
         lock (ServerContext.DbLocker)
@@ -506,6 +479,19 @@ public class UpdateHandler : IUpdateHandler
             _context.SaveChanges();
         }
 
+        if (message_id_old != default && chat_id_old != default)
+        {
+            try
+            {
+                await _botClient.DeleteMessageAsync(chat_id_old, message_id_old, cancellationToken: cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("error {B8F28B15-5E87-444C-8718-9FA44724CF23}", ex);
+            }
+        }
+
+        await _botClient.DeleteMessageAsync(message_request.Chat.Id, message_request.MessageId, cancellationToken: cancellationToken);
         return msg_res;
     }
 

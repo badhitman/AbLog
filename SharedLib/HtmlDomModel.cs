@@ -27,6 +27,11 @@ public class HtmlDomModel : HashSet<TreeItemDataModel>
             return;
 
         html_source = Regex.Replace(html_source ?? "", @"\s+", " ");
+        html_source = Regex.Replace(html_source ?? "", @"\s+<", "<");
+        html_source = Regex.Replace(html_source ?? "", @"<\s+", "<");
+        html_source = Regex.Replace(html_source ?? "", @"\s+>", ">");
+        html_source = Regex.Replace(html_source ?? "", @">\s+", ">");
+        
         HtmlParser parser = new();
         IHtmlDocument? Document = await parser.ParseDocumentAsync(html_source);
         if (Document.Body is not null)

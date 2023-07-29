@@ -3,10 +3,10 @@
 ////////////////////////////////////////////////
 
 using System.Net.NetworkInformation;
+using System.Runtime.Versioning;
 using System.Xml.Serialization;
 using System.Net.Sockets;
 using System.Net;
-using System.Runtime.Versioning;
 
 namespace SharedLib;
 
@@ -305,15 +305,7 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
-        public const string STOP = "stop";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string ON = "on";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string OFF = "off";
+        public const string STOP = "stop";        
         /// <summary>
         /// 
         /// </summary>
