@@ -19,6 +19,11 @@ public class PortModelDB : PortHardwareBaseModel
     /// </summary>
     public HardwareModelDB? Hardware { get; set; }
 
+    /// <summary>
+    /// Порт деактивирован
+    /// </summary>
+    public bool IsDisable { get; set; }
+
     /// <inheritdoc/>
     public override string ToString()
     {

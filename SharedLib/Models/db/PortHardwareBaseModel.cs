@@ -12,5 +12,5 @@ public class PortHardwareBaseModel : EntryModel
     /// <summary>
     /// Номер порта
     /// </summary>
-    public int PortNum { get; set; }
+    public uint PortNum { get; set; }
 }

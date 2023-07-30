@@ -3,9 +3,12 @@
 ////////////////////////////////////////////////
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Net;
 using ab.context;
 using SharedLib;
-using System.Net;
+using System.Web;
+using System.Collections.Specialized;
 
 namespace ServerLib;
 
@@ -14,6 +17,16 @@ namespace ServerLib;
 /// </summary>
 public class HardwaresLocalService : IHardwaresService
 {
+    readonly ILogger<HardwaresLocalService> _logger;
+
+    /// <summary>
+    /// Устройства
+    /// </summary>
+    public HardwaresLocalService(ILogger<HardwaresLocalService> logger)
+    {
+        _logger = logger;
+    }
+
     /// <inheritdoc/>
     public async Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default)
     {
@@ -208,40 +221,39 @@ public class HardwaresLocalService : IHardwaresService
     }
 
     /// <inheritdoc/>
-    public Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
+    public async Task<HardwareResponseModel> HardwareUpdate(HardwareBaseModel hardware, CancellationToken cancellation_token = default)
     {
         HardwareResponseModel res = new();
 
         if (string.IsNullOrWhiteSpace(hardware.Address) || string.IsNullOrWhiteSpace(hardware.Password))
         {
             res.AddError("string.IsNullOrWhiteSpace(hardware.Name) || string.IsNullOrWhiteSpace(hardware.Address) || string.IsNullOrWhiteSpace(hardware.Password). error {2417D629-D6E5-4499-80DA-F4B7AEF79F77}");
-            return Task.FromResult(res);
+            return res;
         }
 
         hardware.Name = hardware.Name.Trim();
-
         hardware.Address = hardware.Address.Trim();
         hardware.Password = hardware.Password.Trim();
 
         HardwareModelDB? db_hw;
+        using ServerContext db = new();
+
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
-
-            db_hw = db.Hardwares.FirstOrDefault(x => x.Id != hardware.Id && x.Address == hardware.Address);
+            db_hw = db.Hardwares.Include(x => x.Ports).FirstOrDefault(x => x.Id != hardware.Id && x.Address == hardware.Address);
             if (db_hw is not null)
             {
                 res.AddError("устройство с таким адресом уже существует. error {1389FAB4-76E4-4BC9-A5B3-569CD5068388}");
-                return Task.FromResult(res);
+                return res;
             }
 
             if (hardware.Id > 0)
             {
-                db_hw = db.Hardwares.FirstOrDefault(x => x.Id == hardware.Id);
+                db_hw = db.Hardwares.Include(x => x.Ports).FirstOrDefault(x => x.Id == hardware.Id);
                 if (db_hw is null)
                 {
                     res.AddError("db_hw is null. error {08810FA6-75F3-4C85-90D2-F0205ED40053}");
-                    return Task.FromResult(res);
+                    return res;
                 }
 
                 db_hw.Name = hardware.Name;
@@ -263,7 +275,105 @@ public class HardwaresLocalService : IHardwaresService
         }
         res.Hardware = new(db_hw!);
 
-        return Task.FromResult(res);
+        HttpResponseModel? http_resp = null;
+        HardwareGetHttpRequestModel hw_request = new() { HardwareId = db_hw.Id };
+        try
+        {
+            http_resp = await GetHardwareHtmlPage(hw_request, cancellation_token);
+
+            if (http_resp?.IsSuccess != true)
+            {
+                if (http_resp?.Messages.Any() == true)
+                    res.AddMessages(http_resp!.Messages);
+                else
+                    res.AddError("http_resp?.IsSuccess != true error {277DC035-0C62-457A-B466-805AAF9733A9}");
+
+                return res;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("error {66A3933A-D1DA-479F-B271-90A4763A7958}", ex);
+            res.AddError(ex.Message);
+        }
+
+        HtmlDomModel dom = await http_resp!.GetDom();
+
+        HtmlDomModel sub_dom;
+        NameValueCollection query_parameters;
+
+        List<uint> ports = new();
+        string? _port_key;
+        string? _port_num;
+        string? _href;
+        dom.RemoveWhere(x => !x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) || (x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) && !x.Attributes?.Any(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true) == true));
+        foreach (TreeItemDataModel link in dom)
+        {
+            _href = link.Attributes!.First(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
+            hw_request.Path = _href;
+            _href = _href![(_href!.IndexOf("?") + 1)..];
+            query_parameters = HttpUtility.ParseQueryString(_href);
+            _port_key = query_parameters.AllKeys.FirstOrDefault(x => x?.Equals("pt", StringComparison.OrdinalIgnoreCase) == true);
+            _port_num = query_parameters[_port_key];
+
+            if (uint.TryParse(_port_num, out uint _port_num_uint) && !ports.Contains(_port_num_uint))
+                ports.Add(_port_num_uint);
+
+            try
+            {
+                http_resp = await GetHardwareHtmlPage(hw_request, cancellation_token);
+                sub_dom = await http_resp.GetDom();
+                sub_dom.RemoveWhere(x =>
+                {
+                    if (!x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    _href = x.Attributes?.FirstOrDefault(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true).Value;
+                    if (string.IsNullOrWhiteSpace(_href))
+                        return true;
+                    _href = _href[(_href.IndexOf("?") + 1)..];
+                    query_parameters = HttpUtility.ParseQueryString(_href);
+
+                    _port_key = query_parameters.AllKeys.FirstOrDefault(x => x?.Equals("pt", StringComparison.OrdinalIgnoreCase) == true);
+                    _port_num = query_parameters[_port_key];
+
+                    if (uint.TryParse(_port_num, out uint _port_num_uint) && !ports.Contains(_port_num_uint))
+                        ports.Add(_port_num_uint);
+
+                    return !query_parameters.AllKeys.Any(x => x?.Equals("pt", StringComparison.OrdinalIgnoreCase) == true);
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("error {7E47C193-E41F-4C49-BC6F-2DAD953198FC}", ex);
+                res.AddError(ex.Message);
+            }
+        }
+
+        List<PortModelDB> _ports_bd = db_hw.Ports!.Where(x => x.HardwareId == db_hw.Id && !ports.Contains(x.PortNum)).ToList();
+        if (_ports_bd.Any())
+        {
+            res.AddError($"В базе данных обнаружены порты с несуществующими номерами: {string.Join(", ", _ports_bd.Select(x => x.PortNum))}");
+            lock (ServerContext.DbLocker)
+            {
+                _ports_bd.ForEach(x => x.IsDisable = true);
+                db.UpdateRange(_ports_bd);
+                db.SaveChanges();
+            }
+        }
+
+        _ports_bd = ports.Where(x => !db_hw.Ports!.Any(y => y.PortNum == x)).Select(x => new PortModelDB() { HardwareId = db_hw.Id, PortNum = x }).ToList();
+        if (_ports_bd.Any())
+        {
+            res.AddInfo($"В базу данных добавлены порты с новыми номерами: {string.Join(", ", _ports_bd.Select(x => x.PortNum))}");
+            lock (ServerContext.DbLocker)
+            {
+                db.AddRange(_ports_bd);
+                db.SaveChanges();
+            }
+        }
+
+        return res;
     }
 
     /// <inheritdoc/>

@@ -148,11 +148,11 @@ public class ServerContext : DbContext
             Hardwares.Add(new HardwareModelDB { Name = "DEMO 1", Address = "192.168.0.14", Password = "sec", AlarmSubscriber = false, CommandsAllowed = true });
             SaveChanges();
 
-            for (int i = 1; i <= 38; i++)
+            for (uint i = 1; i <= 38; i++)
             {
                 Ports.AddRange(new PortModelDB() { HardwareId = 1, PortNum = i });
             }
-            for (int i = 1; i <= 38; i++)
+            for (uint i = 1; i <= 38; i++)
             {
                 Ports.AddRange(new PortModelDB() { HardwareId = 2, PortNum = i });
             }

@@ -17,7 +17,7 @@ else
         <MudTreeView Items="TreeItems">
             <ItemTemplate>
                 <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context"
-                                 Text="@context.Title" EndText="@context.Number.ToString()" EndTextTypo="@Typo.caption" />
+                                 Text="@context.Title" EndText="@context.ChildElementCount.ToString()" EndTextTypo="@Typo.caption" />
             </ItemTemplate>
         </MudTreeView>
     </div>

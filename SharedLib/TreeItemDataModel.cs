@@ -56,7 +56,7 @@ public class TreeItemDataModel
     /// <summary>
     /// 
     /// </summary>
-    public int? Number { get; set; }
+    public int? ChildElementCount { get; set; }
 
     /// <summary>
     /// 
@@ -96,13 +96,13 @@ public class TreeItemDataModel
         else if (cn is IHtmlFormElement fe)
         {
             Attributes = fe.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name.Trim(), x.Value.Trim())).ToArray();
-            Number = fe.ChildElementCount;
+            ChildElementCount = fe.ChildElementCount;
         }
         else if (cn is IHtmlAnchorElement ae)
         {
             Attributes = ae.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name.Trim(), x.Value.Trim())).ToArray();
-            Number = ae.ChildElementCount;
-            Text = Number > 0 ? "" : cn.Text().Trim();
+            ChildElementCount = ae.ChildElementCount;
+            Text = ChildElementCount > 0 ? "" : cn.Text().Trim();
         }
         else if (cn is IHtmlBreakRowElement)
         {

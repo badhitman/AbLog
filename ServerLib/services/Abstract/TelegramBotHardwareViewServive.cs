@@ -48,7 +48,7 @@ public class TelegramBotHardwareViewServive : ITelegramBotHardwareViewServive
         if (!string.IsNullOrWhiteSpace(hw_db.Name))
             output += $"[<b>{nameof(hw_db.Name)}</b>:<code>{hw_db.Name}</code>]\n";
 
-        output += $"[<b>{nameof(hw_db.Address)}</b>:<code>{hw_db.Address}</code>]\n🔹 🔹🔹 🔹\n";
+        output += $"[<b>{nameof(hw_db.Address)}</b>:<code>{hw_db.Address}</code>]";
 
         if (hw_db.Ports?.Any() != true)
         {
@@ -100,9 +100,11 @@ public class TelegramBotHardwareViewServive : ITelegramBotHardwareViewServive
 
         if (!string.IsNullOrWhiteSpace(port_db.Name))
             output += $"[{nameof(port_db.Name)}: <u>{port_db.Name}</u> ]";
-        output += $"[{nameof(port_db.PortNum)}: <u>{port_db.PortNum}</u> ]\n🔸🔸🔸\n";
+        output += $"[{nameof(port_db.PortNum)}: <u>{port_db.PortNum}</u> ]\n🔹🔹🔹";
 
         List<InlineKeyboardButton[]> kb_rows = new();
+        kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("К контроллеру", $"{GlobalStatic.Routes.AbPrefix}{port_db.Hardware!.Id}") });
+
         HttpResponseModel http_resp;
         HardwareGetHttpRequestModel hw_request = new() { HardwareId = port_db.Hardware!.Id };
 
@@ -114,7 +116,6 @@ public class TelegramBotHardwareViewServive : ITelegramBotHardwareViewServive
 
         hw_request.Path = $"?pt={port_db.PortNum}";
 
-        kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("К контроллеру", $"{GlobalStatic.Routes.AbPrefix}{port_db.Hardware!.Id}") });
         http_resp = await _hw.GetHardwareHtmlPage(hw_request, cancellation_token);
         if (!http_resp.IsSuccess)
         {

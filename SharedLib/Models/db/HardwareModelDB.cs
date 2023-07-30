@@ -24,6 +24,7 @@ public class HardwareModelDB : HardwareBaseModel
         Password = hardware.Password;
         AlarmSubscriber = hardware.AlarmSubscriber;
         CommandsAllowed = hardware.CommandsAllowed;
+        Ports = new();
     }
 
     /// <summary>

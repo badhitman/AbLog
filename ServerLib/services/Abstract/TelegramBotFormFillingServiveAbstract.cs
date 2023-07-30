@@ -82,7 +82,6 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
                         : null;
         try
         {
-
             return await _botClient.EditMessageTextAsync(form.OwnerUser.ChatId, form.OwnerUser.MessageId, html_response, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: kb, cancellationToken: cancellation_token);
         }
         catch (Exception ex)

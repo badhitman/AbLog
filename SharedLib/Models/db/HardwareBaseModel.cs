@@ -16,7 +16,7 @@ public class HardwareBaseModel : UniversalModelDB
     /// <summary>
     /// Управляющий блок (устройство) - Базовая модель
     /// </summary>
-    public HardwareBaseModel() { }
+    public HardwareBaseModel() { Address = ""; }
     /// <summary>
     /// Управляющий блок (устройство) - Базовая модель
     /// </summary>

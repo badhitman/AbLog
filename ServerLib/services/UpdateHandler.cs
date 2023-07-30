@@ -142,6 +142,7 @@ public class UpdateHandler : IUpdateHandler
                         UserFormPropertyModelDb server_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Server)));
                         UserFormPropertyModelDb port_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Port)));
                         UserFormPropertyModelDb secret_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Secret)));
+                        UserFormPropertyModelDb topics_prefix_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.PrefixMqtt)));
 
                         if (!int.TryParse(port_prop?.PropValue, out int port_int))
                         {
@@ -163,6 +164,8 @@ public class UpdateHandler : IUpdateHandler
                                 conf_db.Conf.Server = server_prop.PropValue;
                                 conf_db.Conf.Port = port_int;
                                 conf_db.Conf.Secret = secret_prop.PropValue;
+                                conf_db.Conf.PrefixMqtt = topics_prefix_prop.PropValue;
+
                                 await _storage.SaveMqttConfig(conf_db.Conf);
                                 callbackQuery.Message.Text = "/start";
                                 res_msg = await GetStartMessage(check_user.User, callbackQuery.Message, "<u>Параметры сохранены! Перезапустите MQTT что бы параметры применились...</u>\n", cancellationToken);
@@ -310,6 +313,11 @@ public class UpdateHandler : IUpdateHandler
             }
 
             output += $"\n------------\ntotal mem.: <b>{GlobalStatic.SizeDataAsString(total_mem_used)}</b>";
+            await _botClient.SendTextMessageAsync(callbackQuery.Message!.Chat.Id, output.Trim(),
+                            parseMode: ParseMode.Html,
+                            cancellationToken: cancellationToken);
+            await GetStartMessage(check_user.User, null, cancellationToken: cancellationToken);
+            return;
         }
         else if (callbackQuery.Data.StartsWith(SystemCommandPrefix) && check_user.User.AllowSystemCommands)
         {
@@ -407,7 +415,7 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    async Task<Message> GetStartMessage(UserModelDB User, Message message_request, string? caption = null, CancellationToken cancellationToken = default)
+    async Task<Message> GetStartMessage(UserModelDB User, Message? message_request, string? caption = null, CancellationToken cancellationToken = default)
     {
         string usage = caption ?? "Бот-обормот";
 
@@ -458,7 +466,6 @@ public class UpdateHandler : IUpdateHandler
 
         long chat_id_old = User.ChatId;
         int message_id_old = User.MessageId;
-        User.ChatId = default;
         User.MessageId = default;
         lock (ServerContext.DbLocker)
         {
@@ -466,7 +473,7 @@ public class UpdateHandler : IUpdateHandler
             _context.SaveChanges();
         }
 
-        Message msg_res = await _botClient.SendTextMessageAsync(message_request.Chat.Id, usage,
+        Message msg_res = await _botClient.SendTextMessageAsync(message_request?.Chat.Id ?? chat_id_old, usage,
         parseMode: ParseMode.Html,
         replyMarkup: kb_rows.Any() ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
         cancellationToken: cancellationToken);
@@ -490,8 +497,8 @@ public class UpdateHandler : IUpdateHandler
                 _logger.LogError("error {B8F28B15-5E87-444C-8718-9FA44724CF23}", ex);
             }
         }
-
-        await _botClient.DeleteMessageAsync(message_request.Chat.Id, message_request.MessageId, cancellationToken: cancellationToken);
+        if (message_request is not null)
+            await _botClient.DeleteMessageAsync(message_request.Chat.Id, message_request.MessageId, cancellationToken: cancellationToken);
         return msg_res;
     }
 
@@ -519,7 +526,7 @@ public class UpdateHandler : IUpdateHandler
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
     }
 
-    private UserResponseModel CheckTelegramUser(User? from)
+    private static UserResponseModel CheckTelegramUser(User? from)
     {
         UserResponseModel res = new();
         if (from is null)

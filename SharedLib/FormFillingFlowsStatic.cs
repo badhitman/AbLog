@@ -27,7 +27,7 @@ public static class FormFillingFlowsStatic
         new PropertyFormSet(nameof(MqttConfigModel.Username), "Логин для MQTT"),
         new PropertyFormSet(nameof(MqttConfigModel.Password), "Пароль для MQTT"),
         new PropertyFormSet(nameof(MqttConfigModel.Secret), "Секретная фраза для шифрования трафика"),
-        //new PropertyFormSet(nameof(MqttConfigModel.AutoStart), "Автозапуск", new[]{ "Да - автостарт", "Без автостарта" })
+        new PropertyFormSet(nameof(MqttConfigModel.PrefixMqtt), "Префикс MQTT топиков")
     };
 }
 

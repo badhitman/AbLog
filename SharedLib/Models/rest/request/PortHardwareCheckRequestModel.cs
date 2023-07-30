@@ -17,7 +17,7 @@ public class PortHardwareCheckRequestModel
     /// <summary>
     /// Номер порта
     /// </summary>
-    public int PortNum { get; set; }
+    public uint PortNum { get; set; }
 
     /// <summary>
     /// Создать порт в базе данных (если отсуствует)
