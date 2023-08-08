@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<RootNamespace>ServerLib</RootNamespace>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<VersionPrefix>3</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>

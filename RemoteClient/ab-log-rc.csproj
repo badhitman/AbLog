@@ -12,7 +12,14 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnableDefaultCssItems>false</EnableDefaultCssItems>
-
+		<VersionPrefix>3</VersionPrefix>
+		<VersionSuffix>beta</VersionSuffix>
+		<Version>$(VersionPrefix).0.0-$(VersionSuffix)</Version>
+		<Copyright>open source</Copyright>
+		<Description>Клиент ab-log (неофициальный)</Description>
+		<PackageProjectUrl>https://github.com/badhitman/AbLog</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/badhitman/AbLog</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!-- Display name -->
 		<ApplicationTitle>RemoteClient</ApplicationTitle>
 

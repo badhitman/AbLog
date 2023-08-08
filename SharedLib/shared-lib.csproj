@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SharedLib</RootNamespace>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <VersionPrefix>3</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.0.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="7.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="7.0.10" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	
