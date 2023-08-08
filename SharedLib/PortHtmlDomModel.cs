@@ -1,4 +1,8 @@
-﻿using System.Collections.Specialized;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using System.Collections.Specialized;
 using System.Web;
 
 namespace SharedLib;
@@ -28,13 +32,13 @@ public class PortHtmlDomModel : HtmlDomModel
 
         last_tag_name = "";
         string res = "";
-        foreach (TreeItemDataModel item in this)
+        foreach (HtmlDomTreeItemDataModel item in this)
             ReadNode(ref res, item);
 
         return res;
     }
 
-    void ReadNode(ref string tg_resp_html, TreeItemDataModel item, int deep_num = 0)
+    void ReadNode(ref string tg_resp_html, HtmlDomTreeItemDataModel item, int deep_num = 0)
     {
         string _pref = "";
         for (int i = 0; i < deep_num; i++)
@@ -72,7 +76,7 @@ public class PortHtmlDomModel : HtmlDomModel
                 {
                     last_tag_name = "";
                     deep_num++;
-                    foreach (TreeItemDataModel sub_item in item.TreeItems.Where(x => !x.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase)))
+                    foreach (HtmlDomTreeItemDataModel sub_item in item.TreeItems.Where(x => !x.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase)))
                         ReadNode(ref tg_resp_html, sub_item, deep_num);
                 }
                 break;
@@ -108,7 +112,7 @@ public class PortHtmlDomModel : HtmlDomModel
                 {
                     deep_num++;
                     last_tag_name = "";
-                    foreach (TreeItemDataModel sub_item in item.TreeItems)
+                    foreach (HtmlDomTreeItemDataModel sub_item in item.TreeItems)
                         ReadNode(ref tg_resp_html, sub_item, deep_num);
                 }
                 if (tg_resp_html.TrimEnd().EndsWith("○"))
@@ -118,7 +122,7 @@ public class PortHtmlDomModel : HtmlDomModel
         last_tag_name = item.NodeName;
     }
 
-    static void ReadSelectNode(ref string tg_resp_html, TreeItemDataModel item, string _pref)
+    static void ReadSelectNode(ref string tg_resp_html, HtmlDomTreeItemDataModel item, string _pref)
     {
         string selected_val = GetSelectedItem(item.TreeItems);
 
@@ -132,7 +136,7 @@ public class PortHtmlDomModel : HtmlDomModel
             return "";
 
         string? value_prop = null; ;
-        foreach (TreeItemDataModel item in treeItems)
+        foreach (HtmlDomTreeItemDataModel item in treeItems)
         {
             if (item.Attributes?.Any(x => x.Key.Equals("selected", StringComparison.OrdinalIgnoreCase)) == true)
             {

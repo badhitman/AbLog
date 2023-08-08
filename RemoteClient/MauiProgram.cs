@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
 using System.Reflection;
 using Newtonsoft.Json;

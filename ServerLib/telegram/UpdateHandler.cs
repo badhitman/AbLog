@@ -1,4 +1,8 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Telegram.Bot.Types.ReplyMarkups;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

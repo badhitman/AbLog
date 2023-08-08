@@ -15,7 +15,7 @@
             <h4>@NodeData.Text</h4>
             @if (NodeData.TreeItems?.Any() == true)
             {
-                foreach (TreeItemDataModel node in NodeData.TreeItems)
+                foreach (HtmlDomTreeItemDataModel node in NodeData.TreeItems)
                 {
                     <HtmlNodeTranslatorComponent NodeData="node" />
                 }
@@ -26,7 +26,7 @@
 <ShowMessagesComponent @ref="showMessages" />
 @code {
     [Parameter, EditorRequired]
-    public TreeItemDataModel NodeData { get; set; } = default!;
+    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
 
     [CascadingParameter]
     public int? Id { get; set; }

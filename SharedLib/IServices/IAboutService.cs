@@ -1,0 +1,13 @@
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+namespace SharedLib;
+
+/// <summary>
+/// О программе
+/// </summary>
+public interface IAboutService
+{
+
+}

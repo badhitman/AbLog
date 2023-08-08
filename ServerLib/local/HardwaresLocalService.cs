@@ -307,7 +307,7 @@ public class HardwaresLocalService : IHardwaresService
         string? _port_num;
         string? _href;
         dom.RemoveWhere(x => !x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) || (x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) && !x.Attributes?.Any(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true) == true));
-        foreach (TreeItemDataModel link in dom)
+        foreach (HtmlDomTreeItemDataModel link in dom)
         {
             _href = link.Attributes!.First(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
             hw_request.Path = _href;

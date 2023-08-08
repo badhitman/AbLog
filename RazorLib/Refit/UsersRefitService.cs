@@ -8,7 +8,7 @@ using SharedLib;
 namespace RazorLib;
 
 /// <summary>
-/// 
+/// Пользователи
 /// </summary>
 public class UsersRefitService : IUsersService
 {

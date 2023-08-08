@@ -1,4 +1,8 @@
-﻿using Telegram.Bot.Types;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using Telegram.Bot.Types;
 using SharedLib;
 
 namespace ServerLib;

@@ -1,0 +1,24 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inject ISnackbar _snackbar;
+@inject IAboutService _about;
+
+@inherits BlazorBusyComponentBaseModel
+
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else
+{
+
+}
+
+@code {
+
+}

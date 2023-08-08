@@ -64,7 +64,7 @@
                 @NodeData.Title
                 @if (NodeData.TreeItems?.Any() == true)
                 {
-                    foreach (TreeItemDataModel node in NodeData.TreeItems)
+                    foreach (HtmlDomTreeItemDataModel node in NodeData.TreeItems)
                     {
                         <HtmlNodeTranslatorComponent NodeData="node" />
                     }
@@ -76,7 +76,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public TreeItemDataModel NodeData { get; set; } = default!;
+    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
 
     static string[] input_tags = new string[] { "input", "select" };
 

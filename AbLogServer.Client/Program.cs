@@ -1,3 +1,7 @@
+////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor.Services;

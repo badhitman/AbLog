@@ -1,4 +1,8 @@
-﻿using AngleSharp.Html.Dom;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using AngleSharp.Html.Dom;
 using AngleSharp.Dom;
 using AngleSharp;
 
@@ -7,7 +11,7 @@ namespace SharedLib;
 /// <summary>
 /// 
 /// </summary>
-public class TreeItemDataModel
+public class HtmlDomTreeItemDataModel
 {
     /// <summary>
     /// 
@@ -41,7 +45,7 @@ public class TreeItemDataModel
     /// <summary>
     /// 
     /// </summary>
-    public TreeItemDataModel? Parent { get; set; }
+    public HtmlDomTreeItemDataModel? Parent { get; set; }
 
     /// <summary>
     /// Text content (HTML)
@@ -71,7 +75,7 @@ public class TreeItemDataModel
     /// <summary>
     /// 
     /// </summary>
-    public TreeItemDataModel(INode cn)
+    public HtmlDomTreeItemDataModel(INode cn)
     {
         NodeName = cn.NodeName.ToLower().Trim();
         NodeHtml = cn.ToHtml().Trim();

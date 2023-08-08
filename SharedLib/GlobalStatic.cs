@@ -235,6 +235,10 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
+        public const string About = "about";
+        /// <summary>
+        /// 
+        /// </summary>
         public const string Commands = "commands";
         /// <summary>
         /// 
@@ -305,7 +309,7 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
-        public const string STOP = "stop";        
+        public const string STOP = "stop";
         /// <summary>
         /// 
         /// </summary>

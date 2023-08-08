@@ -12,7 +12,7 @@
         <optgroup label="@label">
             @if (NodeData.TreeItems?.Any() == true)
             {
-                foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
+                foreach (HtmlDomTreeItemDataModel opt_node in NodeData.TreeItems)
                 {
                     <HtmlSelectOptionsTranslatorComponent NodeData="opt_node" />
                 }
@@ -43,7 +43,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public TreeItemDataModel NodeData { get; set; } = default!;
+    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }

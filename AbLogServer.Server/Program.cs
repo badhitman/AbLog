@@ -1,3 +1,7 @@
+////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
 using System.Text.Json.Serialization;
 using System.Runtime.Versioning;
 using Telegram.Bot.Services;

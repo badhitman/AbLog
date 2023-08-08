@@ -48,7 +48,7 @@
 
                 <CascadingValue Value="InputName" Name="InputName">
                     <CascadingValue Value="InputValue" Name="InputValue">
-                        @foreach (TreeItemDataModel opt_node in NodeData.TreeItems)
+                        @foreach (HtmlDomTreeItemDataModel opt_node in NodeData.TreeItems)
                         {
                             <HtmlSelectOptionsTranslatorComponent NodeData="opt_node" />
                         }
@@ -65,7 +65,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public TreeItemDataModel NodeData { get; set; } = default!;
+    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }
@@ -149,7 +149,7 @@
     {
         string? res = "";
 
-        foreach (TreeItemDataModel el in options_or_optgroups)
+        foreach (HtmlDomTreeItemDataModel el in options_or_optgroups)
         {
             if (el.Attributes?.Any(x => x.Key.Equals("selected")) == true)
                 return el.Attributes?.FirstOrDefault().Value;

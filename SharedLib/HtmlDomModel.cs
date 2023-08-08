@@ -1,4 +1,8 @@
-﻿using System.Text.RegularExpressions;
+﻿////////////////////////////////////////////////
+// © https://github.com/badhitman 
+////////////////////////////////////////////////
+
+using System.Text.RegularExpressions;
 using AngleSharp.Html.Parser;
 using AngleSharp.Html.Dom;
 using AngleSharp.Dom;
@@ -8,7 +12,7 @@ namespace SharedLib;
 /// <summary>
 /// 
 /// </summary>
-public class HtmlDomModel : HashSet<TreeItemDataModel>
+public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
 {
     /// <summary>
     /// 
@@ -40,7 +44,7 @@ public class HtmlDomModel : HashSet<TreeItemDataModel>
                 if ((cn is IText && cn.Text().Trim().Equals("|")) || (cn is IHtmlAnchorElement && cn.Text().Trim().Equals("Back", StringComparison.OrdinalIgnoreCase)))
                     continue;
 
-                TreeItemDataModel t = new(cn);
+                HtmlDomTreeItemDataModel t = new(cn);
 
                 if (cn.ChildNodes.Any())
                 {
@@ -55,14 +59,14 @@ public class HtmlDomModel : HashSet<TreeItemDataModel>
             Remove(this.First());
     }
 
-    void InjectChilds(ref TreeItemDataModel nd, INodeList nls)
+    void InjectChilds(ref HtmlDomTreeItemDataModel nd, INodeList nls)
     {
         foreach (INode cn in nls)
         {
             if ((cn is IText && cn.Text().Trim().Equals("|")) || (cn is IHtmlAnchorElement && cn.Text().Trim().Equals("Back", StringComparison.OrdinalIgnoreCase)))
                 continue;
 
-            TreeItemDataModel t = new(cn) { Parent = nd };
+            HtmlDomTreeItemDataModel t = new(cn) { Parent = nd };
             if (cn.ChildNodes.Any())
             {
                 t.TreeItems = new();
