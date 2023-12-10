@@ -3,8 +3,8 @@ Description=AB-LOG App
 
 [Service]
 Type=notify
-WorkingDirectory=/srv/service/net6.0/ablog
-ExecStart=/usr/bin/dotnet /srv/service/net6.0/ablog/ab-log.Server.dll
+WorkingDirectory=/srv/service/net8.0/ablog
+ExecStart=/usr/bin/dotnet /srv/service/net8.0/ablog/ab-log.Server.dll
 
 # to query logs using journalctl, set a logical name here
 SyslogIdentifier=ABLog
