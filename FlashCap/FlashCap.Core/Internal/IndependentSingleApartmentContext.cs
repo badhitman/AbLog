@@ -117,7 +117,7 @@ internal sealed class IndependentSingleApartmentContext :
 
         this.thread = new(this.ThreadEntry);
         this.thread.IsBackground = true;
-        //this.thread.SetApartmentState(ApartmentState.STA);   // Improved compatibility
+        this.thread.SetApartmentState(ApartmentState.STA);   // Improved compatibility
         this.thread.Start();
 
         this.ready.Wait();
@@ -197,6 +197,27 @@ internal sealed class IndependentSingleApartmentContext :
         }, null);
 
         await tcs.Task.
+            ConfigureAwait(false);
+    }
+
+    public async Task<T> InvokeAsync<T>(Func<T> action, CancellationToken ct)
+    {
+        var tcs = new TaskCompletionSource<T>();
+        using var _ = ct.Register(() => tcs.TrySetCanceled());
+
+        this.Post(_ =>
+        {
+            try
+            {
+                tcs.TrySetResult(action());
+            }
+            catch (Exception ex)
+            {
+                tcs.TrySetException(ex);
+            }
+        }, null);
+
+        return await tcs.Task.
             ConfigureAwait(false);
     }
 

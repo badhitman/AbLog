@@ -76,7 +76,7 @@ public class ToolsLocalService : IToolsService
         //    IgnoreCertificateRevocationErrors = true
         //};
         MqttClientOptions mqttClientOptions = new MqttClientOptionsBuilder()
-           .WithTls(p => p.CertificateValidationHandler = e => { return true; })
+           .WithTlsOptions(p => p.WithAllowUntrustedCertificates(true))
            .WithClientId(conf.ClientId)
            .WithTcpServer(conf.Server, conf.Port)
            .WithCredentials(conf.Username, conf.Password)

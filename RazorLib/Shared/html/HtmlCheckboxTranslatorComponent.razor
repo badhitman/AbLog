@@ -6,7 +6,7 @@
 @inject ClientConfigModel _conf
 @inject ISnackbar _snackbar
 
-<input type="checkbox" @bind="IsChecked" name="@InputValue" class="form-check-input" aria-describedby="@($"{InputName}Help")" />
+<input type="checkbox" @bind="isChecked" name="@InputValue" class="form-check-input" aria-describedby="@($"{InputName}Help")" />
 <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
 
 @code {
@@ -16,8 +16,7 @@
     [Parameter, EditorRequired]
     public string? InputValue { get; set; } = default!;
 
-    [Parameter, EditorRequired]
-    public bool IsChecked
+    public bool isChecked
     {
         set
         {

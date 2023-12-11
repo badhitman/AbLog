@@ -51,7 +51,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     /// 
     /// </summary>
     protected MqttClientOptions MqttClientOptions => new MqttClientOptionsBuilder()
-                .WithTls(p => p.CertificateValidationHandler = e => { return true; })
+                .WithTlsOptions(p => p.WithAllowUntrustedCertificates(true))
                 .WithMaximumPacketSize(_mqtt_settings.MessageMaxSizeBytes)
                 .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500)
                 .WithClientId(_mqtt_settings.ClientId)
@@ -101,7 +101,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
         }
         catch (Exception ex)
         {
-            _logger.LogError(nameof(StartService), ex);
+            _logger.LogError(ex, nameof(StartService));
             res.AddError(ex.Message);
         }
         return res;

@@ -17,8 +17,8 @@
                 <button @onclick="() => SendForm(InputName, InputValue)" type="button" class="btn btn-warning">@InputValue</button>
                 break;
             case InputFormTypesEnum.Checkbox:
-                bool is_checked = NodeData.Attributes?.Any(x => x.Key.Equals("checked", StringComparison.OrdinalIgnoreCase)) == true;
-                <HtmlCheckboxTranslatorComponent SetValueHandler="SetInputValue" InputName="@InputName" InputValue="@InputValue" IsChecked="is_checked" />
+                //bool is_checked = NodeData.Attributes?.Any(x => x.Key.Equals("checked", StringComparison.OrdinalIgnoreCase)) == true;
+                <HtmlCheckboxTranslatorComponent SetValueHandler="SetInputValue" InputName="@InputName" InputValue="@InputValue" />
                 break;
             default:
                 string _size = NodeData.Attributes?.FirstOrDefault(x => x.Key.Equals("size", StringComparison.OrdinalIgnoreCase)).Value ?? "20";

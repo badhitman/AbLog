@@ -48,7 +48,7 @@ public static class CipherService
     public static async Task<byte[]> EncryptAsync(byte[] clearBytes, string EncryptionKey, byte[] salt)
     {
         using Aes encryption = Aes.Create();
-        using Rfc2898DeriveBytes pdb = new(EncryptionKey, salt);
+        using Rfc2898DeriveBytes pdb = new(EncryptionKey, salt, 3, hashAlgorithm: HashAlgorithmName.SHA256);
         encryption.Key = pdb.GetBytes(secret_key_size);
         encryption.IV = pdb.GetBytes(iv_key_size);
         using MemoryStream ms = new();
@@ -70,7 +70,7 @@ public static class CipherService
     public static async Task<byte[]> DecryptAsync(byte[] cipherBytes, string EncryptionKey, byte[] salt)
     {
         using Aes encryption = Aes.Create();
-        using Rfc2898DeriveBytes pdb = new(EncryptionKey, salt);
+        using Rfc2898DeriveBytes pdb = new(EncryptionKey, salt, 3, hashAlgorithm: HashAlgorithmName.SHA256);
         encryption.Key = pdb.GetBytes(secret_key_size);
         encryption.IV = pdb.GetBytes(iv_key_size);
         using MemoryStream ms = new();
