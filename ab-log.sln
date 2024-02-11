@@ -39,7 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{15B6F8D0-837
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web", "ab-log.web\ab-log.web\ab-log.web.csproj", "{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web.client", "ab-log.web\ab-log.web.Client\ab-log.web.client.csproj", "{4804BDE0-901E-4DB1-9560-8FA5710B0788}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web.client", "ab-log.web\ab-log.web.client\ab-log.web.client.csproj", "{4804BDE0-901E-4DB1-9560-8FA5710B0788}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.app", "ab-log.app\ab-log.app.csproj", "{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}"
 EndProject
