@@ -1,0 +1,26 @@
+﻿[Unit]
+Description=AB-LOG App
+
+[Service]
+Type=notify
+WorkingDirectory=/srv/service/net8.0/ablog
+ExecStart=/usr/bin/dotnet /srv/service/net8.0/ablog/ab-log.Server.dll
+
+# to query logs using journalctl, set a logical name here
+SyslogIdentifier=ABLog
+
+# To update permissions, use 'chown usa -R /srv/service' to take ownership of the folder and files,
+#       Use 'chmod +x /srv/service' to allow execution of the executable file
+User=usa
+
+# ensure the service restarts after crashing
+Restart=always
+# amount of time to wait before restarting the service                        
+RestartSec=5 
+
+# This environment variable is necessary when dotnet isn't loaded for the specified user.
+# To figure out this value, run 'env | grep DOTNET_ROOT' when dotnet has been loaded into your shell.
+Environment=DOTNET_ROOT=/usr/lib64/dotnet
+
+[Install]
+WantedBy=multi-user.target

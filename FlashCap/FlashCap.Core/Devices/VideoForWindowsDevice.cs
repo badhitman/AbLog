@@ -12,11 +12,13 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Runtime.Versioning;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FlashCap.Devices;
 
+[SupportedOSPlatform("windows")]
 public sealed class VideoForWindowsDevice : CaptureDevice
 {
     private readonly TimestampCounter counter = new();
@@ -135,15 +137,15 @@ public sealed class VideoForWindowsDevice : CaptureDevice
                 throw;
             }
 
-                    ///////////////////////////////////////
+            ///////////////////////////////////////
 
-                    this.handle = handle;
+            this.handle = handle;
 
-                    // https://stackoverflow.com/questions/4097235/is-it-necessary-to-gchandle-alloc-each-callback-in-a-class
-                    this.thisPin = GCHandle.Alloc(this, GCHandleType.Normal);
-                    this.callback = this.CallbackEntry;
+            // https://stackoverflow.com/questions/4097235/is-it-necessary-to-gchandle-alloc-each-callback-in-a-class
+            this.thisPin = GCHandle.Alloc(this, GCHandleType.Normal);
+            this.callback = this.CallbackEntry;
 
-                    NativeMethods_VideoForWindows.capSetCallbackFrame(handle, this.callback);
+            NativeMethods_VideoForWindows.capSetCallbackFrame(handle, this.callback);
         }, ct);
     }
 

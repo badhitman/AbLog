@@ -29,7 +29,7 @@ public sealed class V4L2Devices : CaptureDevices
         {
             var fmtdesc = Interop.Create_v4l2_fmtdesc();
             fmtdesc.index = (uint)index;
-            fmtdesc.type = (uint)v4l2_buf_type.VIDEO_CAPTURE;
+            fmtdesc.type = (uint)V4l2_buf_type.VIDEO_CAPTURE;
             
             return
                 ioctl(fd, Interop.VIDIOC_ENUM_FMT, fmtdesc) == 0 ? (v4l2_fmtdesc?)fmtdesc : null;
@@ -84,12 +84,12 @@ public sealed class V4L2Devices : CaptureDevices
                     Select(r => new FrameSize
                         { Width = r.Width, Height = r.Height, IsDiscrete = false, });
 
-            return (v4l2_frmsizetypes)frmsizeenum.type switch
+            return (V4l2_frmsizetypes)frmsizeenum.type switch
             {
-                v4l2_frmsizetypes.DISCRETE =>
+                V4l2_frmsizetypes.DISCRETE =>
                     new[] { new FrameSize
                         { Width = (int)frmsizeenum.discrete.width, Height = (int)frmsizeenum.discrete.height, IsDiscrete = true, }, },
-                v4l2_frmsizetypes.STEPWISE =>
+                V4l2_frmsizetypes.STEPWISE =>
                     EnumerateStepWise(frmsizeenum.stepwise),
                 _ =>
                     EnumerateContinuous(frmsizeenum.stepwise),
@@ -146,12 +146,12 @@ public sealed class V4L2Devices : CaptureDevices
                     Select(fps => new FramesPerSecond { Value = fps, IsDiscrete = false, });
             }
 
-            return (v4l2_frmivaltypes)frmivalenum.type switch
+            return (V4l2_frmivaltypes)frmivalenum.type switch
             {
-                v4l2_frmivaltypes.DISCRETE =>
+                V4l2_frmivaltypes.DISCRETE =>
                     new [] { new FramesPerSecond
                         { Value = new Fraction((int)frmivalenum.discrete.denominator, (int)frmivalenum.discrete.numerator), IsDiscrete = true, }, },
-                v4l2_frmivaltypes.STEPWISE =>
+                V4l2_frmivaltypes.STEPWISE =>
                     EnumerateStepWise(frmivalenum.stepwise),
                 _ =>
                     EnumerateContinuous(frmivalenum.stepwise),

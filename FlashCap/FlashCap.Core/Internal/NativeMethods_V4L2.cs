@@ -7,14 +7,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using FlashCap.Internal.V4L2;
 using FlashCap.Utilities;
-
-using static FlashCap.Internal.V4L2.NativeMethods_V4L2_Interop;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace FlashCap.Internal;
 
@@ -26,7 +23,7 @@ internal static class NativeMethods_V4L2
 
     static NativeMethods_V4L2()
     {
-        utsname buf;
+        Utsname buf;
         while (uname(out buf) != 0)
         {
             var hr = Marshal.GetLastWin32Error();
@@ -60,6 +57,9 @@ internal static class NativeMethods_V4L2
             case "mips":
             case "mipsel":
                 Interop = new NativeMethods_V4L2_Interop_mips();
+                break;
+            case "loongarch64":
+                Interop = new NativeMethods_V4L2_Interop_loongarch64();
                 break;
             default:
                 throw new InvalidOperationException(
@@ -97,7 +97,7 @@ internal static class NativeMethods_V4L2
     public const int EINVAL = 22;
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct timeval
+    public struct Timeval
     {
         public IntPtr tv_sec;
         public IntPtr tv_usec;
@@ -148,7 +148,7 @@ internal static class NativeMethods_V4L2
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct pollfd
+    public struct Pollfd
     {
         public int fd;
         public POLLBITS events;
@@ -157,7 +157,7 @@ internal static class NativeMethods_V4L2
 
     [DllImport("libc", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
     public static extern int poll(
-        [In, Out] pollfd[] fds, int nfds, int timeout);
+        [In, Out] Pollfd[] fds, int nfds, int timeout);
 
     [Flags]
     public enum PROT
@@ -266,7 +266,7 @@ internal static class NativeMethods_V4L2
     private const int _UTSNAME_LENGTH = 65;
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct utsname
+    public struct Utsname
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = _UTSNAME_LENGTH)] public string sysname;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = _UTSNAME_LENGTH)] public string nodename;
@@ -277,8 +277,8 @@ internal static class NativeMethods_V4L2
     }
 
     [DllImport("libc", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-    public static extern int uname(out utsname buf);
-    
+    public static extern int uname(out Utsname buf);
+
     ///////////////////////////////////////////////////////////
 
     public static VideoCharacteristics? CreateVideoCharacteristics(

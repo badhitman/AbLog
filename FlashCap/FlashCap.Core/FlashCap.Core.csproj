@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<NoWarn>$(NoWarn);CS0649</NoWarn>
+		<NoWarn>$(NoWarn);CS0649;</NoWarn>
 		<IsPackable>true</IsPackable>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>

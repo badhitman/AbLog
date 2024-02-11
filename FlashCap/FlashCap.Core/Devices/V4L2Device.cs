@@ -95,7 +95,7 @@ public sealed class V4L2Device : CaptureDevice
                     fmt_pix.field = (uint)v4l2_field.ANY;
                     
                     var format = Interop.Create_v4l2_format();
-                    format.type = (uint)v4l2_buf_type.VIDEO_CAPTURE;
+                    format.type = (uint)V4l2_buf_type.VIDEO_CAPTURE;
                     format.fmt_pix = fmt_pix;
                     
                     if (ioctl(fd, Interop.VIDIOC_S_FMT, format) == 0)
@@ -112,8 +112,8 @@ public sealed class V4L2Device : CaptureDevice
 
                 var requestbuffers = Interop.Create_v4l2_requestbuffers();
                 requestbuffers.count = BufferCount;   // Flipping
-                requestbuffers.type = (uint)v4l2_buf_type.VIDEO_CAPTURE;
-                requestbuffers.memory = (uint)v4l2_memory.MMAP;
+                requestbuffers.type = (uint)V4l2_buf_type.VIDEO_CAPTURE;
+                requestbuffers.memory = (uint)V4l2_memory.MMAP;
 
                 if (ioctl(fd, Interop.VIDIOC_REQBUFS, requestbuffers) < 0)
                 {
@@ -125,9 +125,9 @@ public sealed class V4L2Device : CaptureDevice
                 for (var index = 0; index < requestbuffers.count; index++)
                 {
                     var buffer = Interop.Create_v4l2_buffer();
-                    buffer.type = (uint)v4l2_buf_type.VIDEO_CAPTURE;
-                    buffer.memory = (uint)v4l2_memory.MMAP;
-                    buffer.index = (uint)index;
+                    buffer.Type = (uint)V4l2_buf_type.VIDEO_CAPTURE;
+                    buffer.memory = (uint)V4l2_memory.MMAP;
+                    buffer.Index = (uint)index;
                     
                     if (ioctl(fd, Interop.VIDIOC_QUERYBUF, buffer) < 0)
                     {
@@ -232,7 +232,7 @@ public sealed class V4L2Device : CaptureDevice
                 this.IsRunning = false;
                 ioctl(
                     this.fd, Interop.VIDIOC_STREAMOFF,
-                    (int)v4l2_buf_type.VIDEO_CAPTURE);
+                    (int)V4l2_buf_type.VIDEO_CAPTURE);
             }
                 
             write(this.abortwfd, new byte[] { 0x01 }, 1);
@@ -257,20 +257,20 @@ public sealed class V4L2Device : CaptureDevice
         
         var fds = new[]
         {
-            new pollfd
+            new Pollfd
             {
                 fd = this.abortrfd,
                 events = POLLBITS.POLLIN | POLLBITS.POLLHUP | POLLBITS.POLLRDHUP | POLLBITS.POLLERR,
             },
-            new pollfd
+            new Pollfd
             {
                 fd = this.fd,
                 events = POLLBITS.POLLIN,
             }
         };
         var buffer = Interop.Create_v4l2_buffer();
-        buffer.type = (uint)v4l2_buf_type.VIDEO_CAPTURE;
-        buffer.memory = (uint)v4l2_memory.MMAP;
+        buffer.Type = (uint)V4l2_buf_type.VIDEO_CAPTURE;
+        buffer.memory = (uint)V4l2_memory.MMAP;
 
         try
         {
@@ -319,8 +319,8 @@ public sealed class V4L2Device : CaptureDevice
                         {
                             this.frameProcessor.OnFrameArrived(
                                 this,
-                                this.pBuffers[buffer.index],
-                                (int)buffer.bytesused,
+                                this.pBuffers[buffer.Index],
+                                (int)buffer.Bytesused,
                                 // buffer.timestamp is untrustworthy.
                                 this.counter.ElapsedMicroseconds,
                                 this.frameIndex++);
@@ -384,7 +384,7 @@ public sealed class V4L2Device : CaptureDevice
 
                 if (ioctl(
                         this.fd, Interop.VIDIOC_STREAMON,
-                        (int)v4l2_buf_type.VIDEO_CAPTURE) < 0)
+                        (int)V4l2_buf_type.VIDEO_CAPTURE) < 0)
                 {
                     var code = Marshal.GetLastWin32Error();
                     throw new ArgumentException(
@@ -406,7 +406,7 @@ public sealed class V4L2Device : CaptureDevice
                 this.IsRunning = false;
                 if (ioctl(
                         this.fd, Interop.VIDIOC_STREAMOFF,
-                        (int)v4l2_buf_type.VIDEO_CAPTURE) < 0)
+                        (int)V4l2_buf_type.VIDEO_CAPTURE) < 0)
                 {
                     var code = Marshal.GetLastWin32Error();
                     this.IsRunning = true;

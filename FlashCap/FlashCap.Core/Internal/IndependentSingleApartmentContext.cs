@@ -14,6 +14,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -111,13 +112,16 @@ internal sealed class IndependentSingleApartmentContext :
     private int targetThreadId;
     private int recursiveCount;
 
+    [SupportedOSPlatform("windows")]
     public IndependentSingleApartmentContext()
     {
         Debug.Assert(NativeMethods.CurrentPlatform == NativeMethods.Platforms.Windows);
 
-        this.thread = new(this.ThreadEntry);
-        this.thread.IsBackground = true;
-        this.thread.SetApartmentState(ApartmentState.STA);   // Improved compatibility
+        this.thread = new(this.ThreadEntry)
+        {
+            IsBackground = true
+        };
+        thread.SetApartmentState(ApartmentState.STA);   // Improved compatibility
         this.thread.Start();
 
         this.ready.Wait();

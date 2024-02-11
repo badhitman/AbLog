@@ -7,13 +7,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+using FlashCap.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Security;
-using FlashCap.Utilities;
-using static FlashCap.Devices.DirectShowDevice;
 
 namespace FlashCap.Internal;
 
@@ -52,12 +52,14 @@ internal static class NativeMethods_DirectShow
         [PreserveSig] new int Save(System.Runtime.InteropServices.ComTypes.IStream stm, bool clearDirty);
         [PreserveSig] new int GetSizeMax(out long size);
 
-        [PreserveSig] int BindToObject(
+        [PreserveSig]
+        int BindToObject(
             System.Runtime.InteropServices.ComTypes.IBindCtx? bindContext,
             IMoniker? makeToLeft,
             in Guid riidResult,
             [MarshalAs(UnmanagedType.Interface)] out object? result);
-        [PreserveSig] int BindToStorage(
+        [PreserveSig]
+        int BindToStorage(
             System.Runtime.InteropServices.ComTypes.IBindCtx? bindContext,
             IMoniker? makeToLeft,
             in Guid riidResult,
@@ -71,9 +73,10 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IEnumMoniker
     {
-        [PreserveSig] int Next(
+        [PreserveSig]
+        int Next(
             int request,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] IMoniker?[] monikers,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] IMoniker?[] monikers,
             out int fetched);
         [PreserveSig] int Skip(int count);
         [PreserveSig] int Reset();
@@ -85,7 +88,8 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface ICreateDevEnum
     {
-        [PreserveSig] int CreateClassEnumerator(
+        [PreserveSig]
+        int CreateClassEnumerator(
             in Guid type,
             out IEnumMoniker? enumMoniker,
             uint flags);
@@ -97,12 +101,14 @@ internal static class NativeMethods_DirectShow
     public interface IReferenceClock
     {
         [PreserveSig] int GetTime(out long time);
-        [PreserveSig] int AdviseTime(
+        [PreserveSig]
+        int AdviseTime(
             long baseTime,
             long streamTime,
             IntPtr hEvent,
             out IntPtr adviseCookie);
-        [PreserveSig] int AdvisePeriodic(
+        [PreserveSig]
+        int AdvisePeriodic(
             long startTime,
             long periodTime,
             IntPtr hSemaphore,
@@ -190,12 +196,12 @@ internal static class NativeMethods_DirectShow
         Output,
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct PIN_INFO
     {
         public IBaseFilter filter;
         public PIN_DIRECTION dir;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)] public string name;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string name;
     }
 
     [SuppressUnmanagedCodeSecurity]
@@ -203,9 +209,10 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IEnumMediaTypes
     {
-        [PreserveSig] int Next(
+        [PreserveSig]
+        int Next(
             int request,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] AM_MEDIA_TYPE[] mediaTypes,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] AM_MEDIA_TYPE[] mediaTypes,
             out int fetched);
         [PreserveSig] int Skip(int count);
         [PreserveSig] int Reset();
@@ -217,10 +224,12 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IPin
     {
-        [PreserveSig] int Connect(
+        [PreserveSig]
+        int Connect(
             IPin receivePin,
             in AM_MEDIA_TYPE mt);
-        [PreserveSig] int ReceiveConnection(
+        [PreserveSig]
+        int ReceiveConnection(
             IPin pReceivePin,
             in AM_MEDIA_TYPE mt);
         [PreserveSig] int Disconnect();
@@ -231,13 +240,15 @@ internal static class NativeMethods_DirectShow
         [PreserveSig] int QueryId([MarshalAs(UnmanagedType.LPWStr)] out string id);
         [PreserveSig] int QueryAccept(in AM_MEDIA_TYPE mt);
         [PreserveSig] int EnumMediaTypes(out IEnumMediaTypes? enumMediaTypes);
-        [PreserveSig] int QueryInternalConnections(
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=1)] out IPin?[] pins,
+        [PreserveSig]
+        int QueryInternalConnections(
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] out IPin?[] pins,
             ref int pin);
         [PreserveSig] int EndOfStream();
         [PreserveSig] int BeginFlush();
         [PreserveSig] int EndFlush();
-        [PreserveSig] int NewSegment(
+        [PreserveSig]
+        int NewSegment(
             long tStart,
             long tStop,
             double rate);
@@ -248,9 +259,10 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IEnumPins
     {
-        [PreserveSig] int Next(
+        [PreserveSig]
+        int Next(
             int request,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] IPin?[] pins,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] IPin?[] pins,
             out int fetched);
         [PreserveSig] int Skip(int count);
         [PreserveSig] int Reset();
@@ -262,9 +274,10 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IEnumFilters
     {
-        [PreserveSig] int Next(
+        [PreserveSig]
+        int Next(
             int request,
-            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] IPin?[] filters,
+            [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] IPin?[] filters,
             out int fetched);
         [PreserveSig] int Skip(int count);
         [PreserveSig] int Reset();
@@ -276,25 +289,28 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IFilterGraph
     {
-        [PreserveSig] int AddFilter(
+        [PreserveSig]
+        int AddFilter(
             IBaseFilter filter,
             [MarshalAs(UnmanagedType.LPWStr)] string name);
         [PreserveSig] int RemoveFilter(IBaseFilter filter);
         [PreserveSig] int EnumFilters(out IEnumFilters? ppEnum);
-        [PreserveSig] int FindFilterByName(
+        [PreserveSig]
+        int FindFilterByName(
             [MarshalAs(UnmanagedType.LPWStr)] string name,
             out IBaseFilter? filter);
-        [PreserveSig] int ConnectDirect(
+        [PreserveSig]
+        int ConnectDirect(
             IPin pinOut, IPin pinIn, in AM_MEDIA_TYPE mt);
         [PreserveSig] int Reconnect(IPin pin);
         [PreserveSig] int Disconnect(IPin pin);
         [PreserveSig] int SetDefaultSyncSource();
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct FILTER_INFO
     {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst=128)] public string chName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string chName;
         public IFilterGraph graph;
     }
 
@@ -312,14 +328,17 @@ internal static class NativeMethods_DirectShow
         [PreserveSig] new int GetSyncSource(out IReferenceClock? clock);
 
         [PreserveSig] int EnumPins(out IEnumPins? enumPins);
-        [PreserveSig] int FindPin(
+        [PreserveSig]
+        int FindPin(
             [MarshalAs(UnmanagedType.LPWStr)] string id,
             out IPin? pin);
         [PreserveSig] int QueryFilterInfo(out FILTER_INFO info);
-        [PreserveSig] int JoinFilterGraph(
+        [PreserveSig]
+        int JoinFilterGraph(
             IFilterGraph graph,
             [MarshalAs(UnmanagedType.LPWStr)] string name);
-        [PreserveSig] int QueryVendorInfo(
+        [PreserveSig]
+        int QueryVendorInfo(
             [MarshalAs(UnmanagedType.LPWStr)] out string vendorInfo);
     }
 
@@ -328,7 +347,8 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IErrorLog
     {
-        [PreserveSig] int AddError(
+        [PreserveSig]
+        int AddError(
             [MarshalAs(UnmanagedType.LPWStr)] string propName,
             in System.Runtime.InteropServices.ComTypes.EXCEPINFO excepInfo);
     }
@@ -338,11 +358,13 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IPropertyBag
     {
-        [PreserveSig] int Read(
+        [PreserveSig]
+        int Read(
             [MarshalAs(UnmanagedType.LPWStr)] string propName,
             out object value,
             IErrorLog? errorLog);
-        [PreserveSig] int Write(
+        [PreserveSig]
+        int Write(
             [MarshalAs(UnmanagedType.LPWStr)] string propName,
             in object value);
     }
@@ -381,7 +403,8 @@ internal static class NativeMethods_DirectShow
         [PreserveSig] int SetFormat(in AM_MEDIA_TYPE mt);
         [PreserveSig] int GetFormat(out AM_MEDIA_TYPE mt);
         [PreserveSig] int GetNumberOfCapabilities(out int count, out int size);
-        [PreserveSig] int GetStreamCaps(
+        [PreserveSig]
+        int GetStreamCaps(
             int index, out IntPtr pMediaType, out VIDEO_STREAM_CONFIG_CAPS scc);
     }
 
@@ -390,32 +413,40 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IGraphBuilder : IFilterGraph
     {
-        [PreserveSig] new int AddFilter(
+        [PreserveSig]
+        new int AddFilter(
             IBaseFilter filter,
             [MarshalAs(UnmanagedType.LPWStr)] string name);
         [PreserveSig] new int RemoveFilter(IBaseFilter filter);
         [PreserveSig] new int EnumFilters(out IEnumFilters? ppEnum);
-        [PreserveSig] new int FindFilterByName(
+        [PreserveSig]
+        new int FindFilterByName(
             [MarshalAs(UnmanagedType.LPWStr)] string name,
             out IBaseFilter? filter);
-        [PreserveSig] new int ConnectDirect(
+        [PreserveSig]
+        new int ConnectDirect(
             IPin pinOut, IPin pinIn, in AM_MEDIA_TYPE mt);
         [PreserveSig] new int Reconnect(IPin pin);
         [PreserveSig] new int Disconnect(IPin pin);
         [PreserveSig] new int SetDefaultSyncSource();
 
-        [PreserveSig] int Connect(
+        [PreserveSig]
+        int Connect(
             IPin pinOut, IPin pinIn);
-        [PreserveSig] int Render(
+        [PreserveSig]
+        int Render(
             IPin pinOut);
-        [PreserveSig] int RenderFile(
+        [PreserveSig]
+        int RenderFile(
             [MarshalAs(UnmanagedType.LPWStr)] string strFile,
             [MarshalAs(UnmanagedType.LPWStr)] string strPlayList);
-        [PreserveSig] int AddSourceFilter(
+        [PreserveSig]
+        int AddSourceFilter(
             [MarshalAs(UnmanagedType.LPWStr)] string strFileName,
             [MarshalAs(UnmanagedType.LPWStr)] string strFilterName,
             out IBaseFilter? filter);
-        [PreserveSig] int SetLogFile(
+        [PreserveSig]
+        int SetLogFile(
             IntPtr hFile);
         [PreserveSig] int Abort();
         [PreserveSig] int ShouldOperationContinue();
@@ -428,9 +459,11 @@ internal static class NativeMethods_DirectShow
     {
         [PreserveSig] int GetPointer(ref IntPtr ppBuffer);
         [PreserveSig] int GetSize();
-        [PreserveSig] int GetTime(
+        [PreserveSig]
+        int GetTime(
             out long timeStart, out long timeEnd);
-        [PreserveSig] int SetTime(
+        [PreserveSig]
+        int SetTime(
             in long timeStart, in long timeEnd);
         [PreserveSig] int IsSyncPoint();
         [PreserveSig] int SetSyncPoint([MarshalAs(UnmanagedType.Bool)] bool isSyncPoint);
@@ -451,10 +484,12 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface ISampleGrabberCB
     {
-        [PreserveSig] int SampleCB(
+        [PreserveSig]
+        int SampleCB(
             double sampleTime,
             IMediaSample sample);
-        [PreserveSig] int BufferCB(
+        [PreserveSig]
+        int BufferCB(
             double sampleTime,
             IntPtr pBuffer,
             int bufferLen);
@@ -466,20 +501,27 @@ internal static class NativeMethods_DirectShow
     public interface ISampleGrabber :
         IBaseFilter  // ISampleGrabber isn't derived from IBaseFilter, but CLSID_SampleGrabber is implemented it.
     {
-        [PreserveSig] int SetOneShot(
+        [PreserveSig]
+        int SetOneShot(
             [MarshalAs(UnmanagedType.Bool)] bool oneShot);
-        [PreserveSig] int SetMediaType(
+        [PreserveSig]
+        int SetMediaType(
             in AM_MEDIA_TYPE type);
-        [PreserveSig] int GetConnectedMediaType(
+        [PreserveSig]
+        int GetConnectedMediaType(
             out AM_MEDIA_TYPE type);
-        [PreserveSig] int SetBufferSamples(
+        [PreserveSig]
+        int SetBufferSamples(
             [MarshalAs(UnmanagedType.Bool)] bool bufferThem);
-        [PreserveSig] int GetCurrentBuffer(
+        [PreserveSig]
+        int GetCurrentBuffer(
             ref int bufferSize,
             IntPtr pBuffer);
-        [PreserveSig, Obsolete] int GetCurrentSample(
+        [PreserveSig, Obsolete]
+        int GetCurrentSample(
             out IMediaSample? sample);
-        [PreserveSig] int SetCallback(
+        [PreserveSig]
+        int SetCallback(
             ISampleGrabberCB callback,
             int whichMethodToCallback);
     }
@@ -489,33 +531,39 @@ internal static class NativeMethods_DirectShow
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface ICaptureGraphBuilder2
     {
-        [PreserveSig] int SetFiltergraph(
+        [PreserveSig]
+        int SetFiltergraph(
             IGraphBuilder gb);
 
-        [PreserveSig] int GetFiltergraph(
+        [PreserveSig]
+        int GetFiltergraph(
             out IGraphBuilder? gb);
 
-        [PreserveSig] int SetOutputFileName(
+        [PreserveSig]
+        int SetOutputFileName(
             in Guid type,
             [MarshalAs(UnmanagedType.LPWStr)] string strFile,
             out IBaseFilter? filter,
             [MarshalAs(UnmanagedType.Interface)] out object? sink);   // IFileSinkFilter
 
-        [PreserveSig] int FindInterface(
+        [PreserveSig]
+        int FindInterface(
             in Guid category,
             in Guid type,
             IBaseFilter pf,
             in Guid riidResult,
             [MarshalAs(UnmanagedType.Interface)] out object? intf);
 
-        [PreserveSig] int RenderStream(
+        [PreserveSig]
+        int RenderStream(
             in Guid category,
             in Guid type,
             [MarshalAs(UnmanagedType.Interface)] object source,
             IBaseFilter? compressor,
             IBaseFilter? renderer);
 
-        [PreserveSig] int ControlStream(
+        [PreserveSig]
+        int ControlStream(
             in Guid category,
             in Guid type,
             IBaseFilter? filter,
@@ -524,17 +572,20 @@ internal static class NativeMethods_DirectShow
             short startCookie,
             short stopCookie);
 
-        [PreserveSig] int AllocCapFile(
+        [PreserveSig]
+        int AllocCapFile(
             [MarshalAs(UnmanagedType.LPWStr)] string str,
             long size);
-    
-        [PreserveSig] int CopyCaptureFile(
+
+        [PreserveSig]
+        int CopyCaptureFile(
             [MarshalAs(UnmanagedType.LPWStr)] string strOld,
             [MarshalAs(UnmanagedType.LPWStr)] string strNew,
             int fAllowEscAbort,
             [MarshalAs(UnmanagedType.Interface)] object? callback);   // IAMCopyCaptureFileProgress
 
-        [PreserveSig] int FindPin(
+        [PreserveSig]
+        int FindPin(
             [MarshalAs(UnmanagedType.IUnknown)] object source,
             PIN_DIRECTION pindir,
             in Guid category,
@@ -559,16 +610,21 @@ internal static class NativeMethods_DirectShow
         [PreserveSig] int Run();
         [PreserveSig] int Pause();
         [PreserveSig] int Stop();
-        [PreserveSig] int GetState(
+        [PreserveSig]
+        int GetState(
             int msTimeout, out FILTER_STATE state);
-        [PreserveSig] int RenderFile(
+        [PreserveSig]
+        int RenderFile(
             [MarshalAs(UnmanagedType.BStr)] string strFilename);
-        [PreserveSig] int AddSourceFilter(
+        [PreserveSig]
+        int AddSourceFilter(
             [MarshalAs(UnmanagedType.BStr)] string strFilename,
             [MarshalAs(UnmanagedType.IUnknown)] out object? unk);
-        [PreserveSig] int get_FilterCollection(
+        [PreserveSig]
+        int get_FilterCollection(
             [MarshalAs(UnmanagedType.IUnknown)] out object? unk);
-        [PreserveSig] int get_RegFilterCollection(
+        [PreserveSig]
+        int get_RegFilterCollection(
             [MarshalAs(UnmanagedType.IUnknown)] out object? unk);
         [PreserveSig] int StopWhenReady();
     }
@@ -630,6 +686,7 @@ internal static class NativeMethods_DirectShow
         in Guid iid,
         [MarshalAs(UnmanagedType.IUnknown)] out object? created);
 
+    [SupportedOSPlatform("windows")]
     public static void SafeReleaseBlock<TIF>(this TIF intf, Action<TIF> action)
         where TIF : notnull
     {
@@ -643,6 +700,7 @@ internal static class NativeMethods_DirectShow
         }
     }
 
+    [SupportedOSPlatform("windows")]
     public static TR SafeReleaseBlock<TR, TIF>(this TIF intf, Func<TIF, TR> action)
         where TIF : notnull
     {
@@ -656,6 +714,7 @@ internal static class NativeMethods_DirectShow
         }
     }
 
+    [SupportedOSPlatform("windows")]
     public static IEnumerable<IMoniker> EnumerateDeviceMoniker(Guid deviceCategory)
     {
         if (CoCreateInstance(
@@ -700,6 +759,7 @@ internal static class NativeMethods_DirectShow
         pb.Read(name, out var value, null) == 0 ?
             (T)value : defaultValue;
 
+    [SupportedOSPlatform("windows")]
     public static IEnumerable<IPin> EnumeratePins(
         this IBaseFilter baseFilter)
     {
@@ -727,7 +787,7 @@ internal static class NativeMethods_DirectShow
         public readonly AM_MEDIA_TYPE PartialMediaType;
         public readonly NativeMethods.VIDEOINFOHEADER VideoInformation;
         public readonly VIDEO_STREAM_CONFIG_CAPS Capabilities;
-        
+
         private IntPtr pBih_;
 
         public VideoMediaFormat(
@@ -800,7 +860,7 @@ internal static class NativeMethods_DirectShow
 
             return mediaType;
         }
-        
+
         public VideoCharacteristics? CreateVideoCharacteristics() =>
             NativeMethods.CreateVideoCharacteristics(
                 this.pBih,
@@ -1020,6 +1080,6 @@ internal static class NativeMethods_DirectShow
 
     [DllImport("oleaut32.dll")]
     public static extern int OleCreatePropertyFrame(IntPtr hwndOwner, int x, int y, [MarshalAs(UnmanagedType.LPWStr)] string caption, int cObjects, [MarshalAs(UnmanagedType.Interface)] ref object ppUnk, int cPages, IntPtr lpPageClsID, int lcid, int dwReserved, IntPtr lpvReserved);
-    
+
     #endregion
 }

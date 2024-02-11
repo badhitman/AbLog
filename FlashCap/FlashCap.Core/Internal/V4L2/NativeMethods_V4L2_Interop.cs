@@ -1,9 +1,8 @@
-// This is auto generated code by FlashCap.V4L2Generator [0.14.6]. Do not edit.
-// Linux version 5.13.0-39-generic (buildd@lcy02-amd64-080) (gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, GNU ld (GNU Binutils for Ubuntu) 2.34) #44~20.04.1-Ubuntu SMP Thu Mar 24 16:43:35 UTC 2022
-// Fri, 15 Apr 2022 03:57:16 GMT
+// This is auto generated code by FlashCap.V4L2Generator [1.8.0]. Do not edit.
+// Linux version 4.19.0-19-loongson-3 (abuild@10.40.52.160) (gcc version 8.3.0 (Loongnix 8.3.0-6.lnd.vec.36)) #1 SMP 4.19.190.8.14 Thu Aug 24 08:54:20 UTC 2023
+// Thu, 14 Dec 2023 01:30:19 GMT
 
 using System;
-using System.Runtime.InteropServices;
 
 namespace FlashCap.Internal.V4L2
 {
@@ -41,7 +40,7 @@ namespace FlashCap.Internal.V4L2
         public virtual uint VIDIOC_STREAMON => throw new NotImplementedException();
 
         // Enums
-        public enum v4l2_buf_type
+        public enum V4l2_buf_type
         {
             VIDEO_CAPTURE = 1,
             VIDEO_OUTPUT = 2,
@@ -56,7 +55,6 @@ namespace FlashCap.Internal.V4L2
             SDR_CAPTURE = 11,
             SDR_OUTPUT = 12,
             META_CAPTURE = 13,
-            META_OUTPUT = 14,
             PRIVATE = 128,
         }
 
@@ -74,21 +72,21 @@ namespace FlashCap.Internal.V4L2
             INTERLACED_BT = 9,
         }
 
-        public enum v4l2_frmivaltypes
+        public enum V4l2_frmivaltypes
         {
             DISCRETE = 1,
             CONTINUOUS = 2,
             STEPWISE = 3,
         }
 
-        public enum v4l2_frmsizetypes
+        public enum V4l2_frmsizetypes
         {
             DISCRETE = 1,
             CONTINUOUS = 2,
             STEPWISE = 3,
         }
 
-        public enum v4l2_memory
+        public enum V4l2_memory
         {
             MMAP = 1,
             USERPTR = 2,
@@ -98,85 +96,85 @@ namespace FlashCap.Internal.V4L2
 
 
         // Structures
-        public interface timespec
+        public interface ITimespec
         {
-            IntPtr tv_sec
+            IntPtr Tv_sec
             {
                 get;
                 set;
             }
 
-            IntPtr tv_nsec
+            IntPtr Tv_nsec
             {
                 get;
                 set;
             }
 
         }
-        public virtual timespec Create_timespec() => throw new NotImplementedException();
+        public virtual ITimespec Create_timespec() => throw new NotImplementedException();
 
-        public interface timeval
+        public interface ITimeval
         {
-            IntPtr tv_sec
+            IntPtr Tv_sec
             {
                 get;
                 set;
             }
 
-            IntPtr tv_usec
+            IntPtr Tv_usec
             {
                 get;
                 set;
             }
 
         }
-        public virtual timeval Create_timeval() => throw new NotImplementedException();
+        public virtual ITimeval Create_timeval() => throw new NotImplementedException();
 
-        public interface v4l2_buffer
+        public interface IV4l2_buffer
         {
-            uint index
+            uint Index
             {
                 get;
                 set;
             }
 
-            uint type
+            uint Type
             {
                 get;
                 set;
             }
 
-            uint bytesused
+            uint Bytesused
             {
                 get;
                 set;
             }
 
-            uint flags
+            uint Flags
             {
                 get;
                 set;
             }
 
-            uint field
+            uint Field
             {
                 get;
                 set;
             }
 
-            timeval timestamp
+            ITimeval Timestamp
             {
                 get;
                 set;
             }
 
-            v4l2_timecode timecode
+            IV4l2_timecode Timecode
             {
                 get;
                 set;
             }
 
-            uint sequence
+            uint Sequence
             {
                 get;
                 set;
@@ -224,12 +222,6 @@ namespace FlashCap.Internal.V4L2
                 set;
             }
 
-            int request_fd
-            {
-                get;
-                set;
-            }
-
             uint reserved
             {
                 get;
@@ -237,7 +229,7 @@ namespace FlashCap.Internal.V4L2
             }
 
         }
-        public virtual v4l2_buffer Create_v4l2_buffer() => throw new NotImplementedException();
+        public virtual IV4l2_buffer Create_v4l2_buffer() => throw new NotImplementedException();
 
         public interface v4l2_capability
         {
@@ -364,19 +356,19 @@ namespace FlashCap.Internal.V4L2
                 set;
             }
 
-            v4l2_window fmt_win
+            IV4l2_window fmt_win
             {
                 get;
                 set;
             }
 
-            v4l2_vbi_format fmt_vbi
+            IV4l2_vbi_format fmt_vbi
             {
                 get;
                 set;
             }
 
-            v4l2_sliced_vbi_format fmt_sliced
+            IV4l2_sliced_vbi_format fmt_sliced
             {
                 get;
                 set;
@@ -897,12 +889,6 @@ namespace FlashCap.Internal.V4L2
                 set;
             }
 
-            uint capabilities
-            {
-                get;
-                set;
-            }
-
             uint[] reserved
             {
                 get;
@@ -926,7 +912,7 @@ namespace FlashCap.Internal.V4L2
                 set;
             }
 
-            byte[] reserved
+            byte[] Reserved
             {
                 get;
                 set;
@@ -935,181 +921,181 @@ namespace FlashCap.Internal.V4L2
         }
         public virtual v4l2_sdr_format Create_v4l2_sdr_format() => throw new NotImplementedException();
 
-        public interface v4l2_sliced_vbi_format
+        public interface IV4l2_sliced_vbi_format
         {
-            ushort service_set
+            ushort Service_set
             {
                 get;
                 set;
             }
 
-            ushort[][] service_lines
+            ushort[][] Service_lines
             {
                 get;
                 set;
             }
 
-            uint io_size
+            uint Io_size
             {
                 get;
                 set;
             }
 
-            uint[] reserved
+            uint[] Reserved
             {
                 get;
                 set;
             }
 
         }
-        public virtual v4l2_sliced_vbi_format Create_v4l2_sliced_vbi_format() => throw new NotImplementedException();
+        public virtual IV4l2_sliced_vbi_format Create_v4l2_sliced_vbi_format() => throw new NotImplementedException();
 
-        public interface v4l2_timecode
+        public interface IV4l2_timecode
         {
-            uint type
+            uint Type
             {
                 get;
                 set;
             }
 
-            uint flags
+            uint Flags
             {
                 get;
                 set;
             }
 
-            byte frames
+            byte Frames
             {
                 get;
                 set;
             }
 
-            byte seconds
+            byte Seconds
             {
                 get;
                 set;
             }
 
-            byte minutes
+            byte Minutes
             {
                 get;
                 set;
             }
 
-            byte hours
+            byte Hours
             {
                 get;
                 set;
             }
 
-            byte[] userbits
+            byte[] Userbits
             {
                 get;
                 set;
             }
 
         }
-        public virtual v4l2_timecode Create_v4l2_timecode() => throw new NotImplementedException();
+        public virtual IV4l2_timecode Create_v4l2_timecode() => throw new NotImplementedException();
 
-        public interface v4l2_vbi_format
+        public interface IV4l2_vbi_format
         {
-            uint sampling_rate
+            uint Sampling_rate
             {
                 get;
                 set;
             }
 
-            uint offset
+            uint Offset
             {
                 get;
                 set;
             }
 
-            uint samples_per_line
+            uint Samples_per_line
             {
                 get;
                 set;
             }
 
-            uint sample_format
+            uint Sample_format
             {
                 get;
                 set;
             }
 
-            int[] start
+            int[] Start
             {
                 get;
                 set;
             }
 
-            uint[] count
+            uint[] Count
             {
                 get;
                 set;
             }
 
-            uint flags
+            uint Flags
             {
                 get;
                 set;
             }
 
-            uint[] reserved
+            uint[] Reserved
             {
                 get;
                 set;
             }
 
         }
-        public virtual v4l2_vbi_format Create_v4l2_vbi_format() => throw new NotImplementedException();
+        public virtual IV4l2_vbi_format Create_v4l2_vbi_format() => throw new NotImplementedException();
 
-        public interface v4l2_window
+        public interface IV4l2_window
         {
-            v4l2_rect w
+            v4l2_rect W
             {
                 get;
                 set;
             }
 
-            uint field
+            uint Field
             {
                 get;
                 set;
             }
 
-            uint chromakey
+            uint Chromakey
             {
                 get;
                 set;
             }
 
-            IntPtr clips
+            IntPtr Clips
             {
                 get;
                 set;
             }
 
-            uint clipcount
+            uint Clipcount
             {
                 get;
                 set;
             }
 
-            IntPtr bitmap
+            IntPtr Bitmap
             {
                 get;
                 set;
             }
 
-            byte global_alpha
+            byte Global_alpha
             {
                 get;
                 set;
             }
 
         }
-        public virtual v4l2_window Create_v4l2_window() => throw new NotImplementedException();
+        public virtual IV4l2_window Create_v4l2_window() => throw new NotImplementedException();
 
 
     }

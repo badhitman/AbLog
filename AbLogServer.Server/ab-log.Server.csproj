@@ -19,11 +19,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DEMO</DefineConstants>
+		<DefineConstants>$(DefineConstants);DEMO</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Include="favicon.ico" />
+		<Content Include="favicon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>

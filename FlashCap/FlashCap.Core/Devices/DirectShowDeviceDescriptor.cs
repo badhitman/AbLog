@@ -7,11 +7,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace FlashCap.Devices;
 
+[SupportedOSPlatform("windows")]
 public sealed class DirectShowDeviceDescriptor : CaptureDeviceDescriptor
 {
     private readonly string devicePath;

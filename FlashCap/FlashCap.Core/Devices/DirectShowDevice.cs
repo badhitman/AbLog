@@ -13,11 +13,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace FlashCap.Devices;
 
+[SupportedOSPlatform("windows")]
 public sealed class DirectShowDevice :
     CaptureDevice
 {
@@ -40,12 +42,14 @@ public sealed class DirectShowDevice :
             this.frameIndex = 0;
 
         // whichMethodToCallback: 0
-        [PreserveSig] public int SampleCB(
+        [PreserveSig]
+        public int SampleCB(
             double sampleTime, NativeMethods_DirectShow.IMediaSample sample) =>
             unchecked((int)0x80004001);  // E_NOTIMPL
 
         // whichMethodToCallback: 1
-        [PreserveSig] public int BufferCB(
+        [PreserveSig]
+        public int BufferCB(
             double sampleTime, IntPtr pBuffer, int bufferLen)
         {
             // HACK: Avoid stupid camera devices...
@@ -83,6 +87,7 @@ public sealed class DirectShowDevice :
     {
     }
 
+    [SupportedOSPlatform("windows")]
     protected override Task OnInitializeAsync(
         VideoCharacteristics characteristics,
         TranscodeFormats transcodeFormat,
@@ -96,20 +101,20 @@ public sealed class DirectShowDevice :
 
         return this.workingContext!.InvokeAsync(() =>
         {
-        if (NativeMethods_DirectShow.EnumerateDeviceMoniker(
-            NativeMethods_DirectShow.CLSID_VideoInputDeviceCategory).
-            Where(moniker =>
-                moniker.GetPropertyBag() is { } pb &&
-                pb.SafeReleaseBlock(pb =>
-                    pb.GetValue("DevicePath", default(string))?.Trim() is { } dp &&
-                    dp.Equals(devicePath))).
-            Collect(moniker =>
-                moniker.BindToObject(null, null, in NativeMethods_DirectShow.IID_IBaseFilter, out var captureSource) == 0 ?
-                captureSource as NativeMethods_DirectShow.IBaseFilter : null).
-            FirstOrDefault() is { } captureSource)
-        {
-            try
+            if (NativeMethods_DirectShow.EnumerateDeviceMoniker(
+                NativeMethods_DirectShow.CLSID_VideoInputDeviceCategory).
+                Where(moniker =>
+                    moniker.GetPropertyBag() is { } pb &&
+                    pb.SafeReleaseBlock(pb =>
+                        pb.GetValue("DevicePath", default(string))?.Trim() is { } dp &&
+                        dp.Equals(devicePath))).
+                Collect(moniker =>
+                    moniker.BindToObject(null, null, in NativeMethods_DirectShow.IID_IBaseFilter, out var captureSource) == 0 ?
+                    captureSource as NativeMethods_DirectShow.IBaseFilter : null).
+                FirstOrDefault() is { } captureSource)
             {
+                try
+                {
                     if (captureSource.EnumeratePins().
                         Collect(pin =>
                             pin.GetPinInfo() is { } pinInfo &&
@@ -240,6 +245,7 @@ public sealed class DirectShowDevice :
         }
     }
 
+    [SupportedOSPlatform("windows")]
     protected override async Task OnDisposeAsync()
     {
         if (this.graphBuilder != null)
@@ -264,6 +270,7 @@ public sealed class DirectShowDevice :
         }
     }
 
+    [SupportedOSPlatform("windows")]
     protected override Task OnStartAsync(CancellationToken ct)
     {
         if (!this.IsRunning)
@@ -328,6 +335,7 @@ public sealed class DirectShowDevice :
 
     public override bool HasPropertyPage => true;
 
+    [SupportedOSPlatform("windows")]
     protected override Task<bool> OnShowPropertyPageAsync(
         IntPtr parentWindow, CancellationToken ct) =>
         this.workingContext!.InvokeAsync(() =>

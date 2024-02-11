@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 		..\secrets\email-conf.Development.json = ..\secrets\email-conf.Development.json
 		..\secrets\mqtt-conf.Development.json = ..\secrets\mqtt-conf.Development.json
 		README.md = README.md
+		README.v3.md = README.v3.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "razor-lib", "RazorLib\razor-lib.csproj", "{1A021BD1-C0A6-481F-ACE7-9DD0D9DC4146}"
@@ -32,7 +33,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashCap", "FlashCap\FlashC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FlashCap", "FlashCap", "{45DDE1A3-62DE-4D7C-8527-39ADF375BBE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ab-log-rc", "ab-log-rc\ab-log-rc.csproj", "{BB0F100B-A773-40B2-8462-A297600F85C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log-rc", "ab-log-rc\ab-log-rc.csproj", "{BB0F100B-A773-40B2-8462-A297600F85C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net8", "net8", "{15B6F8D0-837B-4A85-9F3D-87EED7F03872}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.app", "ab-log.app\ab-log.app\ab-log.app.csproj", "{83028B21-A847-41D0-B0E2-E26F3D262E0A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.app.Client", "ab-log.app\ab-log.app.Client\ab-log.app.Client.csproj", "{503FC20C-BF81-476E-9E5B-857E19669171}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +85,14 @@ Global
 		{BB0F100B-A773-40B2-8462-A297600F85C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0F100B-A773-40B2-8462-A297600F85C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BB0F100B-A773-40B2-8462-A297600F85C6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{83028B21-A847-41D0-B0E2-E26F3D262E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83028B21-A847-41D0-B0E2-E26F3D262E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83028B21-A847-41D0-B0E2-E26F3D262E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83028B21-A847-41D0-B0E2-E26F3D262E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{503FC20C-BF81-476E-9E5B-857E19669171}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{503FC20C-BF81-476E-9E5B-857E19669171}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{503FC20C-BF81-476E-9E5B-857E19669171}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{503FC20C-BF81-476E-9E5B-857E19669171}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +103,8 @@ Global
 		{283FDF9C-4075-4564-A896-7EC7582921E2} = {45DDE1A3-62DE-4D7C-8527-39ADF375BBE3}
 		{3C9292C2-DD0E-421D-8116-5F792D66431F} = {45DDE1A3-62DE-4D7C-8527-39ADF375BBE3}
 		{45DDE1A3-62DE-4D7C-8527-39ADF375BBE3} = {C201E875-8423-4AF0-AABC-68FF8B0B36BE}
+		{83028B21-A847-41D0-B0E2-E26F3D262E0A} = {15B6F8D0-837B-4A85-9F3D-87EED7F03872}
+		{503FC20C-BF81-476E-9E5B-857E19669171} = {15B6F8D0-837B-4A85-9F3D-87EED7F03872}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C70807F-61D7-47A4-A8B3-92E0D885D37B}

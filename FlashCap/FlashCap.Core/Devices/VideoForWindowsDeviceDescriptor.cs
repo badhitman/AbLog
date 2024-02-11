@@ -7,6 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ public sealed class VideoForWindowsDeviceDescriptor : CaptureDeviceDescriptor
     public override DeviceTypes DeviceType =>
         DeviceTypes.VideoForWindows;
 
+    [SupportedOSPlatform("windows")]
     protected override Task<CaptureDevice> OnOpenWithFrameProcessorAsync(
         VideoCharacteristics characteristics,
         TranscodeFormats transcodeFormat,

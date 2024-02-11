@@ -155,6 +155,7 @@ await deviceObservable.StartAsync();
 * eMeet HD Webcam C970L (Windows/Linux)
 * Microsoft LifeCam Cinema HD720 (Windows/Linux)
 * Unnamed cheap USB capture module (Windows/Linux)
+* Spirer RP28WD305 (Linux)
 
 確認したコンピューター:
 
@@ -170,6 +171,7 @@ await deviceObservable.StartAsync();
 * Acer Aspire One ZA3 inside camera (i686, Linux)
 * Imagination Creator Ci20 (mipsel, Linux)
 * Radxa ROCK5B (aarch64, Linux)
+* Loongson-LS3A5000-7A2000-1w-EVB-V1.21 (loongarch64, Linux)
 
 確認した、動作しない環境:
 
@@ -183,7 +185,7 @@ await deviceObservable.StartAsync();
 
 完全なサンプルコードはこちらです:
 
-* [Avaloniaアプリケーション](samples/FlashCap.Avalonia/)
+* [Avalonia11アプリケーション](samples/FlashCap.Avalonia/)
 * [WPFアプリケーション](samples/FlashCap.Wpf)
 * [Windowsフォームアプリケーション](samples/FlashCap.WindowsForms/)
 * [コンソールアプリケーション](samples/FlashCap.OneShot/)
@@ -210,6 +212,55 @@ await File.WriteAllBytesAsync("oneshot", imageData);
 ```
 
 完全な実装は、[サンプルコード](samples/FlashCap.OneShot/)を参照して下さい。
+
+### 対応できないフォーマットの除外
+
+映像特性には、そのカメラがサポートしているフォーマットの一覧が入っています。
+FlashCapは全てのフォーマットに対応しているわけではないため、デバイスをオープンする前に、正しいフォーマットを選択する必要があります。
+対応していないフォーマットは、 `PixelFormats.Unknown` で示されるため、これを除外します:
+
+```csharp
+// 映像特性を指定して、デバイスを開きます:
+var descriptor0 = devices.EnumerateDescriptors().ElementAt(0);
+
+// 対応していないフォーマットを除外する:
+var characteristics = descriptor0.Characteristics.
+    Where(c => c.PixelFormat != PixelFormats.Unknown).
+    ToArray();
+```
+
+FlashCapは、デバイスが返す全てのフォーマットを列挙します。
+従って、 `PixelFormats.Unknown` である `VideoCharacteristics` の情報を確認する事で、デバイスがどのようなフォーマットに対応しているのかを分析することが出来ます。
+
+### カメラデバイスのプロパティページを表示する
+
+カメラデバイスのプロパティページを表示する事が出来ます。
+
+![PropertyPage](Images/PropertyPage.png)
+
+```csharp
+using var device = await descriptor.OpenAsync(
+    characteristics,
+    async bufferScope =>
+    {
+        // ...
+    });
+
+// カメラデバイスがプロパティページをサポートしていれば
+if (device.HasPropertyPage)
+{
+    // Avaloniaのウインドウから親ハンドルを取得
+    if (window.TryGetPlatformHandle()?.Handle is { } handle)
+    {
+        // カメラデバイスのプロパティページを表示する
+        await device.ShowPropertyPageAsync(handle);
+    }
+}
+```
+
+現在のところ、プロパティページを表示出来るのは、対象がDirectShowデバイスの場合のみです。
+
+完全な実装は、[Avaloniaサンプルコード](samples/FlashCap.Avalonia/)や、[WPFサンプルコード](samples/FlashCap.Wpf/)を参照して下さい。
 
 
 ----
@@ -351,11 +402,11 @@ using var device = await descriptor0.OpenAsync(
 
 ## トランスコードについて
 
-デバイスから得られた「生の画像データ」は、私たちが扱いやすい、JPEGやDIBビットマップではない場合があります。一般的に、動画形式の画像データは、MPEGのような連続ストリームではない場合、"MJPEG" (Motion JPEG)や"YUV"と呼ばれる形式です。
+デバイスから得られた「生の画像データ」は、私たちが扱いやすい、JPEGやRGB DIBビットマップではない場合があります。一般的に、動画形式の画像データは、MPEGのような連続ストリームではない場合、"MJPEG" (Motion JPEG)や"YUV"と呼ばれる形式です。
 
 "MJPEG"は、中身が完全にJPEGと同じであるため、FlashCapはそのまま画像データとして返します。対して、"YUV"形式の場合は、データヘッダ形式はDIBビットマップと同じですが、中身は完全に別物です。従って、これをそのまま "output.bmp" のようなファイルで保存しても、多くの画像デコーダはこれを処理できません。
 
-そこで、FlashCapは、"YUV"形式の画像データの場合は、自動的に"RGB" DIB形式に変換します。この処理の事を「トランスコード」と呼んでいます。先ほど、`ReferImage()`は「基本的にコピーが発生しない」と説明しましたが、"YUV"形式の場合は、トランスコードが発生するため、一種のコピーが行われます。（FlashCapはトランスコードをマルチスレッドで処理しますが、それでも画像データが大きい場合は、性能に影響します。）
+そこで、FlashCapは、"YUV"形式の画像データの場合は、自動的にRGB DIB形式に変換します。この処理の事を「トランスコード」と呼んでいます。先ほど、`ReferImage()`は「基本的にコピーが発生しない」と説明しましたが、"YUV"形式の場合は、トランスコードが発生するため、一種のコピーが行われます。（FlashCapはトランスコードをマルチスレッドで処理しますが、それでも画像データが大きい場合は、性能に影響します。）
 
 もし、画像データが"YUV"形式であっても、そのままで問題ないのであれば、トランスコードを無効化することで、コピー処理を完全に1回のみにする事が出来ます:
 
@@ -363,7 +414,7 @@ using var device = await descriptor0.OpenAsync(
 // トランスコードを無効にしてデバイスを開く:
 using var device = await descriptor0.OpenAsync(
   descriptor0.Characteristics[0],
-  false,   // transcodeIfYUV == false
+  TranscodeFormats.DoNotTranscode,   // トランスコードさせない
   async buferScope =>
   {
       // ...
@@ -371,6 +422,20 @@ using var device = await descriptor0.OpenAsync(
 
 // ...
 ```
+
+`TranscodeFormats` 列挙値には以下の選択肢があります:
+
+| `TranscodeFormats` | 内容 |
+|:----|:----|
+| `Auto` | 必要であればトランスコードを行い、変換マトリックスを自動的に選択します。解像度に応じて、`BT601`, `BT709`, `BT2020` が選択されます。 |
+| `DoNotTranscode` | トランスコードを全く行いません。JPEG又はPNG以外のフォーマットは、生データのままDIBビットマップに格納されます。 |
+| `BT601` | 必要であれば、BT.601変換マトリックスを使用してトランスコードを行います。これはHDまでの解像度で標準的に使用されます。 |
+| `BT709` | 必要であれば、BT.709変換マトリックスを使用してトランスコードを行います。これはFullHDまでの解像度で標準的に使用されます。 |
+| `BT2020` | 必要であれば、BT.2020変換マトリックスを使用してトランスコードを行います。これは4K等のFullHDを超える解像度で標準的に使用されます。 |
+
+上記のほかに、 `BT601FullRange`, `BT709FullRange`, `BT2020FullRange`, が存在します。
+これらは、輝度信号の想定範囲を8ビット全体に広げますが、一般的ではありません。
+`Auto` を選択した場合は、これらの `FullRange` を使用しません。
 
 ## コールバックハンドラと呼び出し契機
 
@@ -380,7 +445,7 @@ using var device = await descriptor0.OpenAsync(
 // ハンドラの呼び出し契機を指定する:
 using var device = await descriptor0.OpenAsync(
   descriptor0.Characteristics[0],
-  true,
+  TranscodeFormats.Auto,
   true,   // 呼び出し契機の指定 (true: Scattering)
   10,     // 最大滞留フレーム数
   async buferScope =>
@@ -512,7 +577,7 @@ var descriptor0 = devices.EnumerateDevices().ElementAt(0);
 // フレームプロセッサを指定してオープンする
 using var device = await descriptor0.OpenWitFrameProcessorAsync(
   descriptor0.Characteristics[0],
-  true,   // transcode
+  TranscodeFormats.Auto,
   new CoolFrameProcessor(buffer =>   // カスタムのフレームプロセッサを使う
   {
     // キャプチャされたピクセルバッファが渡される
@@ -553,6 +618,127 @@ await device.StartAsync();
 
 ----
 
+## 自分でビルドする
+
+FlashCapは、ビルド環境をクリーンに保っています。
+基本的に、Visual Studio 2022の.NET開発環境がインストールされていればビルド出来ると思います。
+（WPF, Windows Formsのオプションは追加してください。これらはサンプルコードのビルドに必要です）
+
+1. このリポジトリをクローンします。
+2. `FlashCap.sln`をビルドします。
+   * `dotnet build` でビルドします。
+   * または、`FlashCap.sln`をVisual Studio 2022で開き、ビルドします。
+
+注意: FlashCap自体は、.NET SDKを持つLinux環境でもビルドできるはずですが、サンプルコードにWindowsに依存する実装があるため、
+開発環境にWindowsを想定しています。
+
+プルリクエストを歓迎します! 開発は`develop`ブランチ上で行って、リリース時に`main`ブランチにマージしています。
+そのため、プルリクエストを作る場合は、`develop`ブランチからあなたのトピックブランチを切って下さい。
+
+### V4L2を未対応のプラットフォームに移植する
+
+V4L2はLinuxのイメージキャプチャ標準APIです。
+FlashCapはV4L2に対応していて、これによりLinuxの様々なプラットフォームで動作します。以下に対応プラットフォームを挙げます:
+
+* i686, x86_64
+* aarch64, armv7l
+* mipsel
+* loongarch64
+
+ここに挙げた対応プラットフォームは、単に私やコントリビューターが動作確認出来た、つまり現実のハードウェアを持ち合わせていて、
+FlashCapを使って実際にカメラのキャプチャに成功したものです。
+
+それでは、他のプラットフォーム、例えばmips64,riscv32/64,sparc64で動作するか言えば、動作しません。
+理由は、以下の通りです:
+
+* 私が動作確認できない: 実際のハードウェアやSBC (Single Board Computer) コンポーネントを持ち合わせていないので、物理的な確認が出来ない。
+* .NETランタイム、又はmonoが移植されていない。またはstableな移植が存在しない。
+
+.NETランタイムの問題については、時間が解決する可能性はあります。
+そこで、もしFlashCapを未対応のLinuxプラットフォームに移植するつもりがあるのであれば、
+概要を示すので参考にしてください。
+
+* `FlashCap.V4L2Generator` は、V4L2への移植に必要な相互運用ソースコードを自動生成するためのジェネレータです。
+  このプロジェクトは、[Clang](https://clang.llvm.org/) が出力するAST JSONファイルを使用して、
+  V4L2のヘッダファイルから、正しいABI構造を厳密に適用したC#の相互運用定義ソースコードを生成します。
+* 従って、まずターゲットとするLinuxのABIに対応したClangが必要になります。
+  この理由により、安定的なABIが定まっていない環境に移植することはできません。
+* 同様に、`FlashCap.V4L2Generator` を動作させるために、ターゲットとするLinuxで動作するmono又は.NETランタイムが必要です。
+* ターゲットLinuxがDebian系の移植であれば、これらは `apt` パッケージなどから入手可能かもしれません。
+  `sudo apt install build-essential clang mono-devel` などでインストール出来れば、可能性が高まります。
+* [#100](https://github.com/kekyo/FlashCap/issues/100) の取り組みも参考になると思います。
+
+最初に、 `FlashCap.V4L2Generator` をビルドする必要があります。
+ターゲットのLinux環境で.NET SDKが使用できない場合は、monoの `mcs` を使ってコードをコンパイルする `build-mono.sh` を使用して下さい。
+
+その後、大まかな手順は、 `dumper.sh` というスクリプトに示されているので、
+内容をターゲットの環境に合わせて書き換えて下さい。
+
+`FlashCap.V4L2Generator` が生成したソースコードは、 `FlashCap.Core/Internal/V4L2/` に配置されます。
+これを使用するには、 `NativeMethods_V4L2.cs` のタイプイニシャライザの `switch` 文に、
+新しいプラットフォームの分岐を加えて下さい。
+
+```csharp
+switch (buf.machine)
+{
+    case "x86_64":
+    case "amd64":
+        Interop = new NativeMethods_V4L2_Interop_x86_64();
+        break;
+    case "i686":
+    case "i586":
+    case "i486":
+    case "i386":
+        Interop = new NativeMethods_V4L2_Interop_i686();
+        break;
+    case "aarch64":
+        Interop = new NativeMethods_V4L2_Interop_aarch64();
+        break;
+    case "armv9l":
+    case "armv8l":
+    case "armv7l":
+    case "armv6l":
+        Interop = new NativeMethods_V4L2_Interop_armv7l();
+        break;
+    case "mips":
+    case "mipsel":
+        Interop = new NativeMethods_V4L2_Interop_mips();
+        break;
+    case "loongarch64":
+        Interop = new NativeMethods_V4L2_Interop_loongarch64();
+        break;
+
+    // (ここに新しい移植を加えます...)
+
+    default:
+        throw new InvalidOperationException(
+            $"FlashCap: Architecture '{buf.machine}' is not supported.");
+}
+```
+
+あとは、神に祈ります :)
+Avaloniaのサンプルコードを使用して確認すると良いでしょう。
+Avaloniaが動作しない環境の場合は、OneShotサンプルコードで試した後、
+これを拡張して連続したビットマップを保存して確認する方法もあります。
+
+これで成功したら、PRを歓迎します。
+
+このプロセスで生成されたコードは、他のプラットフォームとほぼ同一のコードと言えるため、
+私が直接ハードウェアで検証出来ていませんが、恐らくPRを受け入れることが出来るでしょう。
+以下の情報も提供してください（ドキュメントに記載されます）:
+
+* ターゲットの物理マシン製品名
+* キャプチャユニットやカメラの製品名
+* これらの接続方法（例えばUSB接続・PCIe接続・内臓カメラなど）
+* 一般的な小売り業者から入手出来ない場合は、具体的な入手先
+* どうしても解消できなかった制約がある場合の説明（例えば特定の映像特性が動かないなど）
+
+TIPS: なぜV4L2Generatorが必要になるかというと、.NET相互運用機能で想定されている各種デフォルトは、
+Windows環境に最適化されていて、ターゲットのABIと互換性がないからです。
+
+
+----
+
 ## License
 
 Apache-v2.
@@ -562,6 +748,21 @@ Apache-v2.
 
 ## 履歴
 
+* 1.9.0:
+  * loongarch64 Linuxに対応しました [#100](https://github.com/kekyo/FlashCap/issues/100)
+* 1.8.0:
+  * .NET 8.0 SDKに対応しました。
+  * トランスコードの変換マトリックス係数が一部誤っていたのを修正 [#107](https://github.com/kekyo/FlashCap/issues/107)
+* 1.7.0:
+  * DirectShowデバイスでプロパティページを表示出来るようになりました [#112](https://github.com/kekyo/FlashCap/issues/112)
+  * `TranscodeFormats` 列挙型を使用して、BT.601, BT.709, BT.2020変換を指定できるようにしました [#107](https://github.com/kekyo/FlashCap/issues/107)
+  * BlackMagic社固有のYUYVフォーマットに対応しました [#105](https://github.com/kekyo/FlashCap/issues/105)
+  * いくつかのメソッド/関数は `Obsolete` としてマークされています。警告に従って変更してください。
+  * .NET 8.0 RC2に対応しました。
+* 1.6.0:
+  * V4L2で一部のフォーマットが列挙されない問題を修正しました。
+  * 未対応のフォーマットを暗黙に除外しないで、`PixelFormats.Unknown` として可視化されるようにしました。
+  * 依存するF#パッケージを5.0.0にダウングレードしました。
 * 1.5.0:
   * 簡単にイメージを一枚だけ撮影する、 `TakeOneShotAsync()` メソッドを追加し、対応するサンプルプロジェクトを追加しました。
   * Avaloniaサンプルコードで、FPSと撮影したイメージの情報をリアルタイムに表示するようにしました。

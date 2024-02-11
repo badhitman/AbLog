@@ -11,11 +11,13 @@ using FlashCap.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Versioning;
 
 namespace FlashCap.Devices;
 
 public sealed class DirectShowDevices : CaptureDevices
 {
+    [SupportedOSPlatform("windows")]
     protected override IEnumerable<CaptureDeviceDescriptor> OnEnumerateDescriptors() =>
         NativeMethods_DirectShow.EnumerateDeviceMoniker(
             NativeMethods_DirectShow.CLSID_VideoInputDeviceCategory).
