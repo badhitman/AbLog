@@ -2,18 +2,18 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.Text.Json.Serialization;
-using System.Runtime.Versioning;
-using Telegram.Bot.Services;
-using Newtonsoft.Json;
-using MQTTnet.Client;
-using Telegram.Bot;
 using ab.context;
-using SharedLib;
-using ServerLib;
-using NLog.Web;
 using MQTTnet;
+using MQTTnet.Client;
+using Newtonsoft.Json;
 using NLog;
+using NLog.Web;
+using ServerLib;
+using SharedLib;
+using System.Runtime.Versioning;
+using System.Text.Json.Serialization;
+using Telegram.Bot;
+using Telegram.Bot.Services;
 
 namespace AbLogServer;
 
@@ -21,8 +21,6 @@ namespace AbLogServer;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
-[SupportedOSPlatform("iOS")]
-[SupportedOSPlatform("MacCatalyst")]
 public class Program
 {
     public static async Task Main(string[] args)

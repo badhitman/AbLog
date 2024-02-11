@@ -2,27 +2,25 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using ab.context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Runtime.Versioning;
-using Newtonsoft.Json;
-using MQTTnet.Client;
-using Telegram.Bot;
-using System.Text;
-using ab.context;
-using SharedLib;
 using MQTTnet;
+using MQTTnet.Client;
+using Newtonsoft.Json;
+using SharedLib;
+using System.Runtime.Versioning;
+using System.Text;
+using Telegram.Bot;
 
 namespace ServerLib;
 
 /// <summary>
 /// 
 /// </summary>
-[SupportedOSPlatform("MacCatalyst")]
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("android")]
 [SupportedOSPlatform("linux")]
-[SupportedOSPlatform("iOS")]
 public class MqttServerService : MqttBaseServiceAbstraction
 {
     readonly ISystemCommandsService _sys_com_service;
