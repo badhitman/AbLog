@@ -1,10 +1,12 @@
-using ABLog4.Components;
+using ABLog4.web.Components;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddControllers();
 
 WebApplication app = builder.Build();
 
@@ -23,8 +25,7 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(ABLog4.Client._Imports).Assembly);
-
+    .AddAdditionalAssemblies(typeof(ABLog4.web.client._Imports).Assembly);
 app.MapControllers();
 
 app.Run();
