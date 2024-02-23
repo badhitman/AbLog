@@ -32,13 +32,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MudBlazor" Version="6.11.1" />
-		<PackageReference Include="NLog" Version="5.2.7" />
-		<PackageReference Include="NLog.Targets.MauiLog" Version="5.2.1" />
+		<PackageReference Include="MudBlazor" Version="6.16.0" />
+		<PackageReference Include="NLog" Version="5.2.8" />
+		<PackageReference Include="NLog.Targets.MauiLog" Version="8.0.0" />
 		<PackageReference Include="Refit" Version="7.0.0" />
 		<PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.3" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.7" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -190,6 +190,10 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.7" />
 	</ItemGroup>
 
 </Project>

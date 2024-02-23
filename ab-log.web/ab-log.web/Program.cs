@@ -2,6 +2,7 @@ using ab.context;
 using ABLog4.web.Components;
 using MQTTnet;
 using MQTTnet.Client;
+using MudBlazor.Services;
 using Newtonsoft.Json;
 using NLog;
 using NLog.Web;
@@ -43,7 +44,7 @@ public class Program
             IWebHostEnvironment _env = builder.Environment;
 
             builder.Services.AddHttpClient<ToolsLocalService>();
-
+            builder.Services.AddMudServices();
             builder.Services.AddHttpClient<MqttServerService>();
 
             builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
@@ -58,7 +59,7 @@ public class Program
             builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
             builder.Services.AddSingleton<ITelegramBotHardwareViewServive, TelegramBotHardwareViewServive>();
 
-            builder.Services.AddControllersWithViews()
+            builder.Services.AddControllers()
                     .AddJsonOptions(x =>
                     {
                         x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -140,11 +141,11 @@ public class Program
 
             app.UseStaticFiles();
             app.UseAntiforgery();
+            app.MapControllers();
 
             app.MapRazorComponents<App>()
                 .AddInteractiveWebAssemblyRenderMode()
                 .AddAdditionalAssemblies(typeof(ABLog4.web.client._Imports).Assembly);
-            app.MapControllers();
 
             app.Run();
         }

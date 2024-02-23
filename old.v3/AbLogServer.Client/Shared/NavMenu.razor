@@ -18,13 +18,13 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav id="main-left-menu" class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/hardwares-page">
-                <span class="oi oi-puzzle-piece" aria-hidden="true"></span> @(IsShort ? "" : "Устройства")
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-wrench" aria-hidden="true"></span> @(IsShort ? "" : "Настройки")
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-wrench" aria-hidden="true"></span> @(IsShort ? "" : "Настройки")
+            <NavLink class="nav-link" href="/hardwares-page">
+                <span class="oi oi-puzzle-piece" aria-hidden="true"></span> @(IsShort ? "" : "Устройства")
             </NavLink>
         </div>
         <div class="nav-item px-3" title="MQTT config">
