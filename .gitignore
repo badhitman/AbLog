@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 AbLogServer.Client/wwwroot/lib/
 RemoteClient/wwwroot/lib
+/ab-log.web/ab-log.web/wwwroot/lib
