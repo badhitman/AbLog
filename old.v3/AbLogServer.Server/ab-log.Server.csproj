@@ -35,7 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ServerLib\server-lib.csproj" />
+		<ProjectReference Include="..\..\ServerLib\server-lib.csproj" />
 		<ProjectReference Include="..\AbLogServer.Client\ab-log.Client.csproj" />
 	</ItemGroup>
 

@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\RazorLib\razor-lib.csproj" />
+		<ProjectReference Include="..\..\RazorLib\razor-lib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
