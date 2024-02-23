@@ -1,11 +1,13 @@
 using ab.context;
 using ABLog4.web.Components;
+using BlazorLib;
 using MQTTnet;
 using MQTTnet.Client;
 using MudBlazor.Services;
 using Newtonsoft.Json;
 using NLog;
 using NLog.Web;
+using Refit;
 using ServerLib;
 using SharedLib;
 using System.Runtime.Versioning;
@@ -55,6 +57,33 @@ public class Program
             builder.Services.AddSingleton<IEmailService, EmailLocalService>();
             builder.Services.AddSingleton<IUsersService, UsersLocalService>();
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
+
+
+
+            builder.Services.AddRefitClient<IRefitHardwaresService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitCommandsService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitConditionsService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitContentionsService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitScriptsService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitStorageService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitTriggersService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitCamerasService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitToolsService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitSystemCommandsService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddRefitClient<IRefitUsersService>();
+            //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+
+
 
             builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
             builder.Services.AddSingleton<ITelegramBotHardwareViewServive, TelegramBotHardwareViewServive>();
