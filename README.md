@@ -1,7 +1,7 @@
-# AB-Log v.4 (nonofficial)
+п»ї# AB-Log v.4 (nonofficial)
 
 ## Upd to NET8.
 
 in progress...
 
-предыдущая версия [v3](old.v3/)
+РїСЂРµРґС‹РґСѓС‰Р°СЏ РІРµСЂСЃРёСЏ [v3](old.v3/)
