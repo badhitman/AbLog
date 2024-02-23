@@ -397,6 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-AbLogServer.Client/wwwroot/lib/
-RemoteClient/wwwroot/lib
-/ab-log.web/ab-log.web/wwwroot/lib
+ab-log.web/ab-log.web/wwwroot/lib
