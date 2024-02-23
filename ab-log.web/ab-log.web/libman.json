@@ -13,6 +13,10 @@
     {
       "library": "highlight.js@11.8.0",
       "destination": "wwwroot/lib/highlight.js/"
+    },
+    {
+      "library": "bootstrap-icons@1.11.3",
+      "destination": "wwwroot/lib/bootstrap-icons/"
     }
   ]
 }
