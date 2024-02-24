@@ -2,6 +2,7 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace SharedLib;
@@ -66,6 +67,35 @@ public class MqttConfigModel
     /// <summary>
     /// 
     /// </summary>
+    public void LoadConfigFromJson(string json_raw)
+    {
+        MqttConfigModel? _conf;
+        try
+        {
+            _conf = JsonConvert.DeserializeObject<MqttConfigModel>(json_raw);
+            if (_conf is null)
+                return;
+        }
+        catch
+        {
+            return;
+        }
+
+        Port = _conf.Port;
+        Password = _conf.Password;
+        Secret = _conf.Secret;
+        Username = _conf.Username;
+        ClientId = _conf.ClientId;
+        AutoStart = _conf.AutoStart;
+        Server = _conf.Server;
+        PrefixMqtt = _conf.PrefixMqtt;
+        ClientId = _conf.ClientId;
+        MessageMaxSizeBytes = _conf.MessageMaxSizeBytes;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public bool IsConfigured =>
         !string.IsNullOrWhiteSpace(Server) &&
         Port > 0 &&
@@ -99,14 +129,10 @@ public class MqttConfigModel
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj))
-        {
             return true;
-        }
 
-        if (ReferenceEquals(obj, null))
-        {
+        if (obj is null)
             return false;
-        }
 
         return this == (MqttConfigModel)obj;
     }

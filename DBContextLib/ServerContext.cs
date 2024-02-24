@@ -4,6 +4,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using SharedLib;
+using System.Diagnostics;
 
 namespace ab.context;
 
@@ -17,6 +18,11 @@ public class ServerContext : DbContext
     /// В частности SQLite на слабом Android железе иногда не поспевала записывать данные
     /// </summary>
     public static object DbLocker = new();
+
+    /// <summary>
+    /// Magic string.
+    /// </summary>
+    public static readonly string RowVersion = nameof(RowVersion);
 
     public string? ConnectString { get; private set; }
 
@@ -115,6 +121,50 @@ public class ServerContext : DbContext
         .WithMany(t => t!.Contentions)
         .HasForeignKey(p => p.MasterScriptId)
         .HasPrincipalKey(t => t!.Id);
+
+        //modelBuilder.Entity<HardwareModelDB>()
+        //    .Property<byte[]>(RowVersion)
+        //    .IsRowVersion();
+        //modelBuilder.Entity<PortModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<ScriptModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<CommandModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<TaskModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<ReportModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<CommandConditionModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<TrigerConditionModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<TrigerModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<ContentionsModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<SystemCommandModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<UserModelDB>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<UserFormModelDb>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+        //modelBuilder.Entity<UserFormPropertyModelDb>()
+        //        .Property<byte[]>(RowVersion)
+        //        .IsRowVersion();
+
     }
 
     /// <summary>
@@ -125,7 +175,7 @@ public class ServerContext : DbContext
         IQueryable<int> scripts_ids = Commands.Where(x => !EF.Functions.Like(x.Sorting.ToString(), "%.0")).Select(x => x.ScriptId).Distinct().AsQueryable();
         ScriptModelDB[] scripts = Scripts.Where(x => scripts_ids.Contains(x.Id)).Include(x => x.Commands).ToArray();
 
-        if (scripts.Any())
+        if (scripts.Length != 0)
         {
             foreach (ScriptModelDB script in scripts)
             {
@@ -135,6 +185,18 @@ public class ServerContext : DbContext
             UpdateRange(scripts.SelectMany(x => x.Commands!));
             SaveChanges();
         }
+    }
+
+    public override void Dispose()
+    {
+        Debug.WriteLine($"{ContextId} context disposed.");
+        base.Dispose();
+    }
+
+    public override ValueTask DisposeAsync()
+    {
+        Debug.WriteLine($"{ContextId} context disposed async.");
+        return base.DisposeAsync();
     }
 
     /// <summary>

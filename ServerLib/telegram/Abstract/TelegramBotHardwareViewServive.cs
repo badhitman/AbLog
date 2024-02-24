@@ -2,15 +2,16 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using Telegram.Bot.Types.ReplyMarkups;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types;
-using Telegram.Bot;
 using ab.context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SharedLib;
-using Telegram.Bot.Types.Enums;
 using System.Text.RegularExpressions;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace ServerLib;
 
@@ -26,9 +27,10 @@ public class TelegramBotHardwareViewServive : ITelegramBotHardwareViewServive
     /// <summary>
     /// 
     /// </summary>
-    public TelegramBotHardwareViewServive(ITelegramBotClient botClient, ILogger<TelegramBotHardwareViewServive> logger, IHardwaresService hw)
+    public TelegramBotHardwareViewServive(IServiceProvider _services, ILogger<TelegramBotHardwareViewServive> logger, IHardwaresService hw)
     {
-        _botClient = botClient;
+        using IServiceScope scope = _services.CreateScope();
+        _botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
         _logger = logger;
         _hw = hw;
     }

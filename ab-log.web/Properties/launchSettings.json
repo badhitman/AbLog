@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ABLogWeb": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52659;http://localhost:52660"
+    }
+  }
+}

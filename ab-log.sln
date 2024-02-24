@@ -36,13 +36,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log-rc", "old.v3\ab-log-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{15B6F8D0-837B-4A85-9F3D-87EED7F03872}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web", "ab-log.web\ab-log.web\ab-log.web.csproj", "{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web", "ab-log.web.fake\ab-log.web\ab-log.web.csproj", "{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web.client", "ab-log.web\ab-log.web.client\ab-log.web.client.csproj", "{4804BDE0-901E-4DB1-9560-8FA5710B0788}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web.client", "ab-log.web.fake\ab-log.web.client\ab-log.web.client.csproj", "{4804BDE0-901E-4DB1-9560-8FA5710B0788}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.app", "ab-log.app\ab-log.app.csproj", "{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_old", "_old", "{C083CD98-5E53-4BA9-AB77-92F6A21A9350}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ABLogWeb", "ab-log.web\ABLogWeb.csproj", "{C2DB5039-C917-4262-A6DC-B9C2C1902862}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -102,6 +104,10 @@ Global
 		{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{C2DB5039-C917-4262-A6DC-B9C2C1902862}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2DB5039-C917-4262-A6DC-B9C2C1902862}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2DB5039-C917-4262-A6DC-B9C2C1902862}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2DB5039-C917-4262-A6DC-B9C2C1902862}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
 namespace ServerLib;
@@ -11,9 +12,10 @@ public class TelegramBotFormFillingServive : TelegramBotFormFillingServiveAbstra
     /// <summary>
     /// 
     /// </summary>
-    public TelegramBotFormFillingServive(ITelegramBotClient botClient, ILogger<TelegramBotFormFillingServive> logger)
+    public TelegramBotFormFillingServive(IServiceProvider _services, ILogger<TelegramBotFormFillingServive> logger)
     {
-        _botClient = botClient;
+        using IServiceScope scope = _services.CreateScope();
+        _botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
         _logger = logger;
     }
 }
