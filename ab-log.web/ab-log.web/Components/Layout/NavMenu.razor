@@ -1,58 +1,73 @@
-﻿<style>
-    #main-left-menu > div > a {
-        padding-left: 12px;
-    }
-</style>
+﻿@using System.Reflection
 
-<div class="top-row ps-3 navbar navbar-dark">
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">ab-log.web</a>
+        <abbr class="navbar-brand text-success-emphasis">
+            Server (@(get_version))
+        </abbr>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        Настройки
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="hardwares-page">
+                        Устройства
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="mqtt-config-page" Match="NavLinkMatch.All">
+                        MQTT
+                    </NavLink>
+                </li>
+                @if (IsDebug)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="scripts-page">
+                            <MudTooltip Text="Эксперементальная версия">
+                                Скрипты
+                            </MudTooltip>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="triggers-page">
+                            <MudTooltip Text="Эксперементальная версия">
+                                Тригеры
+                            </MudTooltip>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="cameras-page">
+                            <MudTooltip Text="Эксперементальная версия">
+                                Камеры
+                            </MudTooltip>
+                        </NavLink>
+                    </li>
+                }
+            </ul>
+            <a target="_blank" class="link-success" href="https://ab-log.ru">
+                https://ab-log.ru
+            </a>
+        </div>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav id="main-left-menu" class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link bi bi-house-door-fill" href="" Match="NavLinkMatch.All">
-                &nbsp;Настройки
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link bi bi-plus-square-fill" href="hardwares-page">
-                &nbsp;Устройства
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link bi bi-list-nested" href="mqtt-config-page">
-                &nbsp;MQTT
-            </NavLink>
-        </div>
-        @if (IsDebug)
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link bi bi-activity" href="scripts-page">
-                    &nbsp;Скрипты
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link bi bi-alarm" href="triggers-page">
-                    &nbsp;Тригеры
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link bi bi-camera" href="cameras-page">
-                    &nbsp;Камеры
-                </NavLink>
-            </div>
-        }
-    </nav>
-</div>
+</nav>
 
 @code {
+    string get_version
+    {
+        get
+        {
+            string v = (Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "error version detect");
+
+            return v.Contains("+") ? v[..v.IndexOf("+")] : v;
+        }
+    }
+
 #if DEBUG
     bool IsDebug = true;
 #else

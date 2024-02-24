@@ -45,6 +45,30 @@ public class Program
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             IWebHostEnvironment _env = builder.Environment;
 
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
+            builder.Host.UseSystemd();
+
+            logger.Warn($"load configs: *.{_env.EnvironmentName}.json");
+            builder.Configuration.AddJsonFile("appsettings.json");
+            builder.Configuration.AddJsonFile($"appsettings.{_env.EnvironmentName}.json");
+
+            builder.Services.AddSingleton<IServiceCollection, ServiceCollection>();
+
+            // Secrets
+            string secretPath = Path.Combine("..", "..", "secrets");
+            FileInfo fi = new(secretPath);
+            logger.Warn($"load secrets from {secretPath} ({fi.FullName}).");
+            if (Directory.Exists(secretPath))
+            {
+                foreach (string secret in Directory.GetFiles(secretPath, $"*.json"))
+                    logger.Warn($"exist secret: {secret}");
+
+                foreach (string secret in Directory.GetFiles(secretPath, $"*.{_env.EnvironmentName}.json"))
+                    builder.Configuration.AddJsonFile(Path.GetFullPath(secret), optional: true, reloadOnChange: true);
+            }
+
+
             builder.Services.AddHttpClient<ToolsLocalService>();
             builder.Services.AddMudServices();
             builder.Services.AddHttpClient<MqttServerService>();
@@ -57,6 +81,8 @@ public class Program
             builder.Services.AddSingleton<IEmailService, EmailLocalService>();
             builder.Services.AddSingleton<IUsersService, UsersLocalService>();
             builder.Services.AddScoped<IToolsService, ToolsLocalService>();
+
+            // IWebAssemblyHostEnvironment hostEnvironment
 
 
 
@@ -83,8 +109,6 @@ public class Program
             builder.Services.AddRefitClient<IRefitUsersService>();
             //.ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
-
-
             builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
             builder.Services.AddSingleton<ITelegramBotHardwareViewServive, TelegramBotHardwareViewServive>();
 
@@ -98,29 +122,6 @@ public class Program
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveWebAssemblyComponents();
-
-            builder.Logging.ClearProviders();
-            builder.Host.UseNLog();
-            builder.Host.UseSystemd();
-
-            logger.Warn($"load configs: *.{_env.EnvironmentName}.json");
-            builder.Configuration.AddJsonFile("appsettings.json");
-            builder.Configuration.AddJsonFile($"appsettings.{_env.EnvironmentName}.json");
-
-            builder.Services.AddSingleton<IServiceCollection, ServiceCollection>();
-
-            // Secrets
-            string secretPath = Path.Combine("..", "..", "secrets");
-            FileInfo fi = new(secretPath);
-            logger.Warn($"load secrets from {secretPath} ({fi.FullName}).");
-            if (Directory.Exists(secretPath))
-            {
-                foreach (string secret in Directory.GetFiles(secretPath, $"*.json"))
-                    logger.Warn($"exist secret: {secret}");
-
-                foreach (string secret in Directory.GetFiles(secretPath, $"*.{_env.EnvironmentName}.json"))
-                    builder.Configuration.AddJsonFile(Path.GetFullPath(secret), optional: true, reloadOnChange: true);
-            }
 
             using ParametersContext _context = new();
             string _json_config_raw = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;

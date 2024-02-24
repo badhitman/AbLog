@@ -14,6 +14,7 @@
 		<PackageProjectUrl>https://github.com/badhitman/AbLog</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/badhitman/AbLog</RepositoryUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Version>$(VersionPrefix).0.0-$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <ItemGroup>
