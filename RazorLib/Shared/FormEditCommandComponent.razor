@@ -52,10 +52,6 @@
     <ConditionsComponent EntriesTreeHW="EntriesTreeHW" OwnerId="CurrentCommand.Id" ConditionType="ConditionsTypesEnum.Command" />
 </EditForm>
 
-<ModalWindowComponent @ref="Modal">
-    <p>@ModalBodyText</p>
-</ModalWindowComponent>
-
 @code {
     [Parameter, EditorRequired]
     public EntrySortingModel CommandEntry { get; set; } = default!;
@@ -84,7 +80,6 @@
 
     MainSelectorCommandComponent? action_selector_ref;
 
-    private ModalWindowComponent? Modal { get; set; }
     private string ModalBodyText { get; set; } = string.Empty;
 
     bool CanSaveCommand => EditCommandOrign != CurrentCommand || CurrentCommand.Id < 1;

@@ -43,9 +43,6 @@
     </div>
 </li>
 
-<ModalWindowComponent @ref="Modal">
-    <p>@ModalBodyText</p>
-</ModalWindowComponent>
 <ShowMessagesComponent @ref="showMessages" />
 @code {
     [Parameter, EditorRequired]
@@ -78,7 +75,6 @@
     [Parameter, EditorRequired]
     public Action<int> DeleteNewConditionAct { get; set; } = default!;
 
-    ModalWindowComponent? Modal { get; set; }
     string ModalBodyText { get; set; } = string.Empty;
 
     ShowMessagesComponent? showMessages;

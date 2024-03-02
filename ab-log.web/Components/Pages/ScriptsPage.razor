@@ -147,9 +147,6 @@ else
     }
 }
 <br />
-<ModalWindowComponent @ref="Modal">
-    <p>@ModalBodyText</p>
-</ModalWindowComponent>
 
 @code {
     List<ScriptModelDB> ScriptsAll = new();
@@ -233,7 +230,6 @@ else
         }
     }
 
-    ModalWindowComponent? Modal { get; set; }
     string ModalBodyText { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()

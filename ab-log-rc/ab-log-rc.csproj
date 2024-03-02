@@ -113,8 +113,8 @@
 		<None Remove="Platforms\Windows\res\BadgeLogo.scale-150.png" />
 		<None Remove="Platforms\Windows\res\BadgeLogo.scale-200.png" />
 		<None Remove="Platforms\Windows\res\BadgeLogo.scale-400.png" />
-		<ProjectReference Include="..\..\RazorLib\razor-lib.csproj" />
-		<ProjectReference Include="..\..\ServerLib\server-lib.csproj" />
+		<ProjectReference Include="..\RazorLib\razor-lib.csproj" />
+		<ProjectReference Include="..\ServerLib\server-lib.csproj" />
 		<Resource Include="libman.json" />
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-100.png" />
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-125.png" />

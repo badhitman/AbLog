@@ -155,9 +155,6 @@ else
     </div>
 }
 
-<ModalWindowComponent @ref="Modal">
-    <p>@ModalBodyText</p>
-</ModalWindowComponent>
 <ShowMessagesComponent @ref="showMessages" />
 @code {
     public EntryNestedModel[] EntriesTreeHW { get; set; } = Array.Empty<EntryNestedModel>();
@@ -229,7 +226,6 @@ else
     List<ScriptModelDB> Scripts = new();
     ShowMessagesComponent? showMessages;
 
-    ModalWindowComponent? Modal { get; set; }
     string ModalBodyText { get; set; } = string.Empty;
 
     bool CanSaveTrigger
