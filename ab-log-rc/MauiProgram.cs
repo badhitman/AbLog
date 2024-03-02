@@ -50,7 +50,7 @@ public static class MauiProgram
         ClientConfigModel settings = new();
         builder.Configuration.Bind(settings);
         builder.Services.AddSingleton(settings);
-        //builder.Services.AddHttpClient<ToolsRemoteService>();
+        builder.Services.AddHttpClient<ToolsRemoteService>();
 
         builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRemoteService>();
         builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsMqttService>();
