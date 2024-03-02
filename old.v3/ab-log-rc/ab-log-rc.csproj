@@ -115,9 +115,6 @@
 		<None Remove="Platforms\Windows\res\BadgeLogo.scale-400.png" />
 		<ProjectReference Include="..\..\RazorLib\razor-lib.csproj" />
 		<ProjectReference Include="..\..\ServerLib\server-lib.csproj" />
-		<EmbeddedResource Include="..\AbLogServer.Client\wwwroot\conf.json" Link="conf.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
 		<Resource Include="libman.json" />
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-100.png" />
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-125.png" />

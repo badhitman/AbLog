@@ -1,0 +1,30 @@
+﻿@page "/hardware-page/{Id:int}"
+
+@using RazorLib.Shared.navs.tabs
+@using RazorLib.Shared.hardwares
+@using RazorLib.Shared;
+@using SharedLib
+
+@inherits BlazorBusyComponentBaseModel
+
+<PageTitle>
+    Управляющий блок #@(Id)
+</PageTitle>
+
+<h1>Настройка управляющего блока</h1>
+
+<CascadingValue Value="@Id">
+    <TabSetComponent>
+        <TabComponent Tooltip="Управляющий блок" Title="Управляющий блок">
+            <HardwareFormComponent />
+        </TabComponent>
+        <TabComponent Tooltip="Ретранслятор" Title="Ретранслятор">
+            <HardwareTranslateMainLayerComponent />
+        </TabComponent>
+    </TabSetComponent>
+</CascadingValue>
+
+@code {
+    [Parameter, EditorRequired]
+    public int Id { get; set; }
+}
