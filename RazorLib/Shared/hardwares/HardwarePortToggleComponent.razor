@@ -4,10 +4,9 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject IHardwaresService _hardwares
-@inject ISnackbar _snackbar
+@inject ISnackbar Snackbar
 
 <button @onclick="RequestPortStateSet" type="button" class="btn btn-primary">@BtnText</button>
-<ShowMessagesComponent @ref="showMessages" />
 
 @code {
     [Parameter, EditorRequired]
@@ -25,20 +24,16 @@
     [CascadingParameter]
     public Action ReloadPage { get; set; } = default!;
 
-    ShowMessagesComponent? showMessages;
-
     async Task RequestPortStateSet()
     {
         IsBusyProgress = true;
         HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = $"?cmd={PortNum}:{PortState}" });
 
-        showMessages?.ShowMessages(rest.Messages);
+        Snackbar.ShowMessagesResponse(rest.Messages);
         if (!rest.IsSuccess)
-        {
             return;
-        }
 
-        _snackbar.Add($"cmd: {PortNum}:{PortState} > {rest.TextPayload}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        Snackbar.Add($"cmd: {PortNum}:{PortState} > {rest.TextPayload}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         IsBusyProgress = false;
         ReloadPage();
     }

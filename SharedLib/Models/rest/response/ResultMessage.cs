@@ -12,7 +12,7 @@ public class ResultMessage
     /// <summary>
     /// Тип сообщения: Ошибка, Успех, Информация, Оповещение, Предупреждение
     /// </summary>
-    public ResultTypeEnum TypeMessage { get; set; }
+    public ResultTypesEnum TypeMessage { get; set; }
 
     /// <summary>
     /// Текст сообщения

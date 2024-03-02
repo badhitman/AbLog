@@ -1,5 +1,4 @@
 ﻿@page "/"
-@rendermode InteractiveServer
 
 <PageTitle>Настройки</PageTitle>
 
@@ -13,11 +12,11 @@
 </figure>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-    <MudTabPanel Text="Email">
-        <EmailConfigComponent />
-    </MudTabPanel>
     <MudTabPanel Text="Telegram bot">
         <TelegramBotConfigComponent />
+    </MudTabPanel>
+    <MudTabPanel Text="Email">
+        <EmailConfigComponent />
     </MudTabPanel>
     <MudTabPanel Text="About">
         <AboutComponent />

@@ -4,7 +4,6 @@
 
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using RazorLib.Shared;
 using RazorLib.Shared.hardwares;
 using SharedLib;
 
@@ -25,7 +24,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
     /// 
     /// </summary>
     [Inject]
-    protected ISnackbar _snackbar { get; set; } = default!;
+    protected ISnackbar Snackbar { get; set; } = default!;
 
     /// <summary>
     /// 
@@ -38,11 +37,6 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
     /// </summary>
     [Parameter]
     public string PagePath { get; set; } = default!;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    protected ShowMessagesComponent? showMessages;
 
     /// <summary>
     /// 
@@ -78,24 +72,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
 
         if (!rest.IsSuccess)
         {
-            if (showMessages is null)
-            {
-                Severity _style;
-                foreach (ResultMessage m in rest.Messages)
-                {
-                    _style = m.TypeMessage switch
-                    {
-                        ResultTypeEnum.Success => Severity.Success,
-                        ResultTypeEnum.Info => Severity.Info,
-                        ResultTypeEnum.Warning => Severity.Warning,
-                        ResultTypeEnum.Error => Severity.Error,
-                        _ => Severity.Normal
-                    };
-                    _snackbar.Add(m.Text, _style, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-                }
-            }
-            else
-                showMessages?.ShowMessages(rest.Messages);
+            Snackbar.ShowMessagesResponse(rest.Messages);
             IsBusyProgress = false;
             StateHasChanged();
             return;

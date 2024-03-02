@@ -1,7 +1,4 @@
-﻿@using MudBlazor;
-@using SharedLib;
-
-@inherits BlazorBusyComponentBaseModel
+﻿@inherits BlazorBusyComponentBaseModel
 
 @inject IParametersStorageService _storage
 @inject IToolsService _tools
@@ -89,17 +86,12 @@
     </div>
 </div>
 
-<ShowMessagesComponent @ref="_messages_ref" />
-
 @code {
     bool CanSave => connect_config != connect_config_orign;
     bool ShowPassword;
 
     EmailConfigModel connect_config = new();
     EmailConfigModel connect_config_orign = new();
-
-    //ToastContainerComponent? toast_ref;
-    ShowMessagesComponent? _messages_ref;
 
     bool TestConnectProcess = false;
 
@@ -113,49 +105,37 @@
 
         IsBusyProgress = true;
         ResponseBaseModel rest = await _storage.SaveEmailConfig(connect_config);
-        _messages_ref?.ShowMessages(rest.Messages);
+
         if (rest.IsSuccess)
         {
             connect_config_orign = GlobalStatic.CreateDeepCopy(connect_config);
         }
         IsBusyProgress = false;
-        _messages_ref?.ShowMessages(rest.Messages);
+        _snackbar.ShowMessagesResponse(rest.Messages);
     }
 
     async Task TectConfigConnect()
     {
         TestConnectProcess = true;
         ResponseBaseModel rest = await _tools.TestEmailConnect(connect_config);
-        _messages_ref?.ShowMessages(rest.Messages);
+        _snackbar.ShowMessagesResponse(rest.Messages);
         TestConnectProcess = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        EmailConfigResponseModel res = await _storage.GetEmailConfig();
+        EmailConfigResponseModel rest = await _storage.GetEmailConfig();
 
-        Severity _style;
-        foreach (ResultMessage m in res.Messages)
-        {
-            _style = m.TypeMessage switch
-            {
-                ResultTypeEnum.Success => Severity.Success,
-                ResultTypeEnum.Info => Severity.Info,
-                ResultTypeEnum.Warning => Severity.Warning,
-                ResultTypeEnum.Error => Severity.Error,
-                _ => Severity.Normal
-            };
-            _snackbar.Add(m.Text, _style, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-        }
+        _snackbar.ShowMessagesResponse(rest.Messages);
 
-        if (!res.IsSuccess || res.Conf is null)
+        if (!rest.IsSuccess || rest.Conf is null)
         {
             IsBusyProgress = false;
             return;
         }
 
-        connect_config_orign = res.Conf;
+        connect_config_orign = rest.Conf;
         connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign);
         IsBusyProgress = false;
     }

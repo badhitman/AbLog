@@ -58,7 +58,7 @@ else
         </figcaption>
     </figure>
 }
-<ShowMessagesComponent @ref="showMessages" />
+
 @code {
     [Parameter, EditorRequired]
     public int ScriptId { get; set; }
@@ -70,8 +70,6 @@ else
     /// Команды
     /// </summary>
     List<EntrySortingModel> Commands = new();
-
-    ShowMessagesComponent? showMessages;
 
     void MoveCommandAction(VerticalDirectionsEnum direction, int command_id)
     {

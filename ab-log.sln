@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FlashCap", "FlashCap", "{45
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web", "ab-log.web\ab-log.web.csproj", "{C2DB5039-C917-4262-A6DC-B9C2C1902862}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log-rc", "ab-log-rc\ab-log-rc.csproj", "{A491DA63-3B17-43A7-8290-D7533AC510DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.app", "ab-log-rc\ab-log.app.csproj", "{A491DA63-3B17-43A7-8290-D7533AC510DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

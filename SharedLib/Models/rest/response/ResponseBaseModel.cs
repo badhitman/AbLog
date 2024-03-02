@@ -19,7 +19,7 @@ public class ResponseBaseModel
     /// <summary>
     /// Базовая модель ответа сервера rest/api
     /// </summary>
-    public ResponseBaseModel(string msg, ResultTypeEnum msgType = ResultTypeEnum.Success)
+    public ResponseBaseModel(string msg, ResultTypesEnum msgType = ResultTypesEnum.Success)
     {
         if (!string.IsNullOrWhiteSpace(msg))
         {
@@ -34,7 +34,7 @@ public class ResponseBaseModel
     /// True - если удачно бз ошибок. False  - если возникли ошибки
     /// </summary>
     [JsonIgnore]
-    public virtual bool IsSuccess => !Messages.Any(x => x.TypeMessage == ResultTypeEnum.Error);
+    public virtual bool IsSuccess => !Messages.Any(x => x.TypeMessage == ResultTypesEnum.Error);
 
     /// <summary>
     /// Сообщение сервера. Если IsSuccess == false, то будет сообщение об ошибке
@@ -52,22 +52,22 @@ public class ResponseBaseModel
     /// <summary>
     /// Создать ответ с ошибкой
     /// </summary>
-    public static ResponseBaseModel CreateError(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Error, Text = msg } } };
+    public static ResponseBaseModel CreateError(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = msg } } };
 
     /// <summary>
     /// Создать ответ с Success
     /// </summary>
-    public static ResponseBaseModel CreateSuccess(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Success, Text = msg } } };
+    public static ResponseBaseModel CreateSuccess(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Success, Text = msg } } };
 
     /// <summary>
     /// Создать ответ с Warning
     /// </summary>
-    public static ResponseBaseModel CreateWarning(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Warning, Text = msg } } };
+    public static ResponseBaseModel CreateWarning(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = msg } } };
 
     /// <summary>
     /// Добавить сообщение: Успех
     /// </summary>
-    public ResponseBaseModel AddSuccess(string text) => AddMessage(ResultTypeEnum.Success, text);
+    public ResponseBaseModel AddSuccess(string text) => AddMessage(ResultTypesEnum.Success, text);
 
     /// <summary>
     /// Добавить сообщения: Успех
@@ -75,29 +75,29 @@ public class ResponseBaseModel
     public ResponseBaseModel AddRangeSuccess(IEnumerable<string> messages)
     {
         foreach (string text in messages)
-            AddMessage(ResultTypeEnum.Success, text);
+            AddMessage(ResultTypesEnum.Success, text);
         return this;
     }
 
     /// <summary>
     /// Добавить сообщение: Информация
     /// </summary>
-    public ResponseBaseModel AddInfo(string text) => AddMessage(ResultTypeEnum.Info, text);
+    public ResponseBaseModel AddInfo(string text) => AddMessage(ResultTypesEnum.Info, text);
 
     /// <summary>
     /// Добавить сообщение: Ошибка
     /// </summary>
-    public ResponseBaseModel AddError(string text) => AddMessage(ResultTypeEnum.Error, text);
+    public ResponseBaseModel AddError(string text) => AddMessage(ResultTypesEnum.Error, text);
 
     /// <summary>
     /// Добавить сообщение: Оповещение
     /// </summary>
-    public ResponseBaseModel AddAlert(string text) => AddMessage(ResultTypeEnum.Alert, text);
+    public ResponseBaseModel AddAlert(string text) => AddMessage(ResultTypesEnum.Alert, text);
 
     /// <summary>
     /// Добавить сообщение: Внимание
     /// </summary>
-    public ResponseBaseModel AddWarning(string text) => AddMessage(ResultTypeEnum.Warning, text);
+    public ResponseBaseModel AddWarning(string text) => AddMessage(ResultTypesEnum.Warning, text);
 
     /// <summary>
     /// Сообщения к ответу rest/api
@@ -107,7 +107,7 @@ public class ResponseBaseModel
     /// <summary>
     /// Добавить сообщение к результату-ответу rest/api
     /// </summary>
-    public ResponseBaseModel AddMessage(ResultTypeEnum type, string text)
+    public ResponseBaseModel AddMessage(ResultTypesEnum type, string text)
     {
         Messages ??= new();
         Messages.Add(new ResultMessage() { TypeMessage = type, Text = text });

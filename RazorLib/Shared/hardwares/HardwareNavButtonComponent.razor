@@ -52,8 +52,6 @@ else
     <button title="@PagePath" @onclick="Expand" type="button" class="btn btn-primary">@($"{(string.IsNullOrEmpty(PortEntry?.Name) ? "" : $"[{PortEntry.Name}] ")}{Text}")</button>
 }
 
-<ShowMessagesComponent @ref="showMessages" />
-
 @code {
     [Parameter, EditorRequired]
     public string Text { get; set; } = default!;
@@ -84,7 +82,7 @@ else
     {
         ResponseBaseModel rest = await _hardwares.SetNamePort(PortEntry);
 
-        showMessages?.ShowMessages(rest.Messages);
+        Snackbar.ShowMessagesResponse(rest.Messages);
     }
 
     protected override async Task OnInitializedAsync()
@@ -101,7 +99,7 @@ else
 
                 EntriyResponseModel rest = await _hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = uint.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true }, cancellationToken);
 
-                showMessages?.ShowMessages(rest.Messages);
+                Snackbar.ShowMessagesResponse(rest.Messages);
                 if (rest.IsSuccess)
                 {
                     PortEntry = rest.Entry ?? new();

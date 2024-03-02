@@ -4,7 +4,7 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject IUsersService _users;
-@inject ISnackbar _snackbar;
+@inject ISnackbar Snackbar;
 
 <div class="card">
     <div class="card-body">
@@ -123,12 +123,10 @@
         </MudTable>
     </div>
 </div>
-<ShowMessagesComponent @ref="showMessages" />
 
 @code {
     private int totalItems;
     private MudTable<UserModelDB>? table;
-    ShowMessagesComponent? showMessages;
 
     UserModelDB elementBeforeEdit = new();
     private List<string> editEvents = new();
@@ -147,7 +145,7 @@
 
         if (sender is null)
         {
-            _snackbar.Add("sender is null. error {71B240C3-2A60-45AB-B7AF-C0A8F4CF7CAB}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add("sender is null. error {71B240C3-2A60-45AB-B7AF-C0A8F4CF7CAB}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
@@ -165,7 +163,7 @@
                     AllowHardwareControl = sender.CommandsAllowed,
                     AllowChangeMqttConfig = sender.AllowChangeMqttConfig
                 });
-            showMessages?.ShowMessages(upd_command.Messages);
+            Snackbar.ShowMessagesResponse(upd_command.Messages);
             if (!upd_command.IsSuccess)
             {
                 IsBusyProgress = false;
@@ -194,7 +192,7 @@
         IsBusyProgress = true;
         StateHasChanged();
         UsersPaginationResponseModel rest = await _users.UsersGetList(new UserListGetModel() { PageNum = state.Page, PageSize = state.PageSize, IncludeDisabledUsers = true });
-        showMessages?.ShowMessages(rest.Messages);
+        Snackbar.ShowMessagesResponse(rest.Messages);
         totalItems = rest.TotalRowsCount;
         IsBusyProgress = false;
         Users = rest.Users ?? Enumerable.Empty<UserModelDB>();

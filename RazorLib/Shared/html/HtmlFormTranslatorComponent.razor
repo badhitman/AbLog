@@ -7,7 +7,7 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject IHardwaresService _hardwares
-@inject ISnackbar _snackbar
+@inject ISnackbar Snackbar
 
 <CascadingValue Value="@FormContext">
     <CascadingValue Value="@SendForm">
@@ -23,7 +23,7 @@
         </form>
     </CascadingValue>
 </CascadingValue>
-<ShowMessagesComponent @ref="showMessages" />
+
 @code {
     [Parameter, EditorRequired]
     public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
@@ -35,7 +35,6 @@
     public Action? ReloadPageHandle { get; set; }
 
     public FormContextModel? FormContext;
-    ShowMessagesComponent? showMessages;
 
     protected override void OnInitialized()
     {
@@ -48,7 +47,7 @@
     {
         if (FormContext is null)
         {
-            _snackbar.Add("FormContext is null. Ошибка {54E46BC9-830E-477B-9EFB-9D03B69C0E3F}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add("FormContext is null. Ошибка {54E46BC9-830E-477B-9EFB-9D03B69C0E3F}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
@@ -67,7 +66,7 @@
             }
         }
         string json = JsonConvert.SerializeObject(FormContext.DataContext);
-        _snackbar.Add($"{FormContext.FormAction} > {json}", Severity.Normal, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        Snackbar.Add($"{FormContext.FormAction} > {json}", Severity.Normal, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         if (Id <= 0)
             return;
 
@@ -80,7 +79,7 @@
                 HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id.Value, Path = $"?{path_query}" });
                 if (!rest.IsSuccess)
                 {
-                    showMessages?.ShowMessages(rest.Messages);
+                    Snackbar.ShowMessagesResponse(rest.Messages);
                     return;
                 }
 

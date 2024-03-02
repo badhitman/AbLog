@@ -5,6 +5,7 @@
 
 @inject IHardwaresService _hardwares
 @inject NavigationManager _nav
+@inject ISnackbar Snackbar
 
 @if (IsBusyProgress)
 {
@@ -73,7 +74,7 @@ else
         </div>
     </EditForm>
 }
-<ShowMessagesComponent @ref="showMessages" />
+
 @code {
     [CascadingParameter]
     public int Id { get; set; }
@@ -85,7 +86,6 @@ else
     bool InitDelete = false;
     bool ShowPass = false;
     HardwareBaseModel hw = new();
-    ShowMessagesComponent? showMessages;
 
 #if DEBUG
     bool IsDebug = true;
@@ -105,7 +105,7 @@ else
         ResponseBaseModel rest = await _hardwares.HardwareDelete(Id);
         if (!rest.IsSuccess)
         {
-            showMessages?.ShowMessages(rest.Messages);
+            Snackbar.ShowMessagesResponse(rest.Messages);
             IsBusyProgress = false;
             return;
         }
@@ -117,7 +117,7 @@ else
     {
         IsBusyProgress = true;
         HardwareResponseModel rest = await _hardwares.HardwareUpdate(hw);
-        showMessages?.ShowMessages(rest.Messages);
+        Snackbar.ShowMessagesResponse(rest.Messages);
         if (!rest.IsSuccess || rest.Hardware is null)
         {
             IsBusyProgress = false;
@@ -140,7 +140,7 @@ else
 
         if (!rest.IsSuccess || rest.Hardware is null)
         {
-            showMessages?.ShowMessages(rest.Messages);
+            Snackbar.ShowMessagesResponse(rest.Messages);
             return;
         }
 

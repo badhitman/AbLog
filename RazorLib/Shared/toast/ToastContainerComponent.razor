@@ -65,17 +65,17 @@
         StateHasChanged();
     }
 
-    ThemeModel GetCss(ResultTypeEnum type_msg)
+    ThemeModel GetCss(ResultTypesEnum type_msg)
     {
         switch (type_msg)
         {
-            case ResultTypeEnum.Success:
+            case ResultTypesEnum.Success:
                 return new ThemeModel("success", "white");
-            case ResultTypeEnum.Info:
+            case ResultTypesEnum.Info:
                 return new ThemeModel("primary", "white");
-            case ResultTypeEnum.Warning:
+            case ResultTypesEnum.Warning:
                 return new ThemeModel("warning", "dark");
-            case ResultTypeEnum.Error:
+            case ResultTypesEnum.Error:
                 return new ThemeModel("danger", "white");
             default:
                 return new ThemeModel("secondary", "white");

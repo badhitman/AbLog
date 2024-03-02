@@ -2,6 +2,7 @@
 @using SharedLib;
 
 @inject ISystemCommandsService _comm
+@inject ISnackbar Snackbar;
 
 <MudTooltip Text="@(IsInitDelete ? "Подтверждаю намерение удалить команду без возможности восстановления" : "Удалить команду навсегда")">
     <button @onclick="@DeleteCommand" class="btn btn@(IsInitDelete?"":"-outline")-danger">@(IsInitDelete ? "Подтвердить удаление" : "Удалить")</button>
@@ -12,7 +13,7 @@
         <button @onclick="() => { IsInitDelete = false; }" class="btn btn-outline-primary">Отменить удаление</button>
     </MudTooltip>
 }
-<ShowMessagesComponent @ref="showMessages" />
+
 @code {
     [Parameter, EditorRequired]
     public int CommandId { get; set; }
@@ -20,7 +21,6 @@
     [Parameter, EditorRequired]
     public Action UpdateCommandsList { get; set; } = default!;
 
-    ShowMessagesComponent? showMessages;
     bool IsInitDelete = false;
 
     async Task DeleteCommand()
@@ -32,6 +32,6 @@
         }
 
         ResponseBaseModel res = await _comm.CommandDelete(CommandId);
-        showMessages?.ShowMessages(res.Messages);
+        Snackbar.ShowMessagesResponse(res.Messages);
     }
 }

@@ -43,7 +43,6 @@
     </div>
 </li>
 
-<ShowMessagesComponent @ref="showMessages" />
 @code {
     [Parameter, EditorRequired]
     public ConditionAnonimModel Condition { get; set; } = default!;
@@ -76,8 +75,6 @@
     public Action<int> DeleteNewConditionAct { get; set; } = default!;
 
     string ModalBodyText { get; set; } = string.Empty;
-
-    ShowMessagesComponent? showMessages;
 
     string? _conditionValue;
     string? _conditionName;

@@ -4,7 +4,7 @@
 @inherits BlazorBusyComponentBaseModel
 
 @inject ISystemCommandsService _comm
-@inject ISnackbar _snackbar;
+@inject ISnackbar Snackbar;
 
 <div class="card">
     <div class="card-body">
@@ -110,10 +110,8 @@
         </MudTable>
     </div>
 </div>
-<ShowMessagesComponent @ref="showMessages" />
-@code {
-    ShowMessagesComponent? showMessages;
 
+@code {
     bool CanAddingSystemCommand => !string.IsNullOrWhiteSpace(createCommand.FileName) && !string.IsNullOrWhiteSpace(createCommand.Name);
     SystemCommandModelDB createCommand = new();
     SystemCommandModelDB elementBeforeEdit = new();
@@ -127,14 +125,14 @@
 
         if (sender is null)
         {
-            _snackbar.Add("sender is null. error {C24B208F-15EE-4F32-B853-5FE9C6AB0F41}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add("sender is null. error {C24B208F-15EE-4F32-B853-5FE9C6AB0F41}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
 
             return;
         }
 
         if (string.IsNullOrWhiteSpace(sender.FileName) || string.IsNullOrWhiteSpace(sender.Name))
         {
-            _snackbar.Add("string.IsNullOrWhiteSpace(sender.FileName) || string.IsNullOrWhiteSpace(sender.Name). error {06356BA7-CD2D-48E3-BC22-B4FBF1276231}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add("string.IsNullOrWhiteSpace(sender.FileName) || string.IsNullOrWhiteSpace(sender.Name). error {06356BA7-CD2D-48E3-BC22-B4FBF1276231}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             sender.FileName = elementBeforeEdit.FileName;
             sender.Arguments = elementBeforeEdit.Arguments;
             sender.IsDisabled = elementBeforeEdit.IsDisabled;
@@ -147,7 +145,7 @@
             IsBusyProgress = true;
             StateHasChanged();
             ResponseBaseModel upd_command = await _comm.CommandUpdateOrCreate(sender);
-            showMessages?.ShowMessages(upd_command.Messages);
+            Snackbar.ShowMessagesResponse(upd_command.Messages);
             if (!upd_command.IsSuccess)
             {
                 IsBusyProgress = false;
@@ -176,7 +174,7 @@
         IsBusyProgress = true;
         ResponseBaseModel run_cmd_res = await _comm.CommandRun(command_id);
         IsBusyProgress = false;
-        showMessages?.ShowMessages(run_cmd_res.Messages);
+        Snackbar.ShowMessagesResponse(run_cmd_res.Messages);
     }
 
     private void ResetItemToOriginalValues(object element)
@@ -199,7 +197,7 @@
     {
         if (!CanAddingSystemCommand)
         {
-            _snackbar.Add("Имя файла и название команды обязательны для заполнения", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add("Имя файла и название команды обязательны для заполнения", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
         IsBusyProgress = true;
@@ -208,7 +206,7 @@
         if (!adding_command.IsSuccess)
         {
             IsBusyProgress = false;
-            showMessages?.ShowMessages(adding_command.Messages);
+            Snackbar.ShowMessagesResponse(adding_command.Messages);
             return;
         }
         createCommand = new();
@@ -232,13 +230,13 @@
         {
             _style = m.TypeMessage switch
             {
-                ResultTypeEnum.Success => Severity.Success,
-                ResultTypeEnum.Info => Severity.Info,
-                ResultTypeEnum.Warning => Severity.Warning,
-                ResultTypeEnum.Error => Severity.Error,
+                ResultTypesEnum.Success => Severity.Success,
+                ResultTypesEnum.Info => Severity.Info,
+                ResultTypesEnum.Warning => Severity.Warning,
+                ResultTypesEnum.Error => Severity.Error,
                 _ => Severity.Normal
             };
-            _snackbar.Add(m.Text, _style, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add(m.Text, _style, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         }
         if (elements.SystemCommands is not null)
         {

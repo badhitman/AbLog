@@ -80,8 +80,8 @@ public class HardwaresLocalService : IHardwaresService
                 StatusCode = HttpStatusCode.RequestTimeout,
                 Messages = new List<ResultMessage>()
                     {
-                        new ResultMessage() { TypeMessage = ResultTypeEnum.Warning, Text = $"Контроллер [{db_hw.Address}] недоступен" },
-                        new ResultMessage() { TypeMessage = ResultTypeEnum.Error, Text = tcex.Message }
+                        new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = $"Контроллер [{db_hw.Address}] недоступен" },
+                        new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = tcex.Message }
                     }
             };
         }
@@ -90,7 +90,7 @@ public class HardwaresLocalService : IHardwaresService
             return new()
             {
                 StatusCode = HttpStatusCode.InternalServerError,
-                Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypeEnum.Error, Text = ex.Message } }
+                Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = ex.Message } }
             };
         }
     }

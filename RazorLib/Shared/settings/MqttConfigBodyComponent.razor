@@ -5,7 +5,7 @@
 
 @inject IParametersStorageService _storage
 @inject IToolsService _tools
-@inject ISnackbar _snackbar
+@inject ISnackbar Snackbar
 
 <div class="card">
     <div class="card-body">
@@ -110,7 +110,6 @@
         </EditForm>
     </div>
 </div>
-<ShowMessagesComponent @ref="showMessages" />
 
 @code {
     MqttConfigModel conf = new();
@@ -122,14 +121,12 @@
 
     bool ServiceIsRunning = false;
 
-    ShowMessagesComponent? showMessages;
-
     protected override async Task OnInitializedAsync()
     {
         editContext = new(conf);
         IsBusyProgress = true;
         MqttConfigResponseModel res = await _storage.GetMqttConfig();
-        showMessages?.ShowMessages(res.Messages);
+        Snackbar.ShowMessagesResponse(res.Messages);
         if (!res.IsSuccess || res.Conf is null)
         {
             IsBusyProgress = false;
@@ -148,14 +145,14 @@
     {
         BoolResponseModel status = await _tools.StatusMqtt();
         ServiceIsRunning = status.Response;
-        showMessages?.ShowMessages(status.Messages);
+        Snackbar.ShowMessagesResponse(status.Messages);
     }
 
     async Task StopService()
     {
         IsBusyProgress = true;
         ResponseBaseModel stop_res = await _tools.StopMqtt();
-        showMessages?.ShowMessages(stop_res.Messages);
+        Snackbar.ShowMessagesResponse(stop_res.Messages);
         await GetStatusService();
         IsBusyProgress = false;
     }
@@ -164,7 +161,7 @@
     {
         IsBusyProgress = true;
         ResponseBaseModel start_res = await _tools.StartMqtt();
-        showMessages?.ShowMessages(start_res.Messages);
+        Snackbar.ShowMessagesResponse(start_res.Messages);
         await GetStatusService();
         IsBusyProgress = false;
     }
@@ -174,13 +171,13 @@
         bool? validate = editContext?.Validate();
         if (validate != true)
         {
-            _snackbar.Add("Форма не заполнена!", Severity.Warning, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            Snackbar.Add("Форма не заполнена!", Severity.Warning, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
         IsBusyProgress = true;
         ResponseBaseModel res = await _storage.SaveMqttConfig(conf);
-        showMessages?.ShowMessages(res.Messages);
+        Snackbar.ShowMessagesResponse(res.Messages);
 
         if (res.IsSuccess)
             conf_self = GlobalStatic.CreateDeepCopy(conf);
@@ -192,7 +189,7 @@
     {
         IsBusyProgress = true;
         ResponseBaseModel res = await _tools.TestMqttConnect(conf);
-        showMessages?.ShowMessages(res.Messages);
+        Snackbar.ShowMessagesResponse(res.Messages);
         IsBusyProgress = false;
     }
 }

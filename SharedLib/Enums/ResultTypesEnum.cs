@@ -8,7 +8,7 @@ namespace SharedLib;
 /// Типы сообщения (результата-ответа):
 /// Ошибка, Успех, Информация, Оповещение, Предупреждение
 /// </summary>
-public enum ResultTypeEnum
+public enum ResultTypesEnum
 {
     /// <summary>
     /// Ошибка

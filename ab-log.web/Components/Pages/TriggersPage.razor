@@ -1,10 +1,4 @@
 ﻿@page "/triggers-page"
-@rendermode InteractiveServer
-
-@using RazorLib.Shared.navs.tabs
-@using RazorLib.Shared;
-@using SharedLib;
-@using MudBlazor;
 
 @* @inject IRefitScriptsService _refit_scripts;
 @inject IRefitTriggersService _refit_trig;
@@ -155,7 +149,6 @@ else
     </div>
 }
 
-<ShowMessagesComponent @ref="showMessages" />
 @code {
     public EntryNestedModel[] EntriesTreeHW { get; set; } = Array.Empty<EntryNestedModel>();
 
@@ -224,7 +217,6 @@ else
 
     List<TrigerModelDB> Triggers = new();
     List<ScriptModelDB> Scripts = new();
-    ShowMessagesComponent? showMessages;
 
     string ModalBodyText { get; set; } = string.Empty;
 
