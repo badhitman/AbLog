@@ -1,8 +1,7 @@
 ﻿@using MudBlazor;
 @using SharedLib
-@using BlazorLib
 
-@inject IRefitHardwaresService _refit
+@* @inject IRefitHardwaresService _refit *@
 @inject ISnackbar _snackbar
 
 <div class="col-auto">
@@ -110,15 +109,15 @@ else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
 
     async Task RestByPortId(int port_id)
     {
-        Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit.HardwarePortGet(port_id);
-        CurrentPort = rest.Content?.Port;
+        // Refit.ApiResponse<PortHardwareResponseModel> rest = await _refit.HardwarePortGet(port_id);
+        // CurrentPort = rest.Content?.Port;
         CurrentController = CurrentPort?.Hardware;
         await RestByControllerId(CurrentController!.Id);
     }
 
     async Task RestByControllerId(int controller_id)
     {
-        Refit.ApiResponse<HardwareResponseModel> rest = await _refit.HardwareGet(controller_id);
-        CurrentController = rest.Content!.Hardware;
+        //Refit.ApiResponse<HardwareResponseModel> rest = await _refit.HardwareGet(controller_id);
+        //CurrentController = rest.Content!.Hardware;
     }
 }

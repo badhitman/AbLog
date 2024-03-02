@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.Server", "old.v3\AbLogServer.Server\ab-log.Server.csproj", "{CB18AF5E-9509-4042-A90C-278FC3151DBF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.Client", "old.v3\AbLogServer.Client\ab-log.Client.csproj", "{44722011-B062-4321-AB85-46CADB8B40F0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shared-lib", "SharedLib\shared-lib.csproj", "{81D9FB74-124C-4FD2-997C-1D15CB3FFFB0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "server-lib", "ServerLib\server-lib.csproj", "{0F20D4DE-5C34-4D1C-B135-A725EC8BB888}"
@@ -24,8 +20,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "razor-lib", "RazorLib\razor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "db-context", "DBContextLib\db-context.csproj", "{0F89D313-7C3C-438D-9BEE-86E294983CC4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ab-log server", "ab-log server", "{D0453C5F-12E6-4051-BDC0-1F765F147E74}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashCap.Core", "FlashCap\FlashCap.Core\FlashCap.Core.csproj", "{283FDF9C-4075-4564-A896-7EC7582921E2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashCap", "FlashCap\FlashCap\FlashCap.csproj", "{3C9292C2-DD0E-421D-8116-5F792D66431F}"
@@ -33,12 +27,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FlashCap", "FlashCap", "{45DDE1A3-62DE-4D7C-8527-39ADF375BBE3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log-rc", "old.v3\ab-log-rc\ab-log-rc.csproj", "{BB0F100B-A773-40B2-8462-A297600F85C6}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{15B6F8D0-837B-4A85-9F3D-87EED7F03872}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web", "ab-log.web.fake\ab-log.web\ab-log.web.csproj", "{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.web.client", "ab-log.web.fake\ab-log.web.client\ab-log.web.client.csproj", "{4804BDE0-901E-4DB1-9560-8FA5710B0788}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ab-log.app", "ab-log.app\ab-log.app.csproj", "{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}"
 EndProject
@@ -52,14 +40,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CB18AF5E-9509-4042-A90C-278FC3151DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CB18AF5E-9509-4042-A90C-278FC3151DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CB18AF5E-9509-4042-A90C-278FC3151DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CB18AF5E-9509-4042-A90C-278FC3151DBF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{44722011-B062-4321-AB85-46CADB8B40F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44722011-B062-4321-AB85-46CADB8B40F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44722011-B062-4321-AB85-46CADB8B40F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44722011-B062-4321-AB85-46CADB8B40F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81D9FB74-124C-4FD2-997C-1D15CB3FFFB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{81D9FB74-124C-4FD2-997C-1D15CB3FFFB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81D9FB74-124C-4FD2-997C-1D15CB3FFFB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -90,14 +70,6 @@ Global
 		{BB0F100B-A773-40B2-8462-A297600F85C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0F100B-A773-40B2-8462-A297600F85C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BB0F100B-A773-40B2-8462-A297600F85C6}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4804BDE0-901E-4DB1-9560-8FA5710B0788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4804BDE0-901E-4DB1-9560-8FA5710B0788}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4804BDE0-901E-4DB1-9560-8FA5710B0788}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4804BDE0-901E-4DB1-9560-8FA5710B0788}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BCB3628-AC15-4C2C-99FB-7AF63AEF1E3B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -113,15 +85,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CB18AF5E-9509-4042-A90C-278FC3151DBF} = {D0453C5F-12E6-4051-BDC0-1F765F147E74}
-		{44722011-B062-4321-AB85-46CADB8B40F0} = {D0453C5F-12E6-4051-BDC0-1F765F147E74}
-		{D0453C5F-12E6-4051-BDC0-1F765F147E74} = {C083CD98-5E53-4BA9-AB77-92F6A21A9350}
 		{283FDF9C-4075-4564-A896-7EC7582921E2} = {45DDE1A3-62DE-4D7C-8527-39ADF375BBE3}
 		{3C9292C2-DD0E-421D-8116-5F792D66431F} = {45DDE1A3-62DE-4D7C-8527-39ADF375BBE3}
 		{45DDE1A3-62DE-4D7C-8527-39ADF375BBE3} = {C201E875-8423-4AF0-AABC-68FF8B0B36BE}
 		{BB0F100B-A773-40B2-8462-A297600F85C6} = {C083CD98-5E53-4BA9-AB77-92F6A21A9350}
-		{2D4B14FA-75AE-4A70-BDD9-3C8AFFF15B31} = {15B6F8D0-837B-4A85-9F3D-87EED7F03872}
-		{4804BDE0-901E-4DB1-9560-8FA5710B0788} = {15B6F8D0-837B-4A85-9F3D-87EED7F03872}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C70807F-61D7-47A4-A8B3-92E0D885D37B}

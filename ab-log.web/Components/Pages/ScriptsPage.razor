@@ -5,11 +5,9 @@
 @using RazorLib.Shared;
 @using MudBlazor;
 @using SharedLib;
-@using BlazorLib;
-@using Refit;
 
 @inject ILogger<ScriptsPage> _logger;
-@inject IRefitScriptsService _refit;
+@* @inject IRefitScriptsService _refit; *@
 @inject ISnackbar _snackbar;
 
 @inherits BlazorBusyComponentBaseModel
@@ -186,25 +184,25 @@ else
         if (CurrentScript.Id > 0)
         {
             IsBusyProgress = true;
-            ApiResponse<ScriptsResponseModel> rest = await _refit.ScriptDelete(CurrentScript.Id);
-            if (!rest.IsSuccessStatusCode)
-            {
-                ModalBodyText = $"Ошибка: {rest.StatusCode}";
-                Modal?.Open("Ошибка");
-                return;
-            }
-            if (rest.Content is null)
-            {
-                ModalBodyText = $"rest.Content is null";
-                Modal?.Open("Ошибка");
-                return;
-            }
-            if (!rest.Content.IsSuccess)
-            {
-                ModalBodyText = rest.Content.Message;
-                Modal?.Open("Ошибка");
-                return;
-            }
+            // ApiResponse<ScriptsResponseModel> rest = await _refit.ScriptDelete(CurrentScript.Id);
+            // if (!rest.IsSuccessStatusCode)
+            // {
+            //     ModalBodyText = $"Ошибка: {rest.StatusCode}";
+            //     Modal?.Open("Ошибка");
+            //     return;
+            // }
+            // if (rest.Content is null)
+            // {
+            //     ModalBodyText = $"rest.Content is null";
+            //     Modal?.Open("Ошибка");
+            //     return;
+            // }
+            // if (!rest.Content.IsSuccess)
+            // {
+            //     ModalBodyText = rest.Content.Message;
+            //     Modal?.Open("Ошибка");
+            //     return;
+            // }
             ScriptsAll.RemoveAt(ScriptsAll.FindIndex(x => x.Id == CurrentScript.Id));
             IsBusyProgress = false;
         }
@@ -241,13 +239,13 @@ else
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        ApiResponse<ScriptsResponseModel> rest_all_scripts = await _refit.ScriptsGetAll();
-        if (rest_all_scripts.Content?.Scripts is null)
-        {
-            _snackbar.Add("res.Content?.Scripts is null ошибка {45E0C870-67E6-4F33-AC1A-644C828148E9}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-            return;
-        }
-        ScriptsAll = rest_all_scripts.Content.Scripts;
+        // ApiResponse<ScriptsResponseModel> rest_all_scripts = await _refit.ScriptsGetAll();
+        // if (rest_all_scripts.Content?.Scripts is null)
+        // {
+        //     _snackbar.Add("res.Content?.Scripts is null ошибка {45E0C870-67E6-4F33-AC1A-644C828148E9}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        //     return;
+        // }
+        // ScriptsAll = rest_all_scripts.Content.Scripts;
 
         if (ScriptsAll.Any())
             CurrentScript = ScriptsAll.First();
@@ -277,29 +275,29 @@ else
     async Task SaveScriptHandle()
     {
         IsBusyProgress = true;
-        ApiResponse<ScriptsResponseModel> rest = await _refit.ScriptUpdateOrCreate(new EntryDescriptionModel() { Id = CurrentScript.Id, Name = CurrentScript.Name, Description = CurrentScript.Description });
-        if (rest.Content?.Scripts is null)
-        {
-            _snackbar.Add("rest.Content?.Scripts is null ошибка {093F4C03-E89C-40F9-931D-EDB389FF56A6}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-            return;
-        }
+        // ApiResponse<ScriptsResponseModel> rest = await _refit.ScriptUpdateOrCreate(new EntryDescriptionModel() { Id = CurrentScript.Id, Name = CurrentScript.Name, Description = CurrentScript.Description });
+        // if (rest.Content?.Scripts is null)
+        // {
+        //     _snackbar.Add("rest.Content?.Scripts is null ошибка {093F4C03-E89C-40F9-931D-EDB389FF56A6}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        //     return;
+        // }
 
-        ScriptModelDB src = rest.Content.Scripts.First(x => x.Name == CurrentScript.Name);
-        CurrentScript.Id = src.Id;
-        CurrentScript.Name = src.Name;
-        CurrentScript.Description = src.Description;
-        ResetFormState(ResetFormModesEnum.EditToOrign);
+        // ScriptModelDB src = rest.Content.Scripts.First(x => x.Name == CurrentScript.Name);
+        // CurrentScript.Id = src.Id;
+        // CurrentScript.Name = src.Name;
+        // CurrentScript.Description = src.Description;
+        // ResetFormState(ResetFormModesEnum.EditToOrign);
 
-        int[] rows_for_del = ScriptsAll.Where(x => x.Id > 0 && !rest.Content.Scripts.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
-        while (ScriptsAll.Any(x => rows_for_del.Contains(x.Id)))
-        {
-            ScriptsAll.RemoveAt(ScriptsAll.FindIndex(x => rows_for_del.Contains(x.Id)));
-        }
-        ScriptModelDB[] rows_for_add = rest.Content.Scripts.Where(x => x.Id != src.Id && !ScriptsAll.Any(y => y.Id == x.Id)).ToArray();
-        if (rows_for_add.Any())
-        {
-            ScriptsAll.AddRange(rows_for_add);
-        }
+        // int[] rows_for_del = ScriptsAll.Where(x => x.Id > 0 && !rest.Content.Scripts.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
+        // while (ScriptsAll.Any(x => rows_for_del.Contains(x.Id)))
+        // {
+        //     ScriptsAll.RemoveAt(ScriptsAll.FindIndex(x => rows_for_del.Contains(x.Id)));
+        // }
+        // ScriptModelDB[] rows_for_add = rest.Content.Scripts.Where(x => x.Id != src.Id && !ScriptsAll.Any(y => y.Id == x.Id)).ToArray();
+        // if (rows_for_add.Any())
+        // {
+        //     ScriptsAll.AddRange(rows_for_add);
+        // }
         IsBusyProgress = false;
     }
 }

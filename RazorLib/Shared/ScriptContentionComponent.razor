@@ -1,10 +1,8 @@
 ﻿@using SharedLib;
-@using BlazorLib;
 @using MudBlazor;
-@using Refit;
 
 @inject ILogger<ScriptContentionComponent> _logger
-@inject IRefitContentionsService _refit
+@* @inject IRefitContentionsService _refit *@
 @inject ISnackbar _snackbar
 
 @inherits BlazorBusyComponentBaseModel
@@ -100,26 +98,26 @@ else
 
     async Task SetContention(int script_master, int script_slave, bool is_set)
     {
-        ApiResponse<IdsResponseModel> rest = await _refit.ContentionSet(new UpdateContentionRequestModel() { IsSet = is_set, ScriptMasterId = script_master, ScriptSlaveId = script_slave });
+        // ApiResponse<IdsResponseModel> rest = await _refit.ContentionSet(new UpdateContentionRequestModel() { IsSet = is_set, ScriptMasterId = script_master, ScriptSlaveId = script_slave });
 
-        if (rest.Content?.Ids is null)
-        {
-            _snackbar.Add("rest.Content?.Ids is null ошибка {E5088810-40A1-4AFA-BF4E-F19635027F16}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-            return;
-        }
-        _snackbar.Add(is_set ? "Выбран" : "Отменён", is_set ? Severity.Success : Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-        SelectedIds = rest.Content.Ids;
+        // if (rest.Content?.Ids is null)
+        // {
+        //     _snackbar.Add("rest.Content?.Ids is null ошибка {E5088810-40A1-4AFA-BF4E-F19635027F16}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        //     return;
+        // }
+        // _snackbar.Add(is_set ? "Выбран" : "Отменён", is_set ? Severity.Success : Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        // SelectedIds = rest.Content.Ids;
     }
 
     public async Task Rest(int script_id)
     {
-        ApiResponse<IdsResponseModel> rest = await _refit.ContentionsGetByScript(script_id);
-        if (rest.Content?.Ids is null)
-        {
-            _snackbar.Add("rest.Content?.Ids is null ошибка {CC161D89-B6C7-4436-8CB6-E83ECD10A509}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-            return;
-        }
-        SelectedIds = rest.Content.Ids;
+        // ApiResponse<IdsResponseModel> rest = await _refit.ContentionsGetByScript(script_id);
+        // if (rest.Content?.Ids is null)
+        // {
+        //     _snackbar.Add("rest.Content?.Ids is null ошибка {CC161D89-B6C7-4436-8CB6-E83ECD10A509}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        //     return;
+        // }
+        // SelectedIds = rest.Content.Ids;
         StateHasChanged();
     }
 }

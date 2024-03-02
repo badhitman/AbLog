@@ -35,8 +35,6 @@
 		<PackageReference Include="MudBlazor" Version="6.16.0" />
 		<PackageReference Include="NLog" Version="5.2.8" />
 		<PackageReference Include="NLog.Targets.MauiLog" Version="8.0.0" />
-		<PackageReference Include="Refit" Version="7.0.0" />
-		<PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.7" />
 	</ItemGroup>
