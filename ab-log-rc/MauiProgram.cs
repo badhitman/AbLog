@@ -2,15 +2,15 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using Microsoft.Extensions.Configuration;
-using MudBlazor.Services;
-using System.Reflection;
-using Newtonsoft.Json;
-using MQTTnet.Client;
 using ab.context;
-using SharedLib;
-using ServerLib;
+using Microsoft.Extensions.Configuration;
 using MQTTnet;
+using MQTTnet.Client;
+using MudBlazor.Services;
+using Newtonsoft.Json;
+using ServerLib;
+using SharedLib;
+using System.Reflection;
 
 namespace ab_log_rc;
 
@@ -50,7 +50,7 @@ public static class MauiProgram
         ClientConfigModel settings = new();
         builder.Configuration.Bind(settings);
         builder.Services.AddSingleton(settings);
-        builder.Services.AddHttpClient<ToolsRemoteService>();
+        //builder.Services.AddHttpClient<ToolsRemoteService>();
 
         builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRemoteService>();
         builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsMqttService>();
