@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////
 
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace SharedLib;
 
@@ -69,12 +68,6 @@ public class UserModelDB : UniversalModelDB
     public UserFormModelDb? UserForm { get; set; }
 
     /// <summary>
-    /// Row version Timestamp
-    /// </summary>
-    [Timestamp]
-    public byte[]? Version { get; set; }
-
-    /// <summary>
     /// Reload
     /// </summary>
     public void Reload(UserModelDB elementBeforeEdit)
@@ -89,7 +82,6 @@ public class UserModelDB : UniversalModelDB
         FirstName = elementBeforeEdit.FirstName;
         Name = elementBeforeEdit.Name;
         LastUpdate = elementBeforeEdit.LastUpdate;
-        Version = elementBeforeEdit.Version;
         UserForm = elementBeforeEdit.UserForm;
     }
 }

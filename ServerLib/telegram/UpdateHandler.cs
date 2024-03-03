@@ -595,7 +595,9 @@ public class UpdateHandler : IUpdateHandler
                 context.Update(res.User);
                 res.AddInfo("Данные Telegram пользователя: обновлены");
             }
+
             context.SaveChanges(true);
+
             res.User = context.Users
                 .Include(x => x.UserForm)
                 .ThenInclude(x => x!.Properties)

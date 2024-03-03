@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ab.context;
 
 #nullable disable
 
-namespace dbcontext.Migrations
+namespace dbcontext.Migrations.Server
 {
     [DbContext(typeof(ServerContext))]
-    partial class ServerContextModelSnapshot : ModelSnapshot
+    [Migration("20240303135133_ab_server_013_4")]
+    partial class ab_server_013_4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
