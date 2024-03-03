@@ -195,4 +195,8 @@
 	  <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.7" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\lib\bootstrap\scss\" />
+	</ItemGroup>
+
 </Project>
