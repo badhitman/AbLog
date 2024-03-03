@@ -15,7 +15,7 @@ public class TelegramBotFormFillingServive : TelegramBotFormFillingServiveAbstra
     public TelegramBotFormFillingServive(IServiceProvider _services, ILogger<TelegramBotFormFillingServive> logger)
     {
         using IServiceScope scope = _services.CreateScope();
-        _botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-        _logger = logger;
+        BotClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
+        Logger = logger;
     }
 }

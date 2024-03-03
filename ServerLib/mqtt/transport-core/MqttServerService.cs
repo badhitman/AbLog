@@ -277,12 +277,6 @@ public class MqttServerService : MqttBaseServiceAbstraction
 
             TelegramBotClientOptions options = new(req_conf_tbot.TelegramBotToken);
 
-            if (!req_conf_tbot!.IsConfigured)
-            {
-                await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("Конфигурация не установлена")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt);
-                return;
-            }
-
             try
             {
                 TelegramBotClient tbot_cli = new(options, _http_client);

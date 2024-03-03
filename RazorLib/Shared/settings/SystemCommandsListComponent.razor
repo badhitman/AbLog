@@ -89,7 +89,7 @@
                     <MudTextField @bind-Value="@context.Arguments" Required />
                 </MudTd>
                 <MudTd DataLabel="IsDisabled">
-                    <MudCheckBox Label="@(context.IsDisabled ? "Отключено (включить?)" : "Включено (отключить?)")" @bind-Checked="@context.IsDisabled" />
+                    <MudCheckBox Label="@(context.IsDisabled ? "Отключено (включить?)" : "Включено (отключить?)")" @bind-Value="@context.IsDisabled" />
                 </MudTd>
             </RowEditingTemplate>
             <NoRecordsContent>

@@ -90,11 +90,11 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel
         IsBusyProgress = true;
         ResponseBaseModel rest = await Storage.SaveTelegramBotConfig(_conf);
         Snackbar.ShowMessagesResponse(rest.Messages);
+        IsBusyProgress = false;
+
         if (!rest.IsSuccess)
-        {
-            IsBusyProgress = false;
             return;
-        }
+
         _conf_self = GlobalStatic.CreateDeepCopy(_conf);
         IsBusyProgress = false;
     }

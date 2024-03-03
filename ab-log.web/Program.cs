@@ -44,7 +44,7 @@ public class Program
         IWebHostEnvironment _env = builder.Environment;
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
-        //builder.Host.UseSystemd();
+        builder.Host.UseSystemd();
 
         logger.Warn($"load configs: *.{_env.EnvironmentName}.json");
         builder.Configuration.AddJsonFile("appsettings.json");
@@ -105,17 +105,14 @@ public class Program
         MqttConfigModel mqtt_settings = new();
         builder.Services.AddSingleton(x => mqtt_settings);
 
-        WebApplication app = builder.Build();
-
-        IDbContextFactory<ParametersContext> db_factory = app.Services.GetRequiredService<IDbContextFactory<ParametersContext>>();
-        using ParametersContext _context = db_factory.CreateDbContext();
+        using ParametersContext _context = new();
 
         mqtt_settings.LoadConfigFromJson(_context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue);
 
         string _json_config_raw = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
         TelegramBotConfigModel tbot_settings = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_json_config_raw) ?? new();
 
-        if (tbot_settings.IsConfigured && tbot_settings.AutoStart && !string.IsNullOrEmpty(tbot_settings.TelegramBotToken))
+        if (tbot_settings.AutoStart && !string.IsNullOrEmpty(tbot_settings.TelegramBotToken))
         {
             builder.Services.AddHttpClient("telegram_bot_client")
             .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
@@ -129,6 +126,8 @@ public class Program
             builder.Services.AddScoped<ReceiverService>();
             builder.Services.AddHostedService<PollingService>();
         }
+
+        WebApplication app = builder.Build();
 
         await using AsyncServiceScope scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
         DbContextOptions<ServerContext> options = scope.ServiceProvider.GetRequiredService<DbContextOptions<ServerContext>>();

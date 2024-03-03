@@ -66,4 +66,21 @@ public class UserModelDB : UniversalModelDB
     /// 
     /// </summary>
     public UserFormModelDb? UserForm { get; set; }
+
+    /// <summary>
+    /// Reload
+    /// </summary>
+    public void Reload(UserModelDB elementBeforeEdit)
+    {
+        Email = elementBeforeEdit.Email;
+        AlarmSubscriber = elementBeforeEdit.AlarmSubscriber;
+        CommandsAllowed = elementBeforeEdit.CommandsAllowed;
+        IsDisabled = elementBeforeEdit.IsDisabled;
+        AllowSystemCommands = elementBeforeEdit.AllowSystemCommands;
+        TelegramId = elementBeforeEdit.TelegramId;
+        LastName = elementBeforeEdit.LastName;
+        FirstName = elementBeforeEdit.FirstName;
+        Name = elementBeforeEdit.Name;
+        LastUpdate = elementBeforeEdit.LastUpdate;
+    }
 }

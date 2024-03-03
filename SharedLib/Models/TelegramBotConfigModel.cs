@@ -22,12 +22,6 @@ public class TelegramBotConfigModel
     /// </summary>
     public bool AutoStart { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool IsConfigured =>
-        !string.IsNullOrWhiteSpace(TelegramBotToken);
-
     /// <inheritdoc/>
     public static bool operator ==(TelegramBotConfigModel l, TelegramBotConfigModel r)
     {

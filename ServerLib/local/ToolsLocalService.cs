@@ -2,12 +2,12 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using Microsoft.Extensions.DependencyInjection;
+using MQTTnet;
 using MQTTnet.Adapter;
 using MQTTnet.Client;
-using Telegram.Bot;
 using SharedLib;
-using MQTTnet;
-using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
 
 namespace ServerLib;
 
@@ -120,12 +120,6 @@ public class ToolsLocalService : IToolsService
         }
 
         TelegramBotClientOptions options = new(conf.TelegramBotToken);
-
-        if (!conf!.IsConfigured)
-        {
-            res.AddError("Конфигурация не установлена");
-            return res;
-        }
 
         try
         {
