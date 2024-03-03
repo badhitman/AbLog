@@ -2,10 +2,9 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using Newtonsoft.Json;
 using ab.context;
+using Newtonsoft.Json;
 using SharedLib;
-using MQTTnet;
 
 namespace ServerLib;
 
@@ -109,7 +108,7 @@ public class ParametersStorageLocalService : IParametersStorageService
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_mqttConfig))
         {
-            res.AddError("string.IsNullOrWhiteSpace(_mqttConfig). error {5A7CC5FA-7D1D-4FB7-BB6C-BD317F964440}");
+            res.AddWarning("MQTT не настроен");
             return Task.FromResult(res);
         }
         res.Conf = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
