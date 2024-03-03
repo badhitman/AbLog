@@ -89,10 +89,6 @@ public class UpdateHandler : IUpdateHandler
         _notify.CheckTelegramUser(check_user);
 
         using ServerContext context = _db_factory.CreateDbContext();
-        //check_user.User = context.Users
-        //        .Include(x => x.UserForm)
-        //        .ThenInclude(x => x!.Properties)
-        //        .FirstOrDefault(x => x.TelegramId == message.From!.Id);
 
         if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled)
             return;
@@ -141,10 +137,6 @@ public class UpdateHandler : IUpdateHandler
         _notify.CheckTelegramUser(check_user);
 
         using ServerContext context = _db_factory.CreateDbContext();
-        //check_user.User = context.Users
-        //        .Include(x => x.UserForm)
-        //        .ThenInclude(x => x!.Properties)
-        //        .FirstOrDefault(x => x.TelegramId == callbackQuery.From!.Id);
 
         if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled == true)
             return;
@@ -580,7 +572,6 @@ public class UpdateHandler : IUpdateHandler
                     CommandsAllowed = false,
                     AllowChangeMqttConfig = false,
                     AllowSystemCommands = false,
-                    LastUpdate = DateTime.Now,
                     IsDisabled = true
                 };
                 context.Add(res.User);

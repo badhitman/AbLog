@@ -6,6 +6,15 @@
 
 @inherits BlazorBusyComponentBaseModel
 
+<figure>
+    <blockquote class="blockquote">
+        <p>Управление умным домом</p>
+    </blockquote>
+    <figcaption class="blockquote-footer">
+        на базе контроллеров <cite title="MegaD-2561">ab-log</cite>
+    </figcaption>
+</figure>
+
 @if (IsBusyProgress)
 {
     <div class="text-center">
@@ -16,9 +25,15 @@
 }
 else
 {
+    <div class="card">
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bi bi-github"> <a target="_blank" href="https://github.com/badhitman/AbLog"> github.com/AbLog исходники C# .NET</a></li>
+                <li class="list-group-item bi bi-basket"> <a target="_blank" href="https://ab-log.ru"> AbLog управляющие контроллеры</a></li>
 
-}
-
-@code {
-
+                <li class="list-group-item bi bi-database-fill-gear"> Database (main): @GlobalStatic.MainDatabasePath</li>
+                <li class="list-group-item bi bi-database-gear"> Database (storage): @GlobalStatic.ParametersStorageDatabasePath</li>
+            </ul>
+        </div>
+    </div>
 }
