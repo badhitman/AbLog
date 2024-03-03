@@ -31,10 +31,7 @@
                 <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd>
-                    @($"{(string.IsNullOrWhiteSpace(context.Name) ? "" : $"@{context.Name} - ")}{context.FirstName} {context.LastName}")
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete" Title="Удалить пользователя из БД"></MudIconButton>
-                </MudTd>
+                <MudTd>@($"{(string.IsNullOrWhiteSpace(context.Name) ? "" : $"@{context.Name} - ")}{context.FirstName} {context.LastName}")</MudTd>
                 <MudTd>@context.Email</MudTd>
                 <MudTd>
                     @if (context.AllowSystemCommands)

@@ -29,7 +29,7 @@ public class UpdateHandler : IUpdateHandler
     readonly ILogger<UpdateHandler> _logger;
     readonly ITelegramBotClient _botClient;
     readonly IToolsService _tools;
-
+    readonly IDbContextFactory<ServerContext> _db_factory;
     readonly INotifyService _notify;
 
     const string GetProcesses = "get-processes";
@@ -40,7 +40,7 @@ public class UpdateHandler : IUpdateHandler
     /// <summary>
     /// 
     /// </summary>
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingServive form_fill, IParametersStorageService storage, IToolsService tools, ITelegramBotHardwareViewServive hardware_view, INotifyService notify)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingServive form_fill, IParametersStorageService storage, IToolsService tools, ITelegramBotHardwareViewServive hardware_view, INotifyService notify, IDbContextFactory<ServerContext> db_factory)
     {
         _botClient = botClient;
         _logger = logger;
@@ -49,6 +49,7 @@ public class UpdateHandler : IUpdateHandler
         _tools = tools;
         _hardware_view = hardware_view;
         _notify = notify;
+        _db_factory = db_factory;
     }
 
     /// <summary>
@@ -86,6 +87,12 @@ public class UpdateHandler : IUpdateHandler
 
         UserResponseModel check_user = CheckTelegramUser(message.From);
         _notify.CheckTelegramUser(check_user);
+
+        using ServerContext context = _db_factory.CreateDbContext();
+        //check_user.User = context.Users
+        //        .Include(x => x.UserForm)
+        //        .ThenInclude(x => x!.Properties)
+        //        .FirstOrDefault(x => x.TelegramId == message.From!.Id);
 
         if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled)
             return;
@@ -131,6 +138,14 @@ public class UpdateHandler : IUpdateHandler
             return;
 
         UserResponseModel check_user = CheckTelegramUser(callbackQuery.From);
+        _notify.CheckTelegramUser(check_user);
+
+        using ServerContext context = _db_factory.CreateDbContext();
+        //check_user.User = context.Users
+        //        .Include(x => x.UserForm)
+        //        .ThenInclude(x => x!.Properties)
+        //        .FirstOrDefault(x => x.TelegramId == callbackQuery.From!.Id);
+
         if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled == true)
             return;
 
@@ -192,7 +207,7 @@ public class UpdateHandler : IUpdateHandler
         }
 
         string output = callbackQuery.Message.Text ?? "[---]", pre_out;
-        using ServerContext _db = new();
+        using ServerContext _db = _db_factory.CreateDbContext();
         UserFormModelDb form;
 
         if (callbackQuery.Data.Equals("/start"))
@@ -248,7 +263,7 @@ public class UpdateHandler : IUpdateHandler
                 if (check_user.User.UserForm is not null && _db.UsersForms.Any(x => x.Id == check_user.User.UserForm.Id))
                 {
                     _db.Remove(check_user.User.UserForm);
-                    _db.SaveChanges();
+                    _db.SaveChanges(true);
                 }
                 FormMetadataModel form_metadata = FormFillingFlowsStatic.FormFillingFlows[nameof(MqttConfigModel)];
                 form = new()
@@ -258,10 +273,10 @@ public class UpdateHandler : IUpdateHandler
                 };
 
                 _db.Add(form);
-                _db.SaveChanges();
+                _db.SaveChanges(true);
                 form.Properties = form_metadata.MqttConfigFormPropertyes.Select(x => new UserFormPropertyModelDb() { Code = x.Code, Name = x.Title, OwnerFormId = form.Id }).ToList();
                 _db.AddRange(form.Properties);
-                _db.SaveChanges();
+                _db.SaveChanges(true);
                 check_user.User.UserForm = _db.UsersForms.Include(x => x.OwnerUser).FirstOrDefault(x => x.OwnerUserId == check_user.User.Id);
             }
 
@@ -361,7 +376,7 @@ public class UpdateHandler : IUpdateHandler
             callbackQuery.Data = callbackQuery.Data[GlobalStatic.Routes.AbPrefix.Length..];
             Match match = Regex.Match(callbackQuery.Data, @"^(?<hw_id>\d+)");
             callbackQuery.Data = callbackQuery.Data[(match.Groups["hw_id"].Value.Length)..];
-            if (callbackQuery.Data.StartsWith(":"))
+            if (callbackQuery.Data.StartsWith(':'))
                 callbackQuery.Data = callbackQuery.Data[1..];
             res_msg = await _hardware_view.HardwareViewMainHandle(check_user.User.ChatId, check_user.User.MessageId, callbackQuery.Data, int.Parse(match.Groups["hw_id"].Value), cancellationToken);
             return;
@@ -388,7 +403,7 @@ public class UpdateHandler : IUpdateHandler
                 lock (ServerContext.DbLocker)
                 {
                     _db.Update(check_user.User);
-                    _db.SaveChanges();
+                    _db.SaveChanges(true);
                 }
             }
 
@@ -428,18 +443,19 @@ public class UpdateHandler : IUpdateHandler
     {
         string usage = caption ?? "Бот-обормот";
 
-        using ServerContext _context = new();
+        using ServerContext _context = _db_factory.CreateDbContext();
         lock (ServerContext.DbLocker)
         {
-            UserFormModelDb? actual_form = _context.UsersForms.Include(x => x.Properties).FirstOrDefault(x => x.OwnerUserId == User.Id);
-            if (actual_form is not null)
+            User.UserForm = _context.UsersForms.Include(x => x.Properties).FirstOrDefault(x => x.OwnerUserId == User.Id);
+            if (User.UserForm is not null)
             {
-                _context.Remove(actual_form);
-                _context.SaveChanges();
+                _context.Remove(User.UserForm);
+                User.UserForm = null;
+                _context.SaveChanges(true);
             }
         }
 
-        List<InlineKeyboardButton[]> kb_rows = new();
+        List<InlineKeyboardButton[]> kb_rows = [];
         if (User.AllowSystemCommands)
         {
             lock (ServerContext.DbLocker)
@@ -452,7 +468,7 @@ public class UpdateHandler : IUpdateHandler
                     }).ToList();
             }
 
-            kb_rows.Insert(0, new[] { InlineKeyboardButton.WithCallbackData("Процессы", GetProcesses) });
+            kb_rows.Insert(0, [InlineKeyboardButton.WithCallbackData("Процессы", GetProcesses)]);
         }
         if (User.AllowChangeMqttConfig)
         {
@@ -465,11 +481,11 @@ public class UpdateHandler : IUpdateHandler
             HardwareModelDB[] hardwares;
             lock (ServerContext.DbLocker)
             {
-                hardwares = _context.Hardwares.ToArray();
+                hardwares = [.. _context.Hardwares];
             }
             foreach (HardwareModelDB hw in hardwares)
             {
-                kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData($"•• {(string.IsNullOrWhiteSpace(hw.Name) ? hw.Address : hw.Name)} ••", $"{GlobalStatic.Routes.AbPrefix}{hw.Id}") });
+                kb_rows.Add([InlineKeyboardButton.WithCallbackData($"•• {(string.IsNullOrWhiteSpace(hw.Name) ? hw.Address : hw.Name)} ••", $"{GlobalStatic.Routes.AbPrefix}{hw.Id}")]);
             }
         }
 
@@ -479,12 +495,12 @@ public class UpdateHandler : IUpdateHandler
         lock (ServerContext.DbLocker)
         {
             _context.Update(User);
-            _context.SaveChanges();
+            _context.SaveChanges(true);
         }
 
         Message msg_res = await _botClient.SendTextMessageAsync(message_request?.Chat.Id ?? chat_id_old, usage,
         parseMode: ParseMode.Html,
-        replyMarkup: kb_rows.Any() ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
+        replyMarkup: kb_rows.Count != 0 ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
         cancellationToken: cancellationToken);
         //
         User.ChatId = msg_res.Chat.Id;
@@ -492,7 +508,7 @@ public class UpdateHandler : IUpdateHandler
         lock (ServerContext.DbLocker)
         {
             _context.Update(User);
-            _context.SaveChanges();
+            _context.SaveChanges(true);
         }
 
         if (message_id_old != default && chat_id_old != default)
@@ -535,7 +551,7 @@ public class UpdateHandler : IUpdateHandler
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
     }
 
-    private static UserResponseModel CheckTelegramUser(User? from)
+    private UserResponseModel CheckTelegramUser(User? from)
     {
         UserResponseModel res = new();
         if (from is null)
@@ -544,7 +560,7 @@ public class UpdateHandler : IUpdateHandler
             return res;
         }
 
-        using ServerContext context = new();
+        using ServerContext context = _db_factory.CreateDbContext();
         lock (ServerContext.DbLocker)
         {
             res.User = context.Users
@@ -579,7 +595,11 @@ public class UpdateHandler : IUpdateHandler
                 context.Update(res.User);
                 res.AddInfo("Данные Telegram пользователя: обновлены");
             }
-            context.SaveChanges();
+            context.SaveChanges(true);
+            res.User = context.Users
+                .Include(x => x.UserForm)
+                .ThenInclude(x => x!.Properties)
+                .FirstOrDefault(x => x.TelegramId == from.Id);
         }
 
         return res;

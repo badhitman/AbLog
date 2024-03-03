@@ -20,7 +20,7 @@ public class NotifyService(ILogger<NotifyService> Logger) : INotifyService
     /// </summary>
     public void CheckTelegramUser(UserResponseModel user)
     {
-        Logger.LogDebug($"call > {nameof(Notify)}: {JsonConvert.SerializeObject(user)}");
+        Logger.LogDebug($"call > {nameof(Notify)}: {JsonConvert.SerializeObject(user, Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}");
         Notify?.Invoke(user);
     }
 }

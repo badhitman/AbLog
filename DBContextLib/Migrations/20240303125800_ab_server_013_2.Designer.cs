@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ab.context;
 
 #nullable disable
 
-namespace dbcontext.Migrations
+namespace dbcontext.Migrations.Server
 {
     [DbContext(typeof(ServerContext))]
-    partial class ServerContextModelSnapshot : ModelSnapshot
+    [Migration("20240303125800_ab_server_013_2")]
+    partial class ab_server_013_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -449,10 +452,9 @@ namespace dbcontext.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("Version")
+                    b.Property<Guid>("Version")
                         .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
