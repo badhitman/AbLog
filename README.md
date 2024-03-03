@@ -2,4 +2,4 @@
 
 ## Upd to NET8.
 
-in progress...
+in progress... (предыдущая версия в отдельной ветке [version_3](https://github.com/badhitman/AbLog/tree/version_3)
