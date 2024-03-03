@@ -196,7 +196,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="wwwroot\lib\bootstrap\scss\" />
+	  <Folder Include="wwwroot\lib\**" />
 	</ItemGroup>
 
 </Project>
