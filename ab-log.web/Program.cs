@@ -131,6 +131,12 @@ public class Program
 
         WebApplication app = builder.Build();
 
+        if (mqtt_settings.AutoStart && mqtt_settings.IsConfigured)
+        {
+            IMqttBaseService _mqtt_cli_srv = app.Services.GetRequiredService<IMqttBaseService>();
+            ResponseBaseModel res = await _mqtt_cli_srv.StartService();
+        }
+
         await using AsyncServiceScope scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
         DbContextOptions<ServerContext> options = scope.ServiceProvider.GetRequiredService<DbContextOptions<ServerContext>>();
 

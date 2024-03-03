@@ -51,7 +51,9 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     /// 
     /// </summary>
     protected MqttClientOptions MqttClientOptions => new MqttClientOptionsBuilder()
-                .WithTlsOptions(p => p.WithAllowUntrustedCertificates(true))
+#if DEBUG
+                .WithTlsOptions(p => p.WithCertificateValidationHandler(sx => true))
+#endif
                 .WithMaximumPacketSize(_mqtt_settings.MessageMaxSizeBytes)
                 .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500)
                 .WithClientId(_mqtt_settings.ClientId)

@@ -69,14 +69,11 @@ public class ToolsLocalService : IToolsService
             res.AddError("Конфигурация не установлена");
             return res;
         }
-        //MqttClientOptionsBuilderTlsParameters obtp = new()
-        //{
-        //    AllowUntrustedCertificates = true,
-        //    IgnoreCertificateChainErrors = true,
-        //    IgnoreCertificateRevocationErrors = true
-        //};
+
         MqttClientOptions mqttClientOptions = new MqttClientOptionsBuilder()
-           .WithTlsOptions(p => p.WithAllowUntrustedCertificates(true))
+#if DEBUG
+           .WithTlsOptions(p => p.WithCertificateValidationHandler(sx => true))
+#endif
            .WithClientId(conf.ClientId)
            .WithTcpServer(conf.Server, conf.Port)
            .WithCredentials(conf.Username, conf.Password)
