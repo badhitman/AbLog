@@ -1,157 +1,80 @@
-﻿@inject IJSRuntime _js_runtime
+﻿@using System.Reflection
 
-<style>
-    #main-left-menu > div > a {
-        padding-left: 12px;
-    }
-</style>
-
-<div class="top-row ps-3 navbar navbar-dark">
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">@(IsShort ? "AB" : "AB-Log Srv")</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <abbr class="navbar-brand text-success-emphasis">
+            Remote client (@(get_version))
+        </abbr>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        Настройки
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="hardwares-page">
+                        Устройства
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="mqtt-config-page" Match="NavLinkMatch.All">
+                        MQTT
+                    </NavLink>
+                </li>
+                @if (IsDebug)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="scripts-page">
+                            <MudTooltip Text="Эксперементальная версия">
+                                Скрипты
+                            </MudTooltip>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="triggers-page">
+                            <MudTooltip Text="Эксперементальная версия">
+                                Тригеры
+                            </MudTooltip>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="cameras-page">
+                            <MudTooltip Text="Эксперементальная версия">
+                                Камеры
+                            </MudTooltip>
+                        </NavLink>
+                    </li>
+                }
+            </ul>
+            <a target="_blank" class="link-success" href="https://ab-log.ru">
+                https://ab-log.ru
+            </a>
+        </div>
     </div>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav id="main-left-menu" class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/hardwares-page">
-                <span class="oi oi-puzzle-piece" aria-hidden="true"></span> @(IsShort ? "" : "Устройства")
-            </NavLink>
-        </div>
-        <div class="nav-item px-3" title="Home page">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-wrench" aria-hidden="true"></span> @(IsShort ? "" : "Настройки")
-            </NavLink>
-        </div>
-        <div class="nav-item px-3" title="MQTT config">
-            <NavLink class="nav-link" href="/mqtt-config-page" Match="NavLinkMatch.All">
-                <span class="oi oi-key" aria-hidden="true"></span> @(IsShort ? "" : "MQTT")
-            </NavLink>
-        </div>
-        @if (IsDebug)
-        {
-            @*<div class="nav-item px-3">
-                <NavLink class="nav-link" href="/scripts-page">
-                    <span class="oi oi-script" aria-hidden="true"></span> @(IsShort ? "" : "Скрипты")
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/triggers-page">
-                    <span class="oi oi-pulse" aria-hidden="true"></span> @(IsShort ? "" : "Тригеры")
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/cameras-page">
-                    <span class="oi oi-camera-slr" aria-hidden="true"></span> @(IsShort ? "" : "Камеры")
-                </NavLink>
-            </div>*@
-        }
-    </nav>
-</div>
+</nav>
 
 @code {
-    private bool collapseNavMenu = true;
+    string get_version
+    {
+        get
+        {
+#if DEBUG
+    var test = Assembly.GetExecutingAssembly();
+#endif
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+            string v = (Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "error version detect");
 
-    [Parameter, EditorRequired]
-    public Action ModeChangeHandle { get; set; } = default!;
+            return v.Contains("+") ? v[..v.IndexOf("+")] : v;
+        }
+    }
 
 #if DEBUG
     bool IsDebug = true;
 #else
     bool IsDebug = false;
 #endif
-
-    /// <summary>
-    /// блокировка таймера
-    /// </summary>
-    protected object lock_timer = new();
-    /// <summary>
-    /// Задержка (млс) перед авто-сворачиванием левого меню после потери фокуса (on mouse hover)
-    /// </summary>
-    protected int timer_timeout = 500;
-
-    /// <summary>
-    /// Интервал проверки (млс) задачи авто-сворачивания левого меню после потери фокуса (on mouse leave)
-    /// </summary>
-    protected int timer_step_update = 100;
-
-    /// <summary>
-    /// Оставшееся время до выполнения авто-сворачивания левого меню после потери фокуса (on mouse leave)
-    /// </summary>
-    protected int timer_resource;
-    /// <summary>
-    /// Таймер проверки необходимости выполнить авто-сворачивание левого меню после потери фокуса (on mouse leave)
-    /// </summary>
-    protected Timer? timer;
-
-    public bool IsShort { get; private set; } = true;
-
-    public void SetModeNav(bool mode)
-    {
-        lock (lock_timer)
-        {
-            timer?.Dispose();
-        }
-        if (mode)
-        {
-            InitTimer();
-        }
-        else
-        {
-            IsShort = false;
-            _js_runtime.InvokeVoidAsync("tooltipeHide");
-            InvokeAsync(() =>
-                {
-                    StateHasChanged();
-                    ModeChangeHandle();
-                });
-        }
-    }
-
-    void InitTimer()
-    {
-        lock (lock_timer)
-        {
-            timer?.Dispose();
-            timer_resource = timer_timeout;
-            timer = new Timer(new TimerCallback(PauseRequest), null, 0, timer_step_update);
-        }
-    }
-
-    void PauseRequest(object? obj)
-    {
-        lock (lock_timer)
-        {
-            if (timer_resource > 0)
-            {
-                timer_resource -= timer_step_update;
-            }
-            else
-            {
-                timer?.Dispose();
-                IsShort = true;
-                InvokeAsync(() =>
-                {
-                    StateHasChanged();
-                    ModeChangeHandle();
-                });
-            }
-        }
-    }
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-
-    protected override void OnInitialized()
-    {
-        timer_resource = timer_timeout;
-    }
 }

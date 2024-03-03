@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>ABLogWeb</RootNamespace>
 		<VersionPrefix>4</VersionPrefix>
+		<Version>$(VersionPrefix).0.1$(VersionSuffix)</Version>
 		<VersionSuffix>alfa</VersionSuffix>
 		<AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>

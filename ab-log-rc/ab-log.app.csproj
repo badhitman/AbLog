@@ -10,9 +10,9 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnableDefaultCssItems>false</EnableDefaultCssItems>
-		<VersionPrefix>3</VersionPrefix>
+		<VersionPrefix>4</VersionPrefix>
 		<VersionSuffix>beta</VersionSuffix>
-		<Version>$(VersionPrefix).0.0-$(VersionSuffix)</Version>
+		<Version>$(VersionPrefix).0.1$(VersionSuffix)</Version>
 		<Copyright>open source</Copyright>
 		<Description>Клиент ab-log (неофициальный)</Description>
 		<PackageProjectUrl>https://github.com/badhitman/AbLog</PackageProjectUrl>
@@ -20,8 +20,8 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<ApplicationTitle>ab-log-rc</ApplicationTitle>
 		<ApplicationId>com.companyname.ab_log_rc</ApplicationId>
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>4.0</ApplicationDisplayVersion>
+		<ApplicationVersion>4</ApplicationVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">27.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
@@ -29,6 +29,7 @@
 		<AppInstallerUri>https://ab-log-app.iq-s.pro/</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<DefaultLanguage>ru-ru</DefaultLanguage>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
