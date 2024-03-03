@@ -88,6 +88,8 @@ public class Program
                     x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
+        builder.Services.AddSingleton<INotifyService, NotifyService>();
+
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 

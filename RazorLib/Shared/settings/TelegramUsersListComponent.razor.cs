@@ -5,6 +5,9 @@ using SharedLib;
 
 namespace RazorLib.Shared.settings;
 
+/// <summary>
+/// TelegramUsersListComponent
+/// </summary>
 public partial class TelegramUsersListComponent : BlazorBusyComponentBaseModel
 {
     /// <summary>

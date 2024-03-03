@@ -10,23 +10,12 @@ using SharedLib;
 namespace ABLogWeb;
 
 /// <summary>
-/// 
+/// Commands
 /// </summary>
 [ApiController]
 [Route("/api/[controller]")]
-public class CommandsController : ControllerBase
+public class CommandsController(ILogger<CommandsController> logger, IDbContextFactory<ServerContext> db_factory) : ControllerBase
 {
-    private readonly ILogger<CommandsController> _logger;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="logger"></param>
-    public CommandsController(ILogger<CommandsController> logger)
-    {
-        _logger = logger;
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -36,7 +25,7 @@ public class CommandsController : ControllerBase
         EntriesSortingResponseModel res_oe = new();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = db_factory.CreateDbContext();
             ScriptModelDB? db_script = db.Scripts.Include(x => x.Commands).FirstOrDefault(x => x.Id == script_id);
             if (db_script?.Commands is null)
             {
@@ -57,7 +46,7 @@ public class CommandsController : ControllerBase
         CommandResponseModel res_c = new();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = db_factory.CreateDbContext();
             res_c.Command = db.Commands.Include(x => x.Conditions).FirstOrDefault(x => x.Id == command_id);
             if (res_c.Command is null)
                 res_c.AddError("Ошибка выполнения запроса: {29F5A45E-B0C0-4DDD-B135-39E5BC735028}");
@@ -91,7 +80,7 @@ public class CommandsController : ControllerBase
 
                 lock (ServerContext.DbLocker)
                 {
-                    using ServerContext db = new();
+                    using ServerContext db = db_factory.CreateDbContext();
                     HardwareModelDB? hw_db = db.Hardwares.FirstOrDefault(x => x.Id == command_json.Execution);
                     if (hw_db is null)
                     {
@@ -106,7 +95,7 @@ public class CommandsController : ControllerBase
 
                 lock (ServerContext.DbLocker)
                 {
-                    using ServerContext db = new();
+                    using ServerContext db = db_factory.CreateDbContext();
                     PortModelDB? port_hw = db.Ports.FirstOrDefault(x => x.Id == command_json.Execution);
                     if (port_hw is null)
                     {
@@ -131,7 +120,7 @@ public class CommandsController : ControllerBase
 
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = db_factory.CreateDbContext();
             if (command_json.Id > 0)
             {
                 CommandModelDB? com_db = null;
@@ -205,9 +194,9 @@ public class CommandsController : ControllerBase
 
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
-            var c1 = db.Commands.FirstOrDefault(x => x.Id == req.Id1);
-            var c2 = db.Commands.FirstOrDefault(x => x.Id == req.Id2);
+            using ServerContext db = db_factory.CreateDbContext();
+            CommandModelDB? c1 = db.Commands.FirstOrDefault(x => x.Id == req.Id1);
+            CommandModelDB? c2 = db.Commands.FirstOrDefault(x => x.Id == req.Id2);
 
             if (c1 is null || c2 is null || c1.ScriptId != c2.ScriptId)
             {
@@ -221,11 +210,10 @@ public class CommandsController : ControllerBase
             db.UpdateRange(c1, c2);
             db.SaveChanges();
 
-            res_oe.Entries = db.Commands
+            res_oe.Entries = [.. db.Commands
                 .Where(x => x.ScriptId == c1.ScriptId)
                 .OrderBy(x => x.Sorting)
-                .Select(x => new EntrySortingModel() { Id = x.Id, Name = x.Name, Sorting = x.Sorting })
-                .ToArray();
+                .Select(x => new EntrySortingModel() { Id = x.Id, Name = x.Name, Sorting = x.Sorting })];
         }
 
         return res_oe;
@@ -241,7 +229,7 @@ public class CommandsController : ControllerBase
 
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = db_factory.CreateDbContext();
             CommandModelDB? command_db = db.Commands.FirstOrDefault(x => x.Id == id_command);
             if (command_db is null)
             {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Newtonsoft.Json;
 using SharedLib;
 
 namespace RazorLib.Shared.settings;
@@ -7,7 +8,7 @@ namespace RazorLib.Shared.settings;
 /// <summary>
 /// Telegram Bot configuration - component
 /// </summary>
-public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel
+public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel, IDisposable
 {
     /// <summary>
     /// Storage
@@ -27,6 +28,12 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel
     [Inject]
     public required ISnackbar Snackbar { get; set; }
 
+    /// <summary>
+    /// Notify service
+    /// </summary>
+    [Inject]
+    public required INotifyService NotifyService { get; set; }
+
     TelegramBotConfigModel _conf = new();
     TelegramBotConfigModel _conf_self = new();
     bool ShowToken = false;
@@ -40,6 +47,7 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel
     /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
     {
+        NotifyService.Notify += CheckTelegramUserHandleNotify;
         IsBusyProgress = true;
         TelegramBotConfigResponseModel _bot_conf = await Storage.GetTelegramBotConfig();
         Severity _style;
@@ -97,5 +105,31 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel
 
         _conf_self = GlobalStatic.CreateDeepCopy(_conf);
         IsBusyProgress = false;
+    }
+
+    void CheckTelegramUserHandleNotify(UserResponseModel user)
+    {
+        if (user.User is null)
+        {
+            Snackbar.Add($"error {{8B0B5C84-3FAC-4289-97A8-096AD5023C38}} User is null", Severity.Error, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+
+        if (user.User.IsDisabled)
+        {
+            Snackbar.Add($"Сообщение Telegram отключённого пользователя:\n{JsonConvert.SerializeObject(user, Formatting.Indented)}", Severity.Normal, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        }
+        else
+        {
+            Snackbar.Add($"Сообщение Telegram:\n{JsonConvert.SerializeObject(new { user.User.Name, user.User.FirstName, user.User.LastName, user.User.AlarmSubscriber, user.User.AllowChangeMqttConfig, user.User.AllowSystemCommands, user.User.CommandsAllowed, user.User.Email }, Formatting.Indented)}", Severity.Info, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void Dispose()
+    {
+        NotifyService.Notify -= CheckTelegramUserHandleNotify;
     }
 }

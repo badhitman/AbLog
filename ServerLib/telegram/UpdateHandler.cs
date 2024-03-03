@@ -2,19 +2,19 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using Telegram.Bot.Types.ReplyMarkups;
-using System.Text.RegularExpressions;
+using ab.context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types.Enums;
+using ServerLib;
+using SharedLib;
+using System.Diagnostics;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
-using System.Diagnostics;
 using Telegram.Bot.Types;
-using System.Reflection;
-using ab.context;
-using SharedLib;
-using ServerLib;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegram.Bot.Services;
 
@@ -30,6 +30,8 @@ public class UpdateHandler : IUpdateHandler
     readonly ITelegramBotClient _botClient;
     readonly IToolsService _tools;
 
+    readonly INotifyService _notify;
+
     const string GetProcesses = "get-processes";
     const string SystemCommandPrefix = "sys:";
     const string RestartMQTT = "restart-mqtt";
@@ -38,7 +40,7 @@ public class UpdateHandler : IUpdateHandler
     /// <summary>
     /// 
     /// </summary>
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingServive form_fill, IParametersStorageService storage, IToolsService tools, ITelegramBotHardwareViewServive hardware_view)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingServive form_fill, IParametersStorageService storage, IToolsService tools, ITelegramBotHardwareViewServive hardware_view, INotifyService notify)
     {
         _botClient = botClient;
         _logger = logger;
@@ -46,6 +48,7 @@ public class UpdateHandler : IUpdateHandler
         _storage = storage;
         _tools = tools;
         _hardware_view = hardware_view;
+        _notify = notify;
     }
 
     /// <summary>
@@ -82,7 +85,9 @@ public class UpdateHandler : IUpdateHandler
                cancellationToken: cancellationToken);
 
         UserResponseModel check_user = CheckTelegramUser(message.From);
-        if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled == true)
+        _notify.CheckTelegramUser(check_user);
+
+        if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled)
             return;
 
         Task<Message> action = messageText.Split(' ')[0] switch
@@ -451,9 +456,9 @@ public class UpdateHandler : IUpdateHandler
         }
         if (User.AllowChangeMqttConfig)
         {
-            kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("MQTT - настроить", nameof(UserFormModelDb)) });
-            kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("MQTT - состояние", GetMQTT) });
-            kb_rows.Add(new[] { InlineKeyboardButton.WithCallbackData("MQTT - перезапуск", RestartMQTT) });
+            kb_rows.Add([InlineKeyboardButton.WithCallbackData("MQTT - настроить", nameof(UserFormModelDb))]);
+            kb_rows.Add([InlineKeyboardButton.WithCallbackData("MQTT - состояние", GetMQTT)]);
+            kb_rows.Add([InlineKeyboardButton.WithCallbackData("MQTT - перезапуск", RestartMQTT)]);
         }
         if (User.CommandsAllowed)
         {
@@ -563,7 +568,7 @@ public class UpdateHandler : IUpdateHandler
                     IsDisabled = true
                 };
                 context.Add(res.User);
-                res.AddInfo("Объект создан");
+                res.AddInfo("Пользователь Telegram: создан");
             }
             else
             {
@@ -572,7 +577,7 @@ public class UpdateHandler : IUpdateHandler
                 res.User.Name = from.Username ?? "";
                 res.User.LastUpdate = DateTime.Now;
                 context.Update(res.User);
-                res.AddInfo("Объект обновлён");
+                res.AddInfo("Данные Telegram пользователя: обновлены");
             }
             context.SaveChanges();
         }
