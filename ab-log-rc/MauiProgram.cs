@@ -60,6 +60,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IUsersService, UsersMqttService>();
         builder.Services.AddScoped<IToolsService, ToolsRemoteService>();
 
+        builder.Services.AddSingleton<INotifyService, NotifyService>();
 
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;

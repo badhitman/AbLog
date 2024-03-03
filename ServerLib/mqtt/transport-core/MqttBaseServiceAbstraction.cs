@@ -2,14 +2,14 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using Microsoft.Extensions.Logging;
-using System.Runtime.Versioning;
-using Newtonsoft.Json;
-using MQTTnet.Client;
-using System.Text;
 using ab.context;
-using SharedLib;
+using Microsoft.Extensions.Logging;
 using MQTTnet;
+using MQTTnet.Client;
+using Newtonsoft.Json;
+using SharedLib;
+using System.Runtime.Versioning;
+using System.Text;
 
 namespace ServerLib;
 
@@ -173,12 +173,13 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             Response = _mqttClient.IsConnected
         };
 
-        res.AddInfo(_mqttClient.IsConnected ? "Клиент подключён" : "Клиент не подключён");
+        if (_mqttClient.IsConnected)
+            res.AddInfo("Клиент подключён");
+        else
+            res.AddError("Клиент не подключён");
 
         return Task.FromResult(res);
     }
-
-    // public Task<BoolResponseModel> StatusService(int limit_try_if_not_connected = 0);
 
     /// <inheritdoc/>
     public async Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default)

@@ -10,25 +10,20 @@ namespace ServerLib;
 /// <summary>
 /// 
 /// </summary>
-public class ParametersStorageRemoteService : ParametersStorageLocalService
+public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigModel conf) : ParametersStorageLocalService
 {
-    readonly IMqttBaseService _mqtt;
-    readonly MqttConfigModel _mqtt_conf;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public ParametersStorageRemoteService(IMqttBaseService mqtt_transport, MqttConfigModel mqtt_conf)
-    {
-        _mqtt = mqtt_transport;
-        _mqtt_conf = mqtt_conf;
-    }
-
     /// <inheritdoc/>
     public override async Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
     {
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(connect_config, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}");
         ResponseBaseModel res = new();
+        if (!conf.IsConfigured)
+        {
+            res.AddError("MQTT не настроен!");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(connect_config, $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}");
+
         res.AddMessages(rpc.Messages);
         if (!res.IsSuccess)
             return res;
@@ -45,8 +40,15 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
     /// <inheritdoc/>
     public override async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig()
     {
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}");
         TelegramBotConfigResponseModel res = new();
+        if (!conf.IsConfigured)
+        {
+            res.AddError("MQTT не настроен!");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new NoiseModel(), $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}");
+
         if (!rpc.IsSuccess)
         {
             res.AddMessages(rpc.Messages);
@@ -72,8 +74,15 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
     /// <inheritdoc/>
     public override async Task<EmailConfigResponseModel> GetEmailConfig()
     {
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new NoiseModel(), $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}");
         EmailConfigResponseModel res = new();
+        if (!conf.IsConfigured)
+        {
+            res.AddError("MQTT не настроен!");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new NoiseModel(), $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}");
+
         if (!rpc.IsSuccess)
         {
             res.AddMessages(rpc.Messages);
@@ -99,8 +108,15 @@ public class ParametersStorageRemoteService : ParametersStorageLocalService
     /// <inheritdoc/>
     public override async Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
     {
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(connect_config, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}");
         ResponseBaseModel res = new();
+        if (!conf.IsConfigured)
+        {
+            res.AddError("MQTT не настроен!");
+            return res;
+        }
+
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(connect_config, $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}");
+
         res.AddMessages(rpc.Messages);
         if (!res.IsSuccess)
             return res;

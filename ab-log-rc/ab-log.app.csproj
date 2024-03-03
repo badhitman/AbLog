@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;</TargetFrameworks>
+		<TargetFrameworks>;net8.0-android34.0</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<OutputType>Exe</OutputType>
@@ -22,7 +22,7 @@
 		<ApplicationId>com.companyname.ab_log_rc</ApplicationId>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">27.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<GenerateAppInstallerFile>True</GenerateAppInstallerFile>
@@ -117,6 +117,9 @@
 		<ProjectReference Include="..\RazorLib\razor-lib.csproj" />
 		<ProjectReference Include="..\ServerLib\server-lib.csproj" />
 		<Resource Include="libman.json" />
+		<EmbeddedResource Include="..\ab-log.web\wwwroot\conf.json" Link="conf.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-100.png" />
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-125.png" />
 		<Content Include="Platforms\Windows\res\ab-log.big.scale-150.png" />
