@@ -47,10 +47,9 @@ public class Program
         builder.Host.UseSystemd();
 
         logger.Warn($"load configs: *.{_env.EnvironmentName}.json");
+        builder.Configuration.AddJsonFile("conf.json");
         builder.Configuration.AddJsonFile("appsettings.json");
         builder.Configuration.AddJsonFile($"appsettings.{_env.EnvironmentName}.json");
-
-        builder.Services.AddSingleton<IServiceCollection, ServiceCollection>();
 
         // Secrets
         string secretPath = Path.Combine("..", "..", "secrets");
@@ -64,7 +63,14 @@ public class Program
             foreach (string secret in Directory.GetFiles(secretPath, $"*.{_env.EnvironmentName}.json"))
                 builder.Configuration.AddJsonFile(Path.GetFullPath(secret), optional: true, reloadOnChange: true);
         }
+
+        ClientConfigModel settings = new();
+        builder.Configuration.Bind(settings);
+        builder.Services.AddSingleton(settings);
+
         builder.Services.AddMudServices();
+
+        builder.Services.AddSingleton<IServiceCollection, ServiceCollection>();
 
         builder.Services.AddHttpClient<ToolsLocalService>();
         builder.Services.AddHttpClient<MqttServerService>();

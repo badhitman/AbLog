@@ -10,7 +10,7 @@
 @inherits ReloadPageComponentBaseModel
 @implements IDisposable
 
-@inject ClientConfigModel _conf
+
 
 @if (IsBusyProgress)
 {
@@ -50,73 +50,4 @@ else if (IsExpand)
 else
 {
     <button title="@PagePath" @onclick="Expand" type="button" class="btn btn-primary">@($"{(string.IsNullOrEmpty(PortEntry?.Name) ? "" : $"[{PortEntry.Name}] ")}{Text}")</button>
-}
-
-@code {
-    [Parameter, EditorRequired]
-    public string Text { get; set; } = default!;
-
-    /// <summary>
-    /// Автоматически раскрыть/загрузить данные
-    /// </summary>
-    [Parameter]
-    public bool AutoLoadAndExpand { get; set; } = false;
-
-    bool IsExpand = false;
-    CancellationToken cancellationToken = new CancellationToken();
-    EntryModel PortEntry = new();
-
-    public async Task Expand()
-    {
-        IsExpand = !IsExpand;
-        if (!IsExpand)
-            return;
-
-        await GetData();
-    }
-    static SemaphoreSlim _syncLock = new SemaphoreSlim(5, 5);
-
-    static Regex port_num = new(@"^\d+$", RegexOptions.Compiled);
-
-    async Task UpdatePortName()
-    {
-        ResponseBaseModel rest = await _hardwares.SetNamePort(PortEntry);
-
-        Snackbar.ShowMessagesResponse(rest.Messages);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        string ext_path = PagePath[(PagePath.IndexOf("?") + 1)..];
-        NameValueCollection path_parameters = HttpUtility.ParseQueryString(ext_path);
-        if (path_parameters.Count == 1 && port_num.IsMatch(path_parameters.Get("pt") ?? ""))
-        {
-            await InvokeAsync(async () =>
-            {
-                IsBusyProgress = true;
-                StateHasChanged();
-                await _syncLock.WaitAsync();
-
-                EntriyResponseModel rest = await _hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = uint.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true }, cancellationToken);
-
-                Snackbar.ShowMessagesResponse(rest.Messages);
-                if (rest.IsSuccess)
-                {
-                    PortEntry = rest.Entry ?? new();
-
-                    if (AutoLoadAndExpand)
-                        await Expand();
-                }
-
-                _syncLock.Release();
-                IsBusyProgress = false;
-                StateHasChanged();
-            });
-        }
-    }
-
-    public void Dispose()
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-    }
 }
