@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SharedLib;
 using Telegram.Bot;
@@ -19,12 +20,17 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
     /// <summary>
     /// Клиентский интерфейс для использования Telegram Bot API
     /// </summary>
-    public ITelegramBotClient BotClient { get; set; } = default!;
+    public required ITelegramBotClient BotClient { get; set; }
 
     /// <summary>
     /// Logger
     /// </summary>
-    public ILogger<TelegramBotFormFillingServiveAbstract> Logger { get; set; } = default!;
+    public required ILogger<TelegramBotFormFillingServiveAbstract> Logger { get; set; }
+
+    /// <summary>
+    /// ServerContext DB factory
+    /// </summary>
+    public required IDbContextFactory<ServerContext> DbFactory { get; set; }
 
     /// <inheritdoc/>
     public async Task<Message> FormFillingHandle(UserFormModelDb form, int message_id, TypeValueTelegramBotHandle type_handler, string? set_value, CancellationToken cancellation_token)
@@ -32,9 +38,9 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
         if (form.OwnerUser is null)
             throw new Exception("error {EBB2EFAE-61E7-4E53-86C7-99931FE22656}");
 
-        using ServerContext _db = new();
+        using ServerContext db = DbFactory.CreateDbContext();
         FormMetadataModel form_metadata = FormFillingFlowsStatic.FormFillingFlows[nameof(MqttConfigModel)];
-        if (form.Properties?.Any() != true)
+        if (form.Properties?.Count != 0)
         {
             form.Properties = form_metadata
                 .MqttConfigFormPropertyes
@@ -47,8 +53,8 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
 
             lock (ServerContext.DbLocker)
             {
-                _db.AddRange(form.Properties);
-                _db.SaveChanges();
+                db.AddRange(form.Properties);
+                db.SaveChanges();
             }
 
             form.Properties.ForEach(x => x.OwnerForm = form);
@@ -62,8 +68,8 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
         if (next_prop is not null && type_handler == TypeValueTelegramBotHandle.Message && !string.IsNullOrEmpty(set_value))
         {
             next_prop.PropValue = set_value;
-            _db.Update(next_prop);
-            _db.SaveChanges();
+            db.Update(next_prop);
+            db.SaveChanges();
             await BotClient.DeleteMessageAsync(form.OwnerUser.ChatId, message_id, cancellationToken: cancellation_token);
             return await FormFillingHandle(form, message_id, TypeValueTelegramBotHandle.Message, "", cancellation_token);
         }
@@ -95,8 +101,8 @@ public abstract class TelegramBotFormFillingServiveAbstract : ITelegramBotFormFi
             form.OwnerUser.MessageId = msg.MessageId;
             lock (ServerContext.DbLocker)
             {
-                _db.Update(form.OwnerUser);
-                _db.SaveChanges();
+                db.Update(form.OwnerUser);
+                db.SaveChanges();
             }
             return msg;
         }

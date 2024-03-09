@@ -6,6 +6,9 @@ using System.Web;
 
 namespace RazorLib.Shared.hardwares;
 
+/// <summary>
+/// 
+/// </summary>
 public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
 {
     /// <summary>

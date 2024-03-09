@@ -20,15 +20,15 @@ public static class FormFillingFlowsStatic
     /// <summary>
     /// 
     /// </summary>
-    public static PropertyFormSet[] MqttConfigFormPropertyes => new[]
-    {
+    public static PropertyFormSet[] MqttConfigFormPropertyes =>
+    [
         new PropertyFormSet(nameof(MqttConfigModel.Server), "Адрес сервера MQTT"),
         new PropertyFormSet(nameof(MqttConfigModel.Port), "Порт сервера (обычно 8883)"),
         new PropertyFormSet(nameof(MqttConfigModel.Username), "Логин для MQTT"),
         new PropertyFormSet(nameof(MqttConfigModel.Password), "Пароль для MQTT"),
         new PropertyFormSet(nameof(MqttConfigModel.Secret), "Секретная фраза для шифрования трафика"),
         new PropertyFormSet(nameof(MqttConfigModel.PrefixMqtt), "Префикс MQTT топиков")
-    };
+    ];
 }
 
 /// <summary>

@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using Microsoft.EntityFrameworkCore;
 using SharedLib;
 
 namespace ServerLib;
@@ -10,16 +11,16 @@ namespace ServerLib;
 /// <summary>
 /// Пользователи
 /// </summary>
-public class UsersLocalService : IUsersService
+public class UsersLocalService(IDbContextFactory<ServerContext> DbFactory) : IUsersService
 {
     /// <inheritdoc/>
     public Task<UserResponseModel> GetUser(long telegram_id, CancellationToken cancellation_token = default)
     {
-        using ServerContext _db = new();
+        using ServerContext db = DbFactory.CreateDbContext();
         UserResponseModel res = new();
         lock (ServerContext.DbLocker)
         {
-            res.User = _db.Users.FirstOrDefault(x => x.TelegramId == telegram_id);
+            res.User = db.Users.FirstOrDefault(x => x.TelegramId == telegram_id);
         }
         if (res.User is null)
             res.AddError("User is null. error {E2204B76-5A95-4A49-B7CF-8B5216238FFE}");
@@ -37,8 +38,8 @@ public class UsersLocalService : IUsersService
         if (req.PageNum < 0)
             req.PageNum = 0;
 
-        using ServerContext _db = new();
-        IQueryable<UserModelDB> query = _db.Users.AsQueryable();
+        using ServerContext db = DbFactory.CreateDbContext();
+        IQueryable<UserModelDB> query = db.Users.AsQueryable();
 
         if (!req.IncludeDisabledUsers)
             query = query.Where(x => !x.IsDisabled);
@@ -51,10 +52,9 @@ public class UsersLocalService : IUsersService
         };
         int pages_all_count = (int)Math.Ceiling((double)res.TotalRowsCount / (double)req.PageSize);
 
-        res.Users = query
+        res.Users = [.. query
             .Skip((req.PageNum) * req.PageSize)
-            .Take(req.PageSize)
-            .ToArray();
+            .Take(req.PageSize)];
 
         res.AddInfo($"Пользователи: {res.Users.Count()} из {res.TotalRowsCount}");
 
@@ -65,11 +65,11 @@ public class UsersLocalService : IUsersService
     public Task<ResponseBaseModel> UpdateUser(UpdateUserModel req, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        using ServerContext _db = new();
+        using ServerContext db = DbFactory.CreateDbContext();
         UserModelDB? user_db;
         lock (ServerContext.DbLocker)
         {
-            user_db = _db.Users.FirstOrDefault(x => x.TelegramId == req.TelegramId);
+            user_db = db.Users.FirstOrDefault(x => x.TelegramId == req.TelegramId);
             if (user_db is null)
             {
                 res.AddError("user_db is null. error {D0694672-D5EE-43F4-A158-CCC7C2748729}");
@@ -87,8 +87,8 @@ public class UsersLocalService : IUsersService
             user_db.Email = req.Email;
             user_db.AlarmSubscriber = req.AllowAlerts;
             user_db.CommandsAllowed = req.AllowHardwareControl;
-            _db.Update(user_db);
-            _db.SaveChanges();
+            db.Update(user_db);
+            db.SaveChanges();
             res.AddSuccess("Изменения сохранены в БД");
         }
 

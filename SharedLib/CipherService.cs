@@ -2,8 +2,8 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.Security.Cryptography;
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SharedLib;
@@ -14,8 +14,6 @@ namespace SharedLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
-[SupportedOSPlatform("iOS")]
-[SupportedOSPlatform("MacCatalyst")]
 public static class CipherService
 {
     static readonly Encoding encoding = Encoding.UTF8;

@@ -15,7 +15,7 @@ public class PortHtmlDomModel : HtmlDomModel
     /// <summary>
     /// 
     /// </summary>
-    public List<(string text, string href)> Links = new();
+    public List<(string text, string href)> Links = [];
 
     string last_tag_name = "";
     int _port_id;

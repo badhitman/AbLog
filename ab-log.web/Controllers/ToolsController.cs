@@ -12,59 +12,54 @@ namespace ABLogWeb;
 /// </summary>
 [ApiController]
 [Route("/api/[controller]")]
-public class ToolsController : ControllerBase
+public class ToolsController(IToolsService tools_service) : ControllerBase
 {
-    readonly ILogger<ToolsController> _logger;
-    readonly IToolsService _tools_service;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public ToolsController(ILogger<ToolsController> logger, IToolsService tools_service)
-    {
-        _logger = logger;
-        _tools_service = tools_service;
-    }
-
     /// <summary>
     /// Запустить MQTT службу
     /// </summary>
-    [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.START}")]
-    public async Task<ResponseBaseModel> StartMqtt() => await _tools_service.StartMqtt();
+    [HttpGet($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.START}")]
+    public async Task<ResponseBaseModel> StartMqtt()
+        => await tools_service.StartMqtt();
 
     /// <summary>
     /// Остановить MQTT службу
     /// </summary>
-    [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STOP}")]
-    public async Task<ResponseBaseModel> StopMqtt() => await _tools_service.StopMqtt();
+    [HttpGet($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STOP}")]
+    public async Task<ResponseBaseModel> StopMqtt()
+        => await tools_service.StopMqtt();
 
     /// <summary>
     /// Получить статус MQTT службы
     /// </summary>
-    [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")]
-    public async Task<BoolResponseModel> StatusMqtt() => await _tools_service.StatusMqtt();
+    [HttpGet($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")]
+    public async Task<BoolResponseModel> StatusMqtt()
+        => await tools_service.StatusMqtt();
 
     /// <summary>
     /// Проверить подключение к Email (конфигурация smtp)
     /// </summary>
-    [HttpPost($"{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}")]
-    public async Task<ResponseBaseModel> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf) => await _tools_service.TestEmailConnect(email_conf);
+    [HttpPost($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}-{GlobalStatic.Routes.CONFIG}")]
+    public async Task<ResponseBaseModel> EmailConfigTestSmtpConnection(EmailConfigModel? email_conf, CancellationToken cancellation_token = default)
+        => await tools_service.TestEmailConnect(email_conf, cancellation_token);
 
     /// <summary>
     /// Проверить подключение к Mqtt
     /// </summary>
-    [HttpPost($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.CHECK}")]
-    public async Task<ResponseBaseModel> MqttConfigTestConnection(MqttConfigModel? mqtt_conf) => await _tools_service.TestMqttConnect(mqtt_conf);
+    [HttpPost($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.CHECK}-{GlobalStatic.Routes.CONFIG}")]
+    public async Task<ResponseBaseModel> MqttConfigTestConnection(MqttConfigModel? mqtt_conf, CancellationToken cancellation_token = default)
+        => await tools_service.TestMqttConnect(mqtt_conf, cancellation_token);
 
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.PUBLISH}")]
-    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message) => await _tools_service.PublishMqttMessage(message);
+    [HttpPost($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.MESSAGE}-{GlobalStatic.Routes.PUBLISH}")]
+    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default)
+        => await tools_service.PublishMqttMessage(message, cancellation_token);
 
     /// <summary>
     /// Проверить токен TelegramBot
     /// </summary>
-    [HttpPost($"{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}")]
-    public async Task<TelegramBotCheckResponseModel> TelegramBotConfigTestConnection(TelegramBotConfigModel? telegram_bot_conf) => await _tools_service.TestTelegramBotConnect(telegram_bot_conf);
+    [HttpPost($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}-{GlobalStatic.Routes.CONFIG}")]
+    public async Task<TelegramBotCheckResponseModel> TelegramBotConfigTestConnection(TelegramBotConfigModel? telegram_bot_conf, CancellationToken cancellation_token = default)
+        => await tools_service.TestTelegramBotConnect(telegram_bot_conf, cancellation_token);
 }

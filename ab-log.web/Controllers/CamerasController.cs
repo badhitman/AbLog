@@ -3,37 +3,23 @@
 ////////////////////////////////////////////////
 
 using Microsoft.AspNetCore.Mvc;
-using NLog;
 using SharedLib;
 
 namespace ABLogWeb;
 
 /// <summary>
-/// 
+/// Камеры USB
 /// </summary>
-[Route("/api/[controller]")]
-[ApiController]
-public class CamerasController : ControllerBase
+[Route("/api/[controller]"), ApiController]
+public class CamerasController(ICamerasService cam) : ControllerBase
 {
-    readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    readonly ICamerasService _cam;
-
     /// <summary>
     /// 
     /// </summary>
-    public CamerasController(Logger logger, ICamerasService cam)
+    [HttpGet($"/{GlobalStatic.Routes.Cameras}/{{index_cam}}/{{characteristic?}}")]
+    public async Task<IActionResult> Poto([FromRoute] int? index_cam, [FromRoute] string? characteristic)
     {
-        _logger = logger;
-        _cam = cam;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    [HttpGet("photo/{index_cam}/{characteristic?}")]
-    public async Task<IActionResult> Poto(int? index_cam, string? characteristic)
-    {
-        ShotCameraResponseModel photo = await _cam.TakeOneShotAsync(index_cam, characteristic);
+        ShotCameraResponseModel photo = await cam.TakeOneShotAsync(index_cam, characteristic);
         byte[] data_bytes;
         string content_type;
         if (!photo.IsSuccess)

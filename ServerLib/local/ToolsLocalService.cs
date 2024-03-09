@@ -14,56 +14,36 @@ namespace ServerLib;
 /// <summary>
 /// 
 /// </summary>
-public class ToolsLocalService : IToolsService
+public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersStorageService ParameterStorage, MqttFactory MqttFact, HttpClient HttpClient, IEmailService Email, IServiceProvider ServiceProvider) : IToolsService
 {
-    readonly IParametersStorageService _parameter_storage;
-    readonly IMqttBaseService _mqttClientService;
-    readonly MqttFactory _mqtt_fact;
-    readonly HttpClient _http_client;
-    readonly IEmailService _email;
-    readonly IServiceProvider _service_provider;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public ToolsLocalService(IMqttBaseService mqttClientService, IParametersStorageService parameter_storage, MqttFactory mqtt_fact, HttpClient http_client, IEmailService email, IServiceProvider service_provider)
-    {
-        _mqttClientService = mqttClientService;
-        _parameter_storage = parameter_storage;
-        _mqtt_fact = mqtt_fact;
-        _http_client = http_client;
-        _email = email;
-        _service_provider = service_provider;
-    }
+    /// <inheritdoc/>
+    public async Task<ResponseBaseModel> StartMqtt() => await MqttClientService.StartService();
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> StartMqtt() => await _mqttClientService.StartService();
+    public async Task<ResponseBaseModel> StopMqtt() => await MqttClientService.StopService();
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> StopMqtt() => await _mqttClientService.StopService();
+    public Task<BoolResponseModel> StatusMqtt() => MqttClientService.StatusService();
 
     /// <inheritdoc/>
-    public Task<BoolResponseModel> StatusMqtt() => _mqttClientService.StatusService();
-
-    /// <inheritdoc/>
-    public virtual async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null)
+    public virtual async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        conf ??= (await _parameter_storage.GetEmailConfig()).Conf;
+        conf ??= (await ParameterStorage.GetEmailConfig()).Conf;
         if (!conf!.IsConfigured)
         {
             res.AddError("Конфигурация не установлена");
             return res;
         }
 
-        return await _email.ConnectSmtpAsync(conf);
+        return await Email.ConnectSmtpAsync(conf);
     }
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null)
+    public async Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        conf ??= (await _parameter_storage.GetMqttConfig()).Conf;
+        conf ??= (await ParameterStorage.GetMqttConfig()).Conf;
         if (!conf!.IsConfigured)
         {
             res.AddError("Конфигурация не установлена");
@@ -79,7 +59,7 @@ public class ToolsLocalService : IToolsService
            .WithCredentials(conf.Username, conf.Password)
            .WithCleanSession()
         .Build();
-        using IMqttClient _mqtt = _mqtt_fact.CreateMqttClient();
+        using IMqttClient _mqtt = MqttFact.CreateMqttClient();
         try
         {
             MqttClientConnectResult connect_res = await _mqtt.ConnectAsync(mqttClientOptions, CancellationToken.None);
@@ -89,7 +69,7 @@ public class ToolsLocalService : IToolsService
             else
             {
                 res.AddSuccess($"Подключение успешно: {connect_res.ResultCode}");
-                await _mqtt.DisconnectAsync();
+                await _mqtt.DisconnectAsync(cancellationToken: cancellation_token);
             }
         }
         catch (MqttConnectingFailedException mcf)
@@ -105,10 +85,10 @@ public class ToolsLocalService : IToolsService
     }
 
     /// <inheritdoc/>
-    public virtual async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null)
+    public virtual async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         TelegramBotCheckResponseModel res = new();
-        conf ??= (await _parameter_storage.GetTelegramBotConfig()).Conf;
+        conf ??= (await ParameterStorage.GetTelegramBotConfig()).Conf;
 
         if (string.IsNullOrEmpty(conf?.TelegramBotToken))
         {
@@ -120,19 +100,19 @@ public class ToolsLocalService : IToolsService
 
         try
         {
-            TelegramBotClient tbot_cli = new(options, _http_client);
-            Telegram.Bot.Types.User _me = await tbot_cli.GetMeAsync();
+            TelegramBotClient tbot_cli = new(options, HttpClient);
+            Telegram.Bot.Types.User _me = await tbot_cli.GetMeAsync(cancellationToken: cancellation_token);
 
             res.FirstName = _me.FirstName;
             res.LastName = _me.LastName;
             res.Username = _me.Username;
             res.Id = _me.Id;
 
-            ITelegramBotClient? tbc = _service_provider.GetService<ITelegramBotClient>();
+            ITelegramBotClient? tbc = ServiceProvider.GetService<ITelegramBotClient>();
 
             if (tbc is not null)
             {
-                Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync();
+                Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync(cancellationToken: cancellation_token);
                 res.ServiceIsRunning = new()
                 {
                     FirstName = _demon_me.FirstName,
@@ -151,5 +131,5 @@ public class ToolsLocalService : IToolsService
     }
 
     /// <inheritdoc/>
-    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message) => await _mqttClientService.PublishMessage(message);
+    public async Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default) => await MqttClientService.PublishMessage(message, cancellation_token);
 }

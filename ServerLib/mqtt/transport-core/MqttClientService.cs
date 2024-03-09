@@ -3,10 +3,10 @@
 ////////////////////////////////////////////////
 
 using Microsoft.Extensions.Logging;
-using System.Runtime.Versioning;
+using MQTTnet;
 using MQTTnet.Client;
 using SharedLib;
-using MQTTnet;
+using System.Runtime.Versioning;
 
 namespace ServerLib;
 
@@ -16,8 +16,6 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
-[SupportedOSPlatform("iOS")]
-[SupportedOSPlatform("MacCatalyst")]
 public class MqttClientService : MqttBaseServiceAbstraction
 {
     /// <inheritdoc/>
@@ -40,8 +38,6 @@ public class MqttClientService : MqttBaseServiceAbstraction
     /// </summary>
     public override Task ApplicationMessageReceiveHandledAsync(MqttApplicationMessageReceivedEventArgs e)
     {
-
-
         return base.ApplicationMessageReceiveHandledAsync(e);
     }
 }

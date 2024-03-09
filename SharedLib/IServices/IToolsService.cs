@@ -27,20 +27,20 @@ public interface IToolsService
     /// <summary>
     /// Проверить подключение MQTT
     /// </summary>
-    public Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null);
+    public Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Тест Email подключения (SMTP)
     /// </summary>
-    public Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null);
+    public Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Тест TelegramBot токена
     /// </summary>
-    public Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null);
+    public Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// 
     /// </summary>
-    public Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message);
+    public Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default);
 }

@@ -7,25 +7,25 @@ namespace SharedLib;
 /// <summary>
 /// Обновление условия/ограничения значения порта (для команды или тригера)
 /// </summary>
-public class UpdateConditionRequestModel : ConditionBaseModelDB
+public class ConditionUpdateModel : ConditionBaseModelDB
 {
     /// <summary>
     /// Обновление условия/ограничения значения порта (для команды или тригера)
     /// </summary>
-    public UpdateConditionRequestModel() { }
+    public ConditionUpdateModel() { }
 
     /// <summary>
     /// Обновление условия/ограничения значения порта (для команды или тригера)
     /// </summary>
-    public UpdateConditionRequestModel(ConditionAnonimModel init)
+    public ConditionUpdateModel(ConditionAnonimModel init)
     {
-        this.Id = init.Id;
-        this.Name = init.Name;
-        this.HardwareId = init.HardwareId;
-        this.PortId = init.PortId;
-        this.ConditionValueType = init.ConditionValueType;
-        this.СomparisonMode = init.СomparisonMode;
-        this.Value = init.Value;
+        Id = init.Id;
+        Name = init.Name;
+        HardwareId = init.HardwareId;
+        PortId = init.PortId;
+        ConditionValueType = init.ConditionValueType;
+        СomparisonMode = init.СomparisonMode;
+        Value = init.Value;
     }
 
     /// <summary>

@@ -2,9 +2,9 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using MQTTnet;
 using Newtonsoft.Json;
 using SharedLib;
-using MQTTnet;
 
 namespace ServerLib;
 
@@ -24,7 +24,7 @@ public class ToolsRemoteService : ToolsLocalService
     }
 
     /// <inheritdoc/>
-    public override async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null)
+    public override async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         TelegramBotCheckResponseModel res = new();
         conf ??= new();
@@ -54,7 +54,7 @@ public class ToolsRemoteService : ToolsLocalService
     }
 
     /// <inheritdoc/>
-    public override async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null)
+    public override async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
         conf ??= new();

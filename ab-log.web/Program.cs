@@ -38,7 +38,7 @@ public class Program
         logger.Warn("init main");
         logger.Warn($"main-db: {GlobalStatic.MainDatabasePath}");
         logger.Warn($"storage-db: {GlobalStatic.ParametersStorageDatabasePath}");
-        CheckContext();
+
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         IWebHostEnvironment _env = builder.Environment;
@@ -75,14 +75,20 @@ public class Program
         builder.Services.AddHttpClient<ToolsLocalService>();
         builder.Services.AddHttpClient<MqttServerService>();
 
-        builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
+        builder.Services.AddScoped<IToolsService, ToolsLocalService>();
+        builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
         builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
+        builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
         builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
         builder.Services.AddSingleton<IMqttBaseService, MqttServerService>();
-        builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
         builder.Services.AddSingleton<IEmailService, EmailLocalService>();
         builder.Services.AddSingleton<IUsersService, UsersLocalService>();
-        builder.Services.AddScoped<IToolsService, ToolsLocalService>();
+
+        builder.Services.AddScoped<IScriptsService, ScriptsLocalService>();
+        builder.Services.AddScoped<ICommandsService, CommandsLocalService>();
+        builder.Services.AddScoped<IConditionsService, ConditionsLocalService>();
+        builder.Services.AddScoped<IContentionsService, ContentionsLocalService>();
+        builder.Services.AddScoped<ITriggersService, TriggersLocalService>();
 
         builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
         builder.Services.AddSingleton<ITelegramBotHardwareViewServive, TelegramBotHardwareViewServive>();
@@ -144,7 +150,9 @@ public class Program
         }
 
         await using AsyncServiceScope scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
-        DbContextOptions<ServerContext> options = scope.ServiceProvider.GetRequiredService<DbContextOptions<ServerContext>>();
+        // DbContextOptions<ServerContext> options = scope.ServiceProvider.GetRequiredService<DbContextOptions<ServerContext>>();
+        IDbContextFactory<ServerContext> DbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ServerContext>>();
+        CheckContext(DbFactory);
 
         if (!app.Environment.IsDevelopment())
         {
@@ -164,9 +172,9 @@ public class Program
         app.Run();
     }
 
-    static void CheckContext()
+    static void CheckContext(IDbContextFactory<ServerContext> DbFactory)
     {
-        using ServerContext db = new();
+        using ServerContext db = DbFactory.CreateDbContext();
 #if DEMO
         db.DemoSeed();
 #endif

@@ -2,38 +2,28 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using ab.context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Net;
-using ab.context;
 using SharedLib;
-using System.Web;
 using System.Collections.Specialized;
+using System.Net;
+using System.Web;
 
 namespace ServerLib;
 
 /// <summary>
 /// Устройства
 /// </summary>
-public class HardwaresLocalService : IHardwaresService
+public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbContextFactory<ServerContext> DbFactory) : IHardwaresService
 {
-    readonly ILogger<HardwaresLocalService> _logger;
-
-    /// <summary>
-    /// Устройства
-    /// </summary>
-    public HardwaresLocalService(ILogger<HardwaresLocalService> logger)
-    {
-        _logger = logger;
-    }
-
     /// <inheritdoc/>
     public async Task<HttpResponseModel> GetHardwareHtmlPage(HardwareGetHttpRequestModel req, CancellationToken cancellation_token = default)
     {
         HardwareModelDB? db_hw;
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             db_hw = db.Hardwares.FirstOrDefault(x => x.Id == req.HardwareId);
             if (db_hw is null)
                 return (HttpResponseModel)ResponseBaseModel.CreateError("db.Hardwares.FirstOrDefault(x => x.Id == hardware_id) IS NULL: {98F67202-25A2-4D64-918B-72E651D63D15}");
@@ -78,11 +68,11 @@ public class HardwaresLocalService : IHardwaresService
             return new()
             {
                 StatusCode = HttpStatusCode.RequestTimeout,
-                Messages = new List<ResultMessage>()
-                    {
+                Messages =
+                    [
                         new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = $"Контроллер [{db_hw.Address}] недоступен" },
                         new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = tcex.Message }
-                    }
+                    ]
             };
         }
         catch (Exception ex)
@@ -90,7 +80,7 @@ public class HardwaresLocalService : IHardwaresService
             return new()
             {
                 StatusCode = HttpStatusCode.InternalServerError,
-                Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = ex.Message } }
+                Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = ex.Message }]
             };
         }
     }
@@ -102,7 +92,7 @@ public class HardwaresLocalService : IHardwaresService
 
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             HardwareModelDB? db_hw = db.Hardwares.FirstOrDefault(x => x.Id == hardware_id);
             if (db_hw is null)
             {
@@ -120,7 +110,7 @@ public class HardwaresLocalService : IHardwaresService
         PortHardwareResponseModel res_port = new();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             PortModelDB? db_port = db.Ports.Include(x => x.Hardware).FirstOrDefault(x => x.Id == port_id);
             if (db_port is null)
             {
@@ -139,7 +129,7 @@ public class HardwaresLocalService : IHardwaresService
         HardwaresResponseModel res_hws = new();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             res_hws.Hardwares = db.Hardwares
                 .Include(x => x.Ports)
                 .ToArray()
@@ -155,7 +145,7 @@ public class HardwaresLocalService : IHardwaresService
         EntriesResponseModel res_hws = new();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             res_hws.Entries = db.Hardwares.Select(x => new EntryModel() { Id = x.Id, Name = x.Name }).ToArray();
         }
         return Task.FromResult(res_hws);
@@ -167,7 +157,7 @@ public class HardwaresLocalService : IHardwaresService
         EntriesNestedResponseModel res_tree_hw = new();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
 
             res_tree_hw.Entries = db.Ports.Include(x => x.Hardware)
                 .Select(x => new { port_id = x.Id, port_num = x.PortNum, hw_id = x.HardwareId, hw_name = x.Hardware!.Name, hw_address = x.Hardware.Address })
@@ -201,7 +191,7 @@ public class HardwaresLocalService : IHardwaresService
         PortModelDB? port_db;
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             port_db = db.Ports.FirstOrDefault(x => x.HardwareId == req.HardwareId && x.PortNum == req.PortNum);
             if (port_db is null)
             {
@@ -236,7 +226,7 @@ public class HardwaresLocalService : IHardwaresService
         hardware.Password = hardware.Password.Trim();
 
         HardwareModelDB? db_hw;
-        using ServerContext db = new();
+        using ServerContext db = DbFactory.CreateDbContext();
 
         lock (ServerContext.DbLocker)
         {
@@ -293,7 +283,7 @@ public class HardwaresLocalService : IHardwaresService
         }
         catch (Exception ex)
         {
-            _logger.LogError("error {66A3933A-D1DA-479F-B271-90A4763A7958}", ex);
+            Logger.LogError("error {66A3933A-D1DA-479F-B271-90A4763A7958}", ex);
             res.AddError(ex.Message);
         }
 
@@ -302,7 +292,7 @@ public class HardwaresLocalService : IHardwaresService
         HtmlDomModel sub_dom;
         NameValueCollection query_parameters;
 
-        List<uint> ports = new();
+        List<uint> ports = [];
         string? _port_key;
         string? _port_num;
         string? _href;
@@ -345,13 +335,13 @@ public class HardwaresLocalService : IHardwaresService
             }
             catch (Exception ex)
             {
-                _logger.LogError("error {7E47C193-E41F-4C49-BC6F-2DAD953198FC}", ex);
+                Logger.LogError("error {7E47C193-E41F-4C49-BC6F-2DAD953198FC}", ex);
                 res.AddError(ex.Message);
             }
         }
 
         List<PortModelDB> _ports_bd = db_hw.Ports!.Where(x => x.HardwareId == db_hw.Id && !ports.Contains(x.PortNum)).ToList();
-        if (_ports_bd.Any())
+        if (_ports_bd.Count != 0)
         {
             res.AddError($"В базе данных обнаружены порты с несуществующими номерами: {string.Join(", ", _ports_bd.Select(x => x.PortNum))}");
             lock (ServerContext.DbLocker)
@@ -388,7 +378,7 @@ public class HardwaresLocalService : IHardwaresService
         PortModelDB? port_db;
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             port_db = db.Ports.FirstOrDefault(x => x.Id == port_id_name.Id);
             if (port_db is null)
             {
@@ -410,7 +400,7 @@ public class HardwaresLocalService : IHardwaresService
         HardwareModelDB? hw_db;
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = new();
+            using ServerContext db = DbFactory.CreateDbContext();
             hw_db = db.Hardwares.FirstOrDefault(x => x.Id == hardware_id);
             if (hw_db is null)
             {

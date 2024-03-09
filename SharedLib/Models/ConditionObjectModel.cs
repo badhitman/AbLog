@@ -5,9 +5,9 @@
 namespace SharedLib;
 
 /// <summary>
-/// Запрос условия/ограничения значения порта (для тригера или команда)
+/// Условие/ограничения (для тригера или команды)
 /// </summary>
-public class ConditionRequestModel
+public class ConditionObjectModel
 {
     /// <summary>
     /// Идентификатор объекта ограничения/условия

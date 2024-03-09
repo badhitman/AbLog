@@ -7,7 +7,7 @@ namespace SharedLib;
 /// <summary>
 /// 
 /// </summary>
-public class BoolResponseModel: ResponseBaseModel
+public class BoolResponseModel : ResponseBaseModel
 {
     /// <summary>
     /// 

@@ -7,7 +7,7 @@ namespace SharedLib;
 /// <summary>
 /// Установка конкурирующей связи для взаимоблокировок выполнения скриптов
 /// </summary>
-public class UpdateContentionRequestModel
+public class ContentionUpdateModel
 {
     /// <summary>
     /// Ведущий скрипт, который при запуске порождает ограничения на запуск других скриптов (или запрет паралельного запуска своей же копии в отдельной задаче/потоке)

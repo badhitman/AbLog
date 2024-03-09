@@ -2,11 +2,11 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Runtime.Versioning;
 using System.Xml.Serialization;
-using System.Net.Sockets;
-using System.Net;
 
 namespace SharedLib;
 
@@ -343,14 +343,24 @@ public static class GlobalStatic
         public const string CHECK = "check";
 
         /// <summary>
-        /// 
+        /// publish
         /// </summary>
         public const string PUBLISH = "publish";
+
+        /// <summary>
+        /// message
+        /// </summary>
+        public const string MESSAGE = "message";
 
         /// <summary>
         /// check
         /// </summary>
         public const string GET = "get";
+
+        /// <summary>
+        /// config
+        /// </summary>
+        public const string CONFIG = "config";
 
         /// <summary>
         /// Системный топик MQTT на который будут подписаны все

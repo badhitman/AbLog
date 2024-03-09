@@ -1,12 +1,9 @@
 ﻿@page "/scripts-page"
 
-@using RazorLib.Shared.navs.tabs
-@using RazorLib.Shared;
-@using MudBlazor;
-@using SharedLib;
-
-@* @inject IRefitScriptsService _refit; 
-@inject ISnackbar _snackbar;*@
+@* @inject IHardwaresService _hardwares *@
+@* @inject IRefitScriptsService _refit; *@
+@inject IDbContextFactory<ServerContext> db_factory;
+@inject ISnackbar _snackbar;
 
 @inherits BlazorBusyComponentBaseModel
 

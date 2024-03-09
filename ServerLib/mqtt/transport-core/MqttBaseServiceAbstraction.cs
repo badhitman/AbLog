@@ -19,8 +19,6 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
-[SupportedOSPlatform("iOS")]
-[SupportedOSPlatform("MacCatalyst")]
 public abstract class MqttBaseServiceAbstraction : IMqttBaseService
 {
     /// <summary>
@@ -84,7 +82,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> StartService(CancellationToken cancellation_token = default)
     {
-        ResponseBaseModel res = await StopService();
+        ResponseBaseModel res = await StopService(cancellation_token);
         _logger.LogInformation($"call >> {nameof(StartService)}");
         try
         {
@@ -248,7 +246,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
         MqttPublishMessageModel p_msg = new(request_bytes, new[] { topic })
         {
             CorrelationData = Encoding.UTF8.GetBytes(msg_id),
-            ResponseTopics = new string[] { response_topic }
+            ResponseTopics = [response_topic]
         };
 
         Func<MqttApplicationMessageReceivedEventArgs, Task> MessageReceivedEvent = async (MqttApplicationMessageReceivedEventArgs e) =>

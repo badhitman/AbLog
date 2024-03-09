@@ -2,33 +2,34 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.Diagnostics;
 using ab.context;
+using Microsoft.EntityFrameworkCore;
 using SharedLib;
+using System.Diagnostics;
 
 namespace ServerLib;
 
 /// <summary>
 /// 
 /// </summary>
-public class SystemCommandsLocalService : ISystemCommandsService
+public class SystemCommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : ISystemCommandsService
 {
     /// <inheritdoc/>
     public Task<ResponseBaseModel> CommandDelete(int comm_id, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        using ServerContext _context = new();
+        using ServerContext db = DbFactory.CreateDbContext();
 
         lock (ServerContext.DbLocker)
         {
-            SystemCommandModelDB? com_db = _context.SystemCommands.FirstOrDefault(x => x.Id == comm_id);
+            SystemCommandModelDB? com_db = db.SystemCommands.FirstOrDefault(x => x.Id == comm_id);
             if (com_db is null)
             {
                 res.AddError("com_db is null is null. error {F6DF81C1-5361-4BE3-AC5F-76F4AC457EB0}");
                 return Task.FromResult(res);
             }
-            _context.Remove(com_db);
-            _context.SaveChanges();
+            db.Remove(com_db);
+            db.SaveChanges();
             res.AddSuccess("Команда удалена");
         }
 
@@ -39,11 +40,11 @@ public class SystemCommandsLocalService : ISystemCommandsService
     public Task<SystemCommandsResponseModel> CommandsGetAll(CancellationToken cancellation_token = default)
     {
         SystemCommandsResponseModel res = new();
-        using ServerContext _context = new();
+        using ServerContext db = DbFactory.CreateDbContext();
 
         lock (ServerContext.DbLocker)
         {
-            res.SystemCommands = _context.SystemCommands.ToArray();
+            res.SystemCommands = [.. db.SystemCommands];
         }
 
         return Task.FromResult(res);
@@ -60,11 +61,11 @@ public class SystemCommandsLocalService : ISystemCommandsService
             return Task.FromResult(res);
         }
 
-        using ServerContext _context = new();
+        using ServerContext db = DbFactory.CreateDbContext();
 
         lock (ServerContext.DbLocker)
         {
-            SystemCommandModelDB? control_com = _context.SystemCommands
+            SystemCommandModelDB? control_com = db.SystemCommands
                 .Where(x => x.Id != comm.Id)
                         .FirstOrDefault(x => x.FileName == comm.FileName && x.Arguments == comm.Arguments);
 
@@ -74,7 +75,7 @@ public class SystemCommandsLocalService : ISystemCommandsService
                 return Task.FromResult(res);
             }
 
-            control_com = _context.SystemCommands
+            control_com = db.SystemCommands
                 .Where(x => x.Id != comm.Id)
                         .FirstOrDefault(x => x.Name == comm.Name);
 
@@ -84,7 +85,7 @@ public class SystemCommandsLocalService : ISystemCommandsService
                 return Task.FromResult(res);
             }
 
-            SystemCommandModelDB? com_db = _context.SystemCommands.FirstOrDefault(x => x.Id == comm.Id);
+            SystemCommandModelDB? com_db = db.SystemCommands.FirstOrDefault(x => x.Id == comm.Id);
             if (com_db is null)
             {
                 if (comm.Id > 0)
@@ -94,7 +95,7 @@ public class SystemCommandsLocalService : ISystemCommandsService
                 }
                 else
                 {
-                    _context.Add(comm);
+                    db.Add(comm);
                 }
             }
             else
@@ -103,9 +104,9 @@ public class SystemCommandsLocalService : ISystemCommandsService
                 com_db.Name = comm.Name;
                 com_db.FileName = comm.FileName;
                 com_db.Arguments = comm.Arguments;
-                _context.Update(com_db);
+                db.Update(com_db);
             }
-            _context.SaveChanges();
+            db.SaveChanges();
             res.AddSuccess("Команда обновлена/сохранена");
         }
 
@@ -116,11 +117,11 @@ public class SystemCommandsLocalService : ISystemCommandsService
     public Task<ResponseBaseModel> CommandRun(int comm_id, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        using ServerContext _context = new();
+        using ServerContext db = DbFactory.CreateDbContext();
 
         lock (ServerContext.DbLocker)
         {
-            SystemCommandModelDB? com_db = _context.SystemCommands.FirstOrDefault(x => x.Id == comm_id);
+            SystemCommandModelDB? com_db = db.SystemCommands.FirstOrDefault(x => x.Id == comm_id);
             if (com_db is null)
             {
                 res.AddError("com_db is null is null. error {CD013C5C-6930-41D0-A8E8-2D3E2FF2FD08}");

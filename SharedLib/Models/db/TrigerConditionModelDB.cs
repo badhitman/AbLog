@@ -23,7 +23,7 @@ public class TrigerConditionModelDB : ConditionBaseModelDB
     /// Условие/повод запуска тригера
     /// </summary>
     /// <param name="condition_request"></param>
-    public TrigerConditionModelDB(UpdateConditionRequestModel condition_request)
+    public TrigerConditionModelDB(ConditionUpdateModel condition_request)
     {
         this.Id = condition_request.Id < 0 ? 0 : condition_request.Id;
         this.PortId = condition_request.PortId;

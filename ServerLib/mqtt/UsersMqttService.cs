@@ -10,25 +10,17 @@ namespace ServerLib;
 /// <summary>
 /// Пользователи
 /// </summary>
-public class UsersMqttService : IUsersService
+/// <remarks>
+/// Пользователи
+/// </remarks>
+public class UsersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : IUsersService
 {
-    readonly IMqttBaseService _mqtt;
-    readonly MqttConfigModel _mqtt_conf;
-
-    /// <summary>
-    /// Пользователи
-    /// </summary>
-    public UsersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf)
-    {
-        _mqtt = mqtt;
-        _mqtt_conf = mqtt_conf;
-    }
 
     /// <inheritdoc/>
     public async Task<UserResponseModel> GetUser(long telegram_id, CancellationToken cancellation_token = default)
     {
         UserResponseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(new LongIdNoiseModel() { Id = telegram_id }, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}", cancellation_token);
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new LongIdNoiseModel() { Id = telegram_id }, $"{mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -56,7 +48,7 @@ public class UsersMqttService : IUsersService
     public async Task<UsersPaginationResponseModel> UsersGetList(UserListGetModel req, CancellationToken cancellation_token = default)
     {
         UsersPaginationResponseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}/{GlobalStatic.Routes.LIST}", cancellation_token);
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(req, $"{mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.GET}/{GlobalStatic.Routes.LIST}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -84,7 +76,7 @@ public class UsersMqttService : IUsersService
     public async Task<ResponseBaseModel> UpdateUser(UpdateUserModel req, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(req, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(req, $"{mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Users}/{GlobalStatic.Routes.UPDATE}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {

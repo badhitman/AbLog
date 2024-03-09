@@ -22,7 +22,7 @@ public class CommandConditionModelDB : ConditionBaseModelDB
     /// <summary>
     /// Запрещающее условие (ограничение) для выполнения команды.
     /// </summary>
-    public CommandConditionModelDB(UpdateConditionRequestModel condition_request)
+    public CommandConditionModelDB(ConditionUpdateModel condition_request)
     {
         this.Id = condition_request.Id;
         this.PortId = condition_request.PortId;

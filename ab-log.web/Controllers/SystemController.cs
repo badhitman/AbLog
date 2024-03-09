@@ -10,43 +10,34 @@ namespace ABLogWeb;
 /// <summary>
 /// Команды (системные)
 /// </summary>
-[ApiController]
-[Route("/api/[controller]")]
-public class SystemController : ControllerBase
+[Route("/api/[controller]"), ApiController]
+public class SystemController(ISystemCommandsService com_service) : ControllerBase
 {
-    readonly ILogger<SystemController> _logger;
-    readonly ISystemCommandsService _com_service;
-
-    /// <summary>
-    /// Команды (системные)
-    /// </summary>
-    public SystemController(ILogger<SystemController> logger, ISystemCommandsService com_service)
-    {
-        _logger = logger;
-        _com_service = com_service;
-    }
-
     /// <summary>
     /// Команды (все)
     /// </summary>
-    [HttpGet($"{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}")]
-    public async Task<SystemCommandsResponseModel> CommandsGetAll() => await _com_service.CommandsGetAll();
+    [HttpGet($"{GlobalStatic.Routes.System}-{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}")]
+    public async Task<SystemCommandsResponseModel> CommandsGetAll(CancellationToken cancellation_token = default)
+        => await com_service.CommandsGetAll(cancellation_token);
 
     /// <summary>
     /// 
     /// </summary>
-    [HttpDelete($"{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}/{{comm_id}}")]
-    public async Task<ResponseBaseModel> CommandDelete(int comm_id) => await _com_service.CommandDelete(comm_id);
+    [HttpDelete($"{GlobalStatic.Routes.System}-{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.DELETE}/{{comm_id}}")]
+    public async Task<ResponseBaseModel> CommandDelete(int comm_id, CancellationToken cancellation_token = default)
+        => await com_service.CommandDelete(comm_id, cancellation_token);
 
     /// <summary>
     /// 
     /// </summary>
-    [HttpPut($"{GlobalStatic.Routes.Commands}/{{comm_id}}")]
-    public async Task<ResponseBaseModel> CommandRun(int comm_id) => await _com_service.CommandRun(comm_id);
+    [HttpPut($"{GlobalStatic.Routes.System}-{GlobalStatic.Routes.Commands}/{{comm_id}}")]
+    public async Task<ResponseBaseModel> CommandRun(int comm_id, CancellationToken cancellation_token = default)
+        => await com_service.CommandRun(comm_id, cancellation_token);
 
     /// <summary>
     /// 
     /// </summary>
-    [HttpPost($"{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}")]
-    public async Task<ResponseBaseModel> CommadndRun(SystemCommandModelDB comm) => await _com_service.CommandUpdateOrCreate(comm);
+    [HttpPost($"{GlobalStatic.Routes.System}-{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}")]
+    public async Task<ResponseBaseModel> CommadndRun(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
+        => await com_service.CommandUpdateOrCreate(comm, cancellation_token);
 }
