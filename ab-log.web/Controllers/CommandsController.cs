@@ -16,7 +16,7 @@ public class CommandsController(ICommandsService commands) : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    [HttpGet($"/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.BY_OWNER}/{{script_id}}")]
+    [HttpGet($"/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.ENTRIES}/{GlobalStatic.Routes.BY_OWNER}/{{script_id}}")]
     public async Task<EntriesSortingResponseModel> GetCommandsEntriesByScript([FromRoute] int script_id, CancellationToken cancellation_token = default)
         => await commands.GetCommandsEntriesByScript(script_id, cancellation_token);
 

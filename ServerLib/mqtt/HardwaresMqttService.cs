@@ -11,9 +11,6 @@ namespace ServerLib;
 /// <summary>
 /// Устройства
 /// </summary>
-/// <remarks>
-/// Устройства IMqttClient
-/// </remarks>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]

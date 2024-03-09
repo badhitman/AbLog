@@ -10,9 +10,6 @@ namespace ServerLib;
 /// <summary>
 /// Пользователи
 /// </summary>
-/// <remarks>
-/// Пользователи
-/// </remarks>
 public class UsersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : IUsersService
 {
 

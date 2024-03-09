@@ -60,6 +60,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IUsersService, UsersMqttService>();
         builder.Services.AddScoped<IToolsService, ToolsRemoteService>();
 
+        builder.Services.AddScoped<IScriptsService, ScriptsMqttService>();
+        builder.Services.AddScoped<ICommandsService, CommandsMqttService>();
+        builder.Services.AddScoped<IConditionsService, ConditionsMqttService>();
+        builder.Services.AddScoped<IContentionsService, ContentionsMqttService>();
+        builder.Services.AddScoped<ITriggersService, TriggersMqttService>();
+
         builder.Services.AddSingleton<INotifyService, NotifyService>();
 
         using ParametersContext _context = new();

@@ -8,7 +8,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Пользователи
+/// Скрипты
 /// </summary>
 public class ScriptsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : IScriptsService
 {
