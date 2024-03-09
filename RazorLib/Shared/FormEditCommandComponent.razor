@@ -4,8 +4,8 @@
 @using MudBlazor;
 
 @inject ILogger<FormEditCommandComponent> _loger
-@* @inject IRefitHardwaresService _refit
-@inject IRefitCommandsService _refit_command *@
+@inject IHardwaresService HardwaresService
+@inject ICommandsService CommandsService
 @inject ISnackbar _snackbar
 
 @inherits BlazorBusyComponentBaseModel
@@ -98,13 +98,16 @@
         CurrentCommand.Id = CommandEntry.Id;
         CurrentCommand.Name = CommandEntry.Name;
 
-        // ApiResponse<EntriesNestedResponseModel> rest_hw_tree = await _refit.HardwaresGetTreeNestedEntries();
-        // if (rest_hw_tree.Content?.Entries is null)
-        // {
-        //     _snackbar.Add("", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-        //     return;
-        // }
-        // EntriesTreeHW = rest_hw_tree.Content.Entries;
+        EntriesNestedResponseModel rest = await HardwaresService.HardwaresGetTreeNestedEntries(CancellationToken);
+        string msg;
+        if (rest.Entries is null)
+        {
+            msg = "rest.Entries is null. error {B28F5A75-4265-446E-A0D2-AC1A08FBCB2D}";
+            _loger.LogError(msg);
+            _snackbar.Add(msg, Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        EntriesTreeHW = rest.Entries;
 
         if (CommandEntry.Id > 0)
             await Rest();
@@ -123,8 +126,20 @@
 
     async Task Rest(bool upd_satte = false)
     {
-        // ApiResponse<CommandResponseModel> rest = await _refit_command.CommandGet(CommandEntry.Id);
-        // CurrentCommand = rest.Content!.Command!;
+        CommandResponseModel rest = await CommandsService.CommandGet(CommandEntry.Id, CancellationToken);
+        _snackbar.ShowMessagesResponse(rest.Messages);
+        if (rest.IsSuccess != true)
+            return;
+
+        string msg = "rest.Command is null. error {FC7B35DD-B70B-45D9-9BF8-104D9B60DE5E}";
+        if (rest.Command is null)
+        {
+            _loger.LogError(msg);
+            _snackbar.Add(msg, Severity.Error, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+
+        CurrentCommand = rest.Command;
         CurrentCommand.ScriptId = ScriptId;
         EditCommandOrign = (EditCommandViewModel)CurrentCommand;
         if (upd_satte)
@@ -142,13 +157,10 @@
         EditCommandOrign.Hidden = CurrentCommand.Hidden;
         EditCommandOrign.PauseSecondsBeforeExecution = CurrentCommand.PauseSecondsBeforeExecution;
 
-        // ApiResponse<ResponseBaseModel> rest = await _refit_command.CommandUpdateOrCreate(CurrentCommand);
-
-        // if (rest.Content?.IsSuccess != true)
-        // {
-        //     Modal?.Open("Ошибка", rest.Content!.Messages);
-        //     return;
-        // }
+        ResponseBaseModel rest = await CommandsService.CommandUpdateOrCreate(CurrentCommand, CancellationToken);
+        _snackbar.ShowMessagesResponse(rest.Messages);
+        if (rest.IsSuccess != true)
+            return;
 
         CurrentCommand = (CommandModelDB)EditCommandOrign;
         UpdateCommand(CurrentCommand);
@@ -161,7 +173,11 @@
         if (CommandInitDel)
             return;
 
-        //ApiResponse<ResponseBaseModel> rest = await _refit_command.CommandDelete(CommandEntry.Id);
+        ResponseBaseModel rest = await CommandsService.CommandDelete(CommandEntry.Id, CancellationToken);
+        _snackbar.ShowMessagesResponse(rest.Messages);
+
+        if (!rest.IsSuccess)
+            return;
 
         DeleteCommand(CommandEntry.Id);
     }
