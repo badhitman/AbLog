@@ -11,7 +11,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EnableDefaultCssItems>false</EnableDefaultCssItems>
 		<VersionPrefix>4</VersionPrefix>
-		<VersionSuffix>beta</VersionSuffix>
+		<VersionSuffix>-beta</VersionSuffix>
 		<Version>$(VersionPrefix).0.1$(VersionSuffix)</Version>
 		<Copyright>open source</Copyright>
 		<Description>Клиент ab-log (неофициальный)</Description>
@@ -63,7 +63,7 @@
 		<ProjectReference Include="..\RazorLib\razor-lib.csproj" />
 		<ProjectReference Include="..\ServerLib\server-lib.csproj" />
 		<Resource Include="libman.json" />
-		<EmbeddedResource Include="..\ab-log.web\wwwroot\conf.json" Link="conf.json">
+		<EmbeddedResource Include="..\ab-log.web\conf.json" Link="conf.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
 		<Content Include="Platforms\Windows\res\**" />		
