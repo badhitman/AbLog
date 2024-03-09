@@ -1,13 +1,5 @@
 ﻿@page "/hardware-page/{Id:int}"
-
-@inject ILogger<HardwaresPage> _loger
-
-@inherits BlazorBusyComponentBaseModel
-
-<PageTitle>
-    Управляющий блок #@(Id)
-</PageTitle>
-
+<PageTitle>Управляющий блок #@(Id)</PageTitle>
 <h1>Настройка управляющего блока</h1>
 
 <CascadingValue Value="@Id">

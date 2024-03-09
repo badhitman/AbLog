@@ -9,7 +9,7 @@
 
 @inherits BlazorBusyComponentBaseModel
 
-<div class="card mt-2 text-dark bg-light">
+<div class="card mt-2">
     <div class="card-body">
         <h6 class="card-subtitle mb-2 text-muted">Выбор команды</h6>
         <div class="row gy-2 gx-3 align-items-center">
@@ -102,27 +102,27 @@
 
     void SelectHandlerAction() => RootSelectorHandler(CurrentCommand);
 
-    //protected override void OnInitialized()
-    //{
-    //    if (CurrentCommand?.Execution == 0)
-    //    {
-    //        switch (CommandType)
-    //        {
-    //            case TypesCommandsEnum.Controller:
-    //                if (EntriesTreeHW.Any())
-    //                {
-    //                    CurrentCommand.Execution = EntriesTreeHW.First().Id;
-    //                }
-    //                break;
-    //            case TypesCommandsEnum.PortImap:
-    //                if (EntriesTreeHW.Any(x => x.Childs.Any()))
-    //                {
-    //                    CurrentCommand.Execution = EntriesTreeHW.First(x => x.Childs.Any()).Childs.First().Id;
-    //                }
-    //                break;
-    //            case TypesCommandsEnum.Exit:
-    //                break;
-    //        }
-    //    }
-    //}
+    protected override void OnInitialized()
+    {
+        if (CurrentCommand?.Execution == 0)
+        {
+            switch (CommandType)
+            {
+                case TypesCommandsEnum.Controller:
+                    if (EntriesTreeHW.Any())
+                    {
+                        CurrentCommand.Execution = EntriesTreeHW.First().Id;
+                    }
+                    break;
+                case TypesCommandsEnum.Port:
+                    if (EntriesTreeHW.Any(x => x.Childs.Any()))
+                    {
+                        CurrentCommand.Execution = EntriesTreeHW.First(x => x.Childs.Any()).Childs.First().Id;
+                    }
+                    break;
+                case TypesCommandsEnum.Exit:
+                    break;
+            }
+        }
+    }
 }

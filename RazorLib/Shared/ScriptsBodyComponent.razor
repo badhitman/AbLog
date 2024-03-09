@@ -1,0 +1,135 @@
+﻿@inherits BlazorBusyComponentBaseModel
+
+<nav class="navbar navbar-light mb-3">
+    <div class="container-fluid">
+        <span class="navbar-brand">
+            Скрипты [<small class="text-muted">пакетные задания</small>]
+            <sup class="oi oi-reload"></sup>
+        </span>
+        <div id="navbarSupportedContent">
+            <form class="d-flex">
+                <button @onclick="AddNewScript" class="btn btn-outline-success" type="button">Создать новый</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="alert alert-primary" role="alert">
+    <cite class="text-primary">Пакеты команд</cite> с настраиваемой логикой выполнения.
+    Команды в скрипте имеют возможность ветвления (по условию), выходов (прекращение выполнения) и пользовательским переходов в произвольный [<span class="text-danger-emphasis">шаг</span>/<span class="text-danger-emphasis">команду</span>] другого скрипта.
+</div>
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else
+{
+    if (ScriptsAll?.Any() != true)
+    {
+        <div class="alert alert-danger" role="alert">
+            Скриптов нет
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-3">
+                <div class="list-group">
+                    @foreach (ScriptModelDB script in ScriptsAll)
+                    {
+                        <span @key="@($"script-menu-item-{script.Id}")" @onclick="async () => { CurrentScript = script; ResetFormState(ResetFormModesEnum.EditToOrign); if(_commandsListRef is not null){ await _commandsListRef.Rest(script.Id); } if(_contentionsRef is not null){ await _contentionsRef.Rest(script.Id); } }" class="list-group-item list-group-item-action @(CurrentScript.Id == script.Id ? "active" : "")" aria-current="true">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    @(script.Name)
+                                    <sup>
+                                        #@(script.Id > 0 ? script.Id.ToString() : "new")
+                                    </sup>
+                                </h5>
+                                @if (script.Id > 0)
+                                {
+                                    <small title="Количество команд в скрипте">
+                                        @(script.Commands?.Count)
+                                        <sup class="oi oi-bolt"></sup>
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small title="Запишите скрипт">
+                                        -NEW-
+                                        <sup class="oi oi-file text-@(script.Id == CurrentScript.Id ? "warning" : "danger")"></sup>
+                                    </small>
+                                }
+                            </div>
+                            @if (script.Id > 0)
+                            {
+                                <p class="mb-1">Тригер порт №: 000</p>
+                                <small>При включении</small>
+                            }
+                        </span>
+                    }
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Скрипт
+                            @if (CurrentScript.Id > 0)
+                            {
+                                <span>@($"#{CurrentScript.Id}")</span>
+                            }
+                            else
+                            {
+                                <span class="text-info">[не записан]</span>
+                            }
+                        </h5>
+                        <hr />
+                        <TabSetComponent>
+                            <TabComponent Tooltip="Наименование и описание скрипта" Title="Описание">
+                                <EditForm @ref="_formRef" autocomplete="off" Model="@CurrentScript">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+
+                                    <div class="mb-4">
+                                        <label for="exampleInputTitle" class="form-label">Название</label>
+                                        <CustomInputTextComponent @bind-Value="CurrentScript.Name" class="form-control" id="exampleInputTitle" aria-describedby="nameHelp" />
+                                        <div id="nameHelp" class="form-text">Наименование скрипта.</div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="exampleInputTitle2" class="form-label">Описание скрипта</label>
+                                        <InputRichTextComponent Id="exampleInputTitle2" @bind-Value="CurrentScript.Description" @ref="_textBoxRef" />
+                                    </div>
+                                    @if (CurrentScript.Id > 0)
+                                    {
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                            <button @onclick="SaveScriptHandle" disabled="@(!CanSaveScript)" class="btn btn-outline-primary" type="button">Сохранить</button>
+                                            <button @onclick="() => { ResetFormState(ResetFormModesEnum.OrignToEdit); }" disabled="@(!CanSaveScript)" class="btn btn-outline-info" type="button">Отмена</button>
+                                            <button @onclick="DeleteScript" class="btn btn-outline-danger" type="button">@(script_init_del ? "Подтвердить удаление" : "Удалить")</button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-grid gap-2">
+                                            <button @onclick="SaveScriptHandle" disabled="@(!CanSaveScript)" class="btn btn-outline-primary" type="button">Записать</button>
+                                            <button @onclick="DeleteScript" class="btn btn-@(script_init_del ? "" : "outline-")danger" type="button">@(script_init_del ? "Подтвердить удаление" : "Удалить")</button>
+                                        </div>
+                                    }
+                                </EditForm>
+                            </TabComponent>
+                            <TabComponent IsDisabled="CurrentScript.Id <= 0" Tooltip="Команды" Title="Команды">
+                                <CommandsListComponent AllScripts="ScriptsAll" @ref="_commandsListRef" ScriptId="CurrentScript.Id" />
+                            </TabComponent>
+                            <TabComponent IsDisabled="CurrentScript.Id <= 0" Tooltip="Режим конкуренции и взаимной блокировки" Title="Конкуренция">
+                                <ScriptContentionComponent AllScripts="ScriptsAll" @ref="_contentionsRef" ScriptId="CurrentScript.Id" />
+                            </TabComponent>
+                        </TabSetComponent>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+<br />

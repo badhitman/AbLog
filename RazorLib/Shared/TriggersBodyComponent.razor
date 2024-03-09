@@ -1,0 +1,140 @@
+﻿@inherits BlazorBusyComponentBaseModel
+
+<nav class="navbar navbar-light mb-3">
+    <div class="container-fluid">
+        <span class="navbar-brand">Тригеры [<small class="text-muted">запуск скриптов по событию</small>]</span>
+        <div id="navbarSupportedContent">
+            <form class="d-flex">
+                <button @onclick="AddNewTrigger" class="btn btn-outline-success" type="button">Создать новый</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="alert alert-info" role="alert">
+    <cite class="text-primary">Автозапуск</cite> скриптов при наступлении какого-либо события на порту контроллера.
+</div>
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-3">
+            <MudList @ref="_listRef" Clickable="true" @bind-SelectedValue="SelectedValue">
+                <MudDivider DividerType="DividerType.Middle" />
+                @foreach (TrigerModelDB trig in Triggers.OrderBy(x => x.Name))
+                {
+                    <MudListItem @key="trig.Id" Value="@(trig.Id)">
+                        @trig.Name
+                        <sup>[#@(trig.Id)]</sup>
+                    </MudListItem>
+                }
+                <MudDivider DividerType="DividerType.Middle" />
+            </MudList>
+        </div>
+        <div class="col-9">
+            @if (int.Parse(SelectedValue.ToString() ?? "0") == 0)
+            {
+                <figure class="text-center">
+                    <blockquote class="blockquote">
+                        <p>Нет ни одного тригера.</p>
+                    </blockquote>
+                    <figcaption class="blockquote-footer">
+                        Создайте свой первый <cite title="Тригер">тригер</cite>
+                    </figcaption>
+                </figure>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Тригер: '@(CurrentTrigger.Name)'
+                            @if (CurrentTrigger.Id > 0)
+                            {
+                                <sup>@($"#{CurrentTrigger.Id}")</sup>
+                            }
+                            else
+                            {
+                                <sup class="text-info">[не записан]</sup>
+                            }
+                        </h5>
+                        <hr />
+                        <TabSetComponent>
+                            <TabComponent Tooltip="Наименование и описание скрипта" Title="Описание">
+                                <EditForm @ref="form" autocomplete="off" Model="@CurrentTrigger">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+
+                                    <div class="mb-4">
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="exampleInputTitle" class="form-label">Название</label>
+                                                <CustomInputTextComponent @bind-Value="CurrentTrigger.Name" class="form-control" id="exampleInputTitle" aria-describedby="nameHelp" />
+                                                <div id="nameHelp" class="form-text">Наименование скрипта.</div>
+                                            </div>
+                                            <div class="col">
+                                                <label for="inputState" class="form-label">Скрипт</label>
+                                                <select id="inputState" @bind="CurrentTrigger.ScriptId" class="form-select" aria-describedby="scriptHelp">
+                                                    @foreach (ScriptModelDB s in Scripts)
+                                                    {
+                                                        <option value="@s.Id">@s.Name <sup>[#@s.Id]</sup></option>
+                                                    }
+                                                </select>
+                                                <div id="scriptHelp" class="form-text">Запускаемая задача.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="exampleInputTitle2" class="form-label">Описание</label>
+                                        <InputRichTextComponent Id="exampleInputTitle2" @bind-Value="CurrentTrigger.Description" @ref="_textBox" />
+                                    </div>
+                                    <div class="form-check mb-4">
+                                        <InputCheckbox class="form-check-input" @bind-Value="CurrentTrigger.IsDisable" id="flexCheckDefault" />
+                                        <label class="form-check-label" for="flexCheckDefault">
+                                            @if (CurrentTrigger.IsDisable)
+                                            {
+                                                <span>Отключено<sup>Включить?</sup></span>
+                                            }
+                                            else
+                                            {
+                                                <span>Включено<sup>Выключить?</sup></span>
+                                            }
+                                        </label>
+                                    </div>
+                                    @if (CurrentTrigger.Id > 0)
+                                    {
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                            <button @onclick="SaveTriggerHandle" disabled="@(!CanSaveTrigger)" class="btn btn@(CanSaveTrigger ? "" : "-outline")-primary" type="button">Сохранить</button>
+                                            <button @onclick="ResetFormToOrignState" disabled="@(!CanSaveTrigger && !trigger_init_del)" class="btn btn@(!CanSaveTrigger && !trigger_init_del ? "-outline" : "")-info" type="button">Отмена</button>
+                                            <button @onclick="DeleteTrigger" class="btn btn@(trigger_init_del ? "" : "-outline")-danger" type="button">@(trigger_init_del ? "Подтвердить удаление" : "Удалить")</button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-grid gap-2">
+                                            <button @onclick="SaveTriggerHandle" disabled="@(!CanSaveTrigger)" class="btn btn@(!CanSaveTrigger ? "-outline" : "")-primary" type="button">Записать</button>
+                                            @if (trigger_init_del)
+                                            {
+                                                <button @onclick="ResetFormToOrignState" class="btn btn-info" type="button">Отмена</button>
+                                            }
+                                            <button @onclick="DeleteTrigger" class="btn btn-@(trigger_init_del ? "" : "outline-")danger" type="button">@(trigger_init_del ? "Подтвердить удаление" : "Удалить")</button>
+                                        </div>
+                                    }
+                                </EditForm>
+                            </TabComponent>
+                            <TabComponent IsDisabled="CurrentTrigger.Id <= 0" Tooltip="Условия запуска" Title="События">
+                                <ConditionsComponent @ref="conditions_ref" EntriesTreeHW="EntriesTreeHW" OwnerId="CurrentTrigger.Id" ConditionType="ConditionsTypesEnum.Trigger" />
+                            </TabComponent>
+                        </TabSetComponent>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

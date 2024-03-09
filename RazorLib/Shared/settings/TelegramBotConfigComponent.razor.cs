@@ -125,11 +125,12 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel, 
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void Dispose()
+
+    /// <inheritdoc/>
+    public override void Dispose()
     {
         NotifyService.Notify -= CheckTelegramUserHandleNotify;
+        base.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

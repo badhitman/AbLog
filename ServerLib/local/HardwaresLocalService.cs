@@ -105,60 +105,59 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
     }
 
     /// <inheritdoc/>
-    public Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
+    public async Task<PortHardwareResponseModel> HardwarePortGet(int port_id, CancellationToken cancellation_token = default)
     {
         PortHardwareResponseModel res_port = new();
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
             PortModelDB? db_port = db.Ports.Include(x => x.Hardware).FirstOrDefault(x => x.Id == port_id);
             if (db_port is null)
             {
                 res_port.AddError("Ошибка выполнения запроса: {5AD81739-6A9B-4753-A47C-C278CD64705B}");
-                return Task.FromResult(res_port);
+                return res_port;
             }
             res_port.Port = new PortHardwareModel(db_port);
         }
 
-        return Task.FromResult(res_port);
+        return res_port;
     }
 
     /// <inheritdoc/>
-    public Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
+    public async Task<HardwaresResponseModel> HardwaresGetAll(CancellationToken cancellation_token = default)
     {
         HardwaresResponseModel res_hws = new();
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
             res_hws.Hardwares = db.Hardwares
                 .Include(x => x.Ports)
                 .ToArray()
                 .Select(x => new HardwareModel(x))
                 .ToArray();
         }
-        return Task.FromResult(res_hws);
+        return res_hws;
     }
 
     /// <inheritdoc/>
-    public Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
+    public async Task<EntriesResponseModel> HardwaresGetAllAsEntries(CancellationToken cancellation_token = default)
     {
         EntriesResponseModel res_hws = new();
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
             res_hws.Entries = db.Hardwares.Select(x => new EntryModel() { Id = x.Id, Name = x.Name }).ToArray();
         }
-        return Task.FromResult(res_hws);
+        return res_hws;
     }
 
     /// <inheritdoc/>
-    public Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
+    public async Task<EntriesNestedResponseModel> HardwaresGetTreeNestedEntries(CancellationToken cancellation_token = default)
     {
         EntriesNestedResponseModel res_tree_hw = new();
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
-
             res_tree_hw.Entries = db.Ports.Include(x => x.Hardware)
                 .Select(x => new { port_id = x.Id, port_num = x.PortNum, hw_id = x.HardwareId, hw_name = x.Hardware!.Name, hw_address = x.Hardware.Address })
                 .AsEnumerable()
@@ -176,29 +175,29 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
                 })
                 .ToArray();
         }
-        return Task.FromResult(res_tree_hw);
+        return res_tree_hw;
     }
 
     /// <inheritdoc/>
-    public Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
+    public async Task<EntriyResponseModel> CheckPortHardware(PortHardwareCheckRequestModel req, CancellationToken cancellation_token = default)
     {
         EntriyResponseModel res = new();
         if (req.HardwareId <= 0 || req.PortNum < 0)
         {
             res.AddError("Ошибка запроса. req.HardwareId <= 0 || req.PortNum < 0. error: {C36DDFD8-4E87-4780-9F1F-0693FBD82F00}");
-            return Task.FromResult(res);
+            return res;
         }
         PortModelDB? port_db;
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
             port_db = db.Ports.FirstOrDefault(x => x.HardwareId == req.HardwareId && x.PortNum == req.PortNum);
             if (port_db is null)
             {
                 if (!req.CreatePortIfNoptExist)
                 {
                     res.AddError("Ошибка. port_db is null && !req.CreatePortIfNoptExist. error: {0CBA4187-D799-481F-BAD9-D06E3D20E068}");
-                    return Task.FromResult(res);
+                    return res;
                 }
                 port_db = new PortModelDB() { HardwareId = req.HardwareId, PortNum = req.PortNum, Name = $"№ {req.PortNum}" };
                 db.Add(port_db);
@@ -207,7 +206,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
             }
             res.Entry = new EntryModel() { Id = port_db.Id, Name = port_db.Name };
         }
-        return Task.FromResult(res);
+        return res;
     }
 
     /// <inheritdoc/>
@@ -226,7 +225,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
         hardware.Password = hardware.Password.Trim();
 
         HardwareModelDB? db_hw;
-        using ServerContext db = DbFactory.CreateDbContext();
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
 
         lock (ServerContext.DbLocker)
         {
@@ -273,7 +272,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
 
             if (http_resp?.IsSuccess != true)
             {
-                if (http_resp?.Messages.Any() == true)
+                if (http_resp?.Messages.Count != 0 == true)
                     res.AddMessages(http_resp!.Messages);
                 else
                     res.AddError("http_resp?.IsSuccess != true error {277DC035-0C62-457A-B466-805AAF9733A9}");
@@ -353,7 +352,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
         }
 
         _ports_bd = ports.Where(x => !db_hw.Ports!.Any(y => y.PortNum == x)).Select(x => new PortModelDB() { HardwareId = db_hw.Id, PortNum = x }).ToList();
-        if (_ports_bd.Any())
+        if (_ports_bd.Count != 0)
         {
             res.AddInfo($"В базу данных добавлены порты с новыми номерами: {string.Join(", ", _ports_bd.Select(x => x.PortNum))}");
             lock (ServerContext.DbLocker)
@@ -367,51 +366,51 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
     }
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
+    public async Task<ResponseBaseModel> SetNamePort(EntryModel port_id_name, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
         if (port_id_name.Id < 0 || string.IsNullOrWhiteSpace(port_id_name.Name))
         {
             res.AddError("Ошибка запроса. port_id_name.Id < 0 || string.IsNullOrWhiteSpace(port_id_name.Name). error: {FCA9D7C3-10E5-4DEC-B43E-E252B88CBB77}");
-            return Task.FromResult(res);
+            return res;
         }
         PortModelDB? port_db;
+        using ServerContext db = await DbFactory.CreateDbContextAsync();
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
             port_db = db.Ports.FirstOrDefault(x => x.Id == port_id_name.Id);
             if (port_db is null)
             {
                 res.AddError("Порт не найден. error: {8EDBCFD6-1FDD-4D1A-B411-4D0968F60515}");
-                return Task.FromResult(res);
+                return res;
             }
             port_db.Name = port_id_name.Name;
             db.Update(port_db);
             db.SaveChanges();
             res.AddSuccess("Порт обновлён");
         }
-        return Task.FromResult(res);
+        return res;
     }
 
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
+    public async Task<ResponseBaseModel> HardwareDelete(int hardware_id, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
         HardwareModelDB? hw_db;
+        using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            using ServerContext db = DbFactory.CreateDbContext();
             hw_db = db.Hardwares.FirstOrDefault(x => x.Id == hardware_id);
             if (hw_db is null)
             {
                 res.AddError("Устройство не найдено. error: {FC7CDDB7-6669-4FAE-A3B8-8793FECE83F3}");
-                return Task.FromResult(res);
+                return res;
             }
 
             db.Remove(hw_db);
             db.SaveChanges();
             res.AddSuccess("Устройство удалено");
         }
-        return Task.FromResult(res);
+        return res;
     }
 }
