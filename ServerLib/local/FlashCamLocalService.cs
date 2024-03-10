@@ -2,26 +2,17 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using FlashCap;
 using Microsoft.Extensions.Logging;
 using SharedLib;
-using FlashCap;
 
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Flash Cam
 /// </summary>
-public class FlashCamLocalService : ICamerasService
+public class FlashCamLocalService(ILogger<FlashCamLocalService> logger) : ICamerasService
 {
-    readonly ILogger<FlashCamLocalService> _logger;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public FlashCamLocalService(ILogger<FlashCamLocalService> logger)
-    {
-        _logger = logger;
-    }
 
     /// <inheritdoc/>
     public IEnumerable<CameraModel> GetAvailableDevicesNames(string? find_name_camera = null)
@@ -42,7 +33,7 @@ public class FlashCamLocalService : ICamerasService
         ShotCameraResponseModel cam_photo = await TakeOneShotAsync(index_camera, characteristic);
 
         if (cam_photo.IsSuccess)
-            res.ShotCameraImage = new ShotCameraAsBase64Model(Convert.ToBase64String(cam_photo.ShotCameraImage.data), cam_photo.ShotCameraImage.format);
+            res.ShotCameraImage = new ShotCameraAsBase64Model(Convert.ToBase64String(cam_photo.ShotCameraImage.Data), cam_photo.ShotCameraImage.Format);
 
         return res;
     }
@@ -57,7 +48,7 @@ public class FlashCamLocalService : ICamerasService
         {
             msg = $"Камера с индексом {index_camera} не существует. {(devices.Any() ? $"(доступно:0-{devices.Count() - 1})" : "Камер нет!")}".Trim();
             res.AddError(msg);
-            _logger.LogError(msg);
+            logger.LogError(msg);
             return res;
         }
 
@@ -69,7 +60,7 @@ public class FlashCamLocalService : ICamerasService
         {
             msg = $"Could not detect any capture interfaces.";
             res.AddError(msg);
-            _logger.LogError(msg);
+            logger.LogError(msg);
             return res;
         }
 
@@ -81,11 +72,11 @@ public class FlashCamLocalService : ICamerasService
         {
             msg = $"Could not select primary characteristics.";
             res.AddError(msg);
-            _logger.LogError(msg);
+            logger.LogError(msg);
             return res;
         }
 
-        _logger.LogDebug($"Selected capture device: {descriptor0}, {characteristics}");
+        logger.LogDebug($"Selected capture device: {descriptor0}, {characteristics}");
 
         byte[] image;
         try
@@ -97,7 +88,7 @@ public class FlashCamLocalService : ICamerasService
             res.AddError(ex.Message);
             return res;
         }
-        _logger.LogDebug($"Captured {image.Length} bytes.");
+        logger.LogDebug($"Captured {image.Length} bytes.");
 
         string extension = characteristics.PixelFormat switch
         {

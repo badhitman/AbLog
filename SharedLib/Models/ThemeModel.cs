@@ -7,26 +7,15 @@ namespace SharedLib;
 /// <summary>
 /// Тема (цветовая)
 /// </summary>
-public class ThemeModel
+public class ThemeModel(string bg, string text)
 {
     /// <summary>
     /// цвет фона
     /// </summary>
-    public string BgColor { get; set; }
+    public string BgColor { get; set; } = bg;
 
     /// <summary>
     /// цвет текста
     /// </summary>
-    public string TextColor { get; set; }
-
-    /// <summary>
-    /// Тема (цветовая)
-    /// </summary>
-    /// <param name="bg">фон</param>
-    /// <param name="text">текст</param>
-    public ThemeModel(string bg, string text)
-    {
-        BgColor = bg;
-        TextColor = text;
-    }
+    public string TextColor { get; set; } = text;
 }

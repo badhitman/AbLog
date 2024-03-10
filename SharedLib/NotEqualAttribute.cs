@@ -7,32 +7,20 @@ using System.ComponentModel.DataAnnotations;
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// НЕ:равен (атрибут валидации)
 /// </summary>
-public class NotEqualAttribute : ValidationAttribute
+public class NotEqualAttribute(string otherProperty) : ValidationAttribute
 {
-    private string OtherProperty { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public NotEqualAttribute(string otherProperty)
-    {
-        OtherProperty = otherProperty;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>    
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         // get other property value
-        System.Reflection.PropertyInfo? otherPropertyInfo = validationContext.ObjectType.GetProperty(OtherProperty);
+        System.Reflection.PropertyInfo? otherPropertyInfo = validationContext.ObjectType.GetProperty(otherProperty);
         object? otherValue = otherPropertyInfo?.GetValue(validationContext.ObjectInstance);
 
         // verify values
         if (value?.ToString()?.Equals(otherValue?.ToString()) == true)
-            return new ValidationResult(!string.IsNullOrEmpty(ErrorMessage) ? ErrorMessage : string.Format("{0} не должен быть равен {1}.", validationContext.MemberName, OtherProperty), new string[] { OtherProperty });
+            return new ValidationResult(!string.IsNullOrEmpty(ErrorMessage) ? ErrorMessage : string.Format("{0} не должен быть равен {1}.", validationContext.MemberName, otherProperty), new string[] { otherProperty });
         else
             return ValidationResult.Success;
     }

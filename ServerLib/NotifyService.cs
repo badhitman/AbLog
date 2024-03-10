@@ -13,7 +13,7 @@ public class NotifyService(ILogger<NotifyService> Logger) : INotifyService
     /// <summary>
     /// 
     /// </summary>
-    public event AccountHandler? Notify;
+    public event UserNotifyHandler? Notify;
 
     /// <summary>
     /// Notify: Check Telegram user

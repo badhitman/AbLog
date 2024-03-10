@@ -29,10 +29,10 @@ public class CamerasController(ICamerasService cam) : ControllerBase
         }
         else
         {
-            data_bytes = photo.ShotCameraImage.data;
-            content_type = $"image/{photo.ShotCameraImage.format[1..]}";
+            data_bytes = photo.ShotCameraImage.Data;
+            content_type = $"image/{photo.ShotCameraImage.Format[1..]}";
         }
 
-        return File(data_bytes, content_type, $"photo{photo.ShotCameraImage.format[1..]}");
+        return File(data_bytes, content_type, $"photo{photo.ShotCameraImage.Format[1..]}");
     }
 }

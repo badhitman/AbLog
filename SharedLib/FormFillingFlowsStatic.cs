@@ -10,15 +10,15 @@ namespace SharedLib;
 public static class FormFillingFlowsStatic
 {
     /// <summary>
-    /// 
+    /// Form filling flow`s
     /// </summary>
-    public static Dictionary<string, FormMetadataModel> FormFillingFlows = new()
+    public static readonly Dictionary<string, FormMetadataModel> FormFillingFlows = new()
     {
         { nameof(MqttConfigModel), new("Настройки MQTT", MqttConfigFormPropertyes) }
     };
 
     /// <summary>
-    /// 
+    /// MQTT config form propertyes
     /// </summary>
     public static PropertyFormSet[] MqttConfigFormPropertyes =>
     [
@@ -30,18 +30,3 @@ public static class FormFillingFlowsStatic
         new PropertyFormSet(nameof(MqttConfigModel.PrefixMqtt), "Префикс MQTT топиков")
     ];
 }
-
-/// <summary>
-/// Форма
-/// </summary>
-/// <param name="Title">Заголовок формы</param>
-/// <param name="MqttConfigFormPropertyes">Поля формы</param>
-public record struct FormMetadataModel(string Title, PropertyFormSet[] MqttConfigFormPropertyes);
-
-/// <summary>
-/// Поле формы для заполнения
-/// </summary>
-/// <param name="Code">Код поля формы</param>
-/// <param name="Title">Название поля для пользователя</param>
-/// <param name="AllowedValues">Доступные значения (по желанию). Если в этом перечне есть элементы, то значения в это поле будут ограничены этим списком</param>
-public record struct PropertyFormSet(string Code, string Title, string[]? AllowedValues = null);

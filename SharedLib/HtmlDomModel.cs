@@ -2,25 +2,25 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.Text.RegularExpressions;
-using AngleSharp.Html.Parser;
-using AngleSharp.Html.Dom;
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
+using System.Text.RegularExpressions;
 
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// HTML Dom
 /// </summary>
-public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
+public partial class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
 {
     /// <summary>
-    /// 
+    /// HTML исходники
     /// </summary>
     public string? HtmlSource { get; private set; }
 
     /// <summary>
-    /// 
+    /// Перезагрузка
     /// </summary>
     public async Task Reload(string? html_source)
     {
@@ -30,12 +30,12 @@ public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
         if (string.IsNullOrWhiteSpace(html_source))
             return;
 
-        html_source = Regex.Replace(html_source ?? "", @"\s+", " ");
-        html_source = Regex.Replace(html_source ?? "", @"\s+<", "<");
-        html_source = Regex.Replace(html_source ?? "", @"<\s+", "<");
-        html_source = Regex.Replace(html_source ?? "", @"\s+>", ">");
-        html_source = Regex.Replace(html_source ?? "", @">\s+", ">");
-        
+        html_source = SpicesMyRegex().Replace(html_source ?? "", " ");
+        html_source = SpicesBeforeStartTagMyRegex().Replace(html_source ?? "", "<");
+        html_source = SpicesAfterStartTagMyRegex().Replace(html_source ?? "", "<");
+        html_source = SpicesBeforeEndTagMyRegex().Replace(html_source ?? "", ">");
+        html_source = SpicesAfterEndTagMyRegex().Replace(html_source ?? "", ">");
+
         HtmlParser parser = new();
         IHtmlDocument? Document = await parser.ParseDocumentAsync(html_source);
         if (Document.Body is not null)
@@ -46,9 +46,9 @@ public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
 
                 HtmlDomTreeItemDataModel t = new(cn);
 
-                if (cn.ChildNodes.Any())
+                if (cn.ChildNodes.Length != 0)
                 {
-                    t.TreeItems = new();
+                    t.TreeItems = [];
                     InjectChilds(ref t, cn.ChildNodes);
                 }
 
@@ -59,7 +59,7 @@ public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
             Remove(this.First());
     }
 
-    void InjectChilds(ref HtmlDomTreeItemDataModel nd, INodeList nls)
+    static void InjectChilds(ref HtmlDomTreeItemDataModel nd, INodeList nls)
     {
         foreach (INode cn in nls)
         {
@@ -67,9 +67,9 @@ public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
                 continue;
 
             HtmlDomTreeItemDataModel t = new(cn) { Parent = nd };
-            if (cn.ChildNodes.Any())
+            if (cn.ChildNodes.Length != 0)
             {
-                t.TreeItems = new();
+                t.TreeItems = [];
                 InjectChilds(ref t, cn.ChildNodes);
             }
             nd.TreeItems!.Add(t);
@@ -77,4 +77,19 @@ public class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
         while (nd.TreeItems?.FirstOrDefault()?.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
             nd.TreeItems.Remove(nd.TreeItems.First());
     }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex SpicesMyRegex();
+
+    [GeneratedRegex(@"\s+<")]
+    private static partial Regex SpicesBeforeStartTagMyRegex();
+
+    [GeneratedRegex(@"<\s+")]
+    private static partial Regex SpicesAfterStartTagMyRegex();
+
+    [GeneratedRegex(@"\s+>")]
+    private static partial Regex SpicesBeforeEndTagMyRegex();
+
+    [GeneratedRegex(@">\s+")]
+    private static partial Regex SpicesAfterEndTagMyRegex();
 }

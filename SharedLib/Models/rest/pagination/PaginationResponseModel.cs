@@ -59,8 +59,8 @@ public class PaginationResponseModel : PaginationRequestModel
     {
         get
         {
-            Messages ??= new List<ResultMessage>();
-            return Messages.Any() ? $"{string.Join($",{Environment.NewLine}", Messages.Select(x => $"[{x}]"))};" : string.Empty;
+            Messages ??= [];
+            return Messages.Count != 0 ? $"{string.Join($",{Environment.NewLine}", Messages.Select(x => $"[{x}]"))};" : string.Empty;
         }
     }
 
@@ -69,17 +69,17 @@ public class PaginationResponseModel : PaginationRequestModel
     /// <summary>
     /// Создать ответ с ошибкой
     /// </summary>
-    public static PaginationResponseModel CreateError(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = msg } } };
+    public static PaginationResponseModel CreateError(string msg) => new() { Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = msg }] };
 
     /// <summary>
     /// Создать ответ с Success
     /// </summary>
-    public static PaginationResponseModel CreateSuccess(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Success, Text = msg } } };
+    public static PaginationResponseModel CreateSuccess(string msg) => new() { Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Success, Text = msg }] };
 
     /// <summary>
     /// Создать ответ с Warning
     /// </summary>
-    public static PaginationResponseModel CreateWarning(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = msg } } };
+    public static PaginationResponseModel CreateWarning(string msg) => new() { Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = msg }] };
 
     /// <summary>
     /// Добавить сообщение: Успех
@@ -119,7 +119,7 @@ public class PaginationResponseModel : PaginationRequestModel
     /// <summary>
     /// Сообщения к ответу rest/api
     /// </summary>
-    public List<ResultMessage> Messages { get; set; } = new();
+    public List<ResultMessage> Messages { get; set; } = [];
 
     /// <summary>
     /// Добавить сообщение к результату-ответу rest/api

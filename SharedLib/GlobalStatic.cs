@@ -100,8 +100,6 @@ public static class GlobalStatic
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("android")]
-    [SupportedOSPlatform("iOS")]
-    [SupportedOSPlatform("MacCatalyst")]
     public static IPAddress IpAddress => Dns.GetHostEntry(Dns.GetHostName()).AddressList.Last();
 
     /// <summary>
@@ -110,17 +108,14 @@ public static class GlobalStatic
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("android")]
-    [SupportedOSPlatform("iOS")]
-    [SupportedOSPlatform("MacCatalyst")]
     public static IEnumerable<NetworkInterfaceModel> GetNetworkInterfaces()
     {
-        NetworkInterfaceType[] filter = new NetworkInterfaceType[] { NetworkInterfaceType.Loopback, NetworkInterfaceType.Unknown };
-        NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces()
+        NetworkInterfaceType[] filter = [NetworkInterfaceType.Loopback, NetworkInterfaceType.Unknown];
+        NetworkInterface[] nics = [.. NetworkInterface.GetAllNetworkInterfaces()
             .Where(c => !filter.Contains(c.NetworkInterfaceType) && c.OperationalStatus == OperationalStatus.Up)
-            .OrderBy(x => x.NetworkInterfaceType)
-            .ToArray();
+            .OrderBy(x => x.NetworkInterfaceType)];
 
-        if (!nics.Any())
+        if (nics.Length == 0)
             yield break;
 
         foreach (NetworkInterface e in nics)
@@ -185,7 +180,7 @@ public static class GlobalStatic
     public static T CreateDeepCopy<T>(T obj)
     {
         using MemoryStream ms = new();
-        XmlSerializer serializer = new XmlSerializer(obj!.GetType());
+        XmlSerializer serializer = new(obj!.GetType());
         serializer.Serialize(ms, obj);
         ms.Seek(0, SeekOrigin.Begin);
         return (T)serializer.Deserialize(ms)!;
@@ -203,7 +198,7 @@ public static class GlobalStatic
     }
 
     /// <summary>
-    /// 
+    /// Routes
     /// </summary>
     public static class Routes
     {
@@ -398,13 +393,13 @@ public static class GlobalStatic
     static FormMapModel MqttConfigForm => new()
     {
         Name = "Конфигурация MQTT",
-        Properties = new[]
-        {
+        Properties =
+        [
             new FormPropertyModel() { Code = nameof(MqttConfigModel.Server), Name = "Сервер" },
             new FormPropertyModel() { Code = nameof(MqttConfigModel.Port), Name = "Порт" },
             new FormPropertyModel() { Code = nameof(MqttConfigModel.Username), Name = "Логин" },
             new FormPropertyModel() { Code = nameof(MqttConfigModel.Password), Name = "Пароль" }
-        }
+        ]
     };
 
     #endregion

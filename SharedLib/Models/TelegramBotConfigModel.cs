@@ -18,7 +18,7 @@ public class TelegramBotConfigModel
     public string? TelegramBotToken { get; set; }
 
     /// <summary>
-    /// 
+    /// Автостарт
     /// </summary>
     public bool AutoStart { get; set; }
 
@@ -40,14 +40,10 @@ public class TelegramBotConfigModel
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj))
-        {
             return true;
-        }
 
-        if (ReferenceEquals(obj, null))
-        {
+        if (obj is null)
             return false;
-        }
 
         return this == (TelegramBotConfigModel)obj;
     }

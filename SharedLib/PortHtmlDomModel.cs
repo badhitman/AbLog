@@ -13,12 +13,13 @@ namespace SharedLib;
 public class PortHtmlDomModel : HtmlDomModel
 {
     /// <summary>
-    /// 
+    /// Links
     /// </summary>
     public List<(string text, string href)> Links = [];
 
     string last_tag_name = "";
     int _port_id;
+    private static readonly string[] attributes_html = ["submit", "hidden"];
 
     /// <summary>
     /// Получить данные по порту
@@ -59,7 +60,7 @@ public class PortHtmlDomModel : HtmlDomModel
                 {
                     if (href.Contains("pt=", StringComparison.OrdinalIgnoreCase) && href.Contains("cmd=", StringComparison.OrdinalIgnoreCase))
                     {
-                        href = href[(href.IndexOf("?") + 1)..];
+                        href = href[(href.IndexOf('?') + 1)..];
                         NameValueCollection parse_query = HttpUtility.ParseQueryString(href);
                         string? cmd_key = parse_query.AllKeys.FirstOrDefault(x => x?.Equals("cmd", StringComparison.OrdinalIgnoreCase) == true);
                         string? cmd_val = parse_query.Get(cmd_key);
@@ -85,7 +86,7 @@ public class PortHtmlDomModel : HtmlDomModel
                 string? input_name = item.Attributes?.FirstOrDefault(x => x.Key.Equals("name", StringComparison.OrdinalIgnoreCase)).Value;
                 string? input_value = item.Attributes?.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
 
-                if (new[] { "submit", "hidden" }.Any(x => x.Equals(input_type, StringComparison.OrdinalIgnoreCase)))
+                if (attributes_html.Any(x => x.Equals(input_type, StringComparison.OrdinalIgnoreCase)))
                     break;
 
                 if (input_type?.Equals("checkbox", StringComparison.OrdinalIgnoreCase) == true)

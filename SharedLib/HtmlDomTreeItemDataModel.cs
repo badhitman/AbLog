@@ -2,19 +2,19 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using AngleSharp.Html.Dom;
-using AngleSharp.Dom;
 using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// HTML Dom tree item Data
 /// </summary>
 public class HtmlDomTreeItemDataModel
 {
     /// <summary>
-    /// 
+    /// Title
     /// </summary>
     public string Title
     {
@@ -38,12 +38,12 @@ public class HtmlDomTreeItemDataModel
     public string NodeName { get; set; }
 
     /// <summary>
-    /// 
+    /// Node HTML
     /// </summary>
     public string NodeHtml { get; set; }
 
     /// <summary>
-    /// 
+    /// Parent
     /// </summary>
     public HtmlDomTreeItemDataModel? Parent { get; set; }
 
@@ -58,22 +58,22 @@ public class HtmlDomTreeItemDataModel
     public KeyValuePair<string, string?>[]? Attributes { get; set; }
 
     /// <summary>
-    /// 
+    /// Child elements count
     /// </summary>
-    public int? ChildElementCount { get; set; }
+    public int? ChildElementsCount { get; set; }
 
     /// <summary>
-    /// 
+    /// Развёрнут
     /// </summary>
     public bool IsExpanded { get; set; }
 
     /// <summary>
-    /// 
+    /// Элементы дерева
     /// </summary>
     public HtmlDomModel? TreeItems { get; set; }
 
     /// <summary>
-    /// 
+    /// HTML Dom tree item Data
     /// </summary>
     public HtmlDomTreeItemDataModel(INode cn)
     {
@@ -100,13 +100,13 @@ public class HtmlDomTreeItemDataModel
         else if (cn is IHtmlFormElement fe)
         {
             Attributes = fe.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name.Trim(), x.Value.Trim())).ToArray();
-            ChildElementCount = fe.ChildElementCount;
+            ChildElementsCount = fe.ChildElementCount;
         }
         else if (cn is IHtmlAnchorElement ae)
         {
             Attributes = ae.Attributes.Select(x => new KeyValuePair<string, string?>(x.Name.Trim(), x.Value.Trim())).ToArray();
-            ChildElementCount = ae.ChildElementCount;
-            Text = ChildElementCount > 0 ? "" : cn.Text().Trim();
+            ChildElementsCount = ae.ChildElementCount;
+            Text = ChildElementsCount > 0 ? "" : cn.Text().Trim();
         }
         else if (cn is IHtmlBreakRowElement)
         {

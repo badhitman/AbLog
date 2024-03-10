@@ -7,6 +7,6 @@ namespace SharedLib;
 /// <summary>
 /// Снимок с камеры
 /// </summary>
-/// <param name="Data">Данные фото</param>
+/// <param name="Data64">Данные Base64</param>
 /// <param name="Format">Расширение</param>
-public record struct ShotCameraModel(byte[] Data, string Format);
+public record struct ShotCameraAsBase64Model(string Data64, string Format);
