@@ -40,6 +40,7 @@ public class Program
         logger.Warn($"storage-db: {GlobalStatic.ParametersStorageDatabasePath}");
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
         builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
         IWebHostEnvironment _env = builder.Environment;

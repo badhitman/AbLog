@@ -72,7 +72,21 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
             _mqttClient.DisconnectedAsync += DisconnectedHandleAsync;
             _mqttClient.ApplicationMessageReceivedAsync += ApplicationMessageReceiveHandledAsync;
 
-            MqttClientConnectResult ccr = await _mqttClient.ConnectAsync(MqttClientOptions, cancellation_token);
+            MqttClientConnectResult ccr;
+            string msg;
+            try
+            {
+                ccr = await _mqttClient.ConnectAsync(MqttClientOptions, cancellation_token);
+            }
+            catch (Exception ex)
+            {
+                msg = $"{MqttClientOptions.Credentials.GetUserName(MqttClientOptions)}:{MqttClientOptions.Credentials.GetPassword(MqttClientOptions)}";
+                _logger.LogError(ex, msg);
+                res.AddError(msg);
+                return res;
+            }
+
+
 
             if (ccr.ResultCode == MqttClientConnectResultCode.Success)
                 res.AddSuccess($"Connect: {Enum.GetName(ccr.ResultCode)}; {ccr.ReasonString}".Trim());
