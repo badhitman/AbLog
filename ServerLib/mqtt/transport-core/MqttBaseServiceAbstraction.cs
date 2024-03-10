@@ -6,8 +6,10 @@ using ab.context;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Exceptions;
 using Newtonsoft.Json;
 using SharedLib;
+using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Text;
 
@@ -19,24 +21,24 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
-public abstract class MqttBaseServiceAbstraction : IMqttBaseService
+public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, ILogger<MqttBaseServiceAbstraction> logger, INotifyService notifyService, CancellationToken cancellationTokenMain) : IMqttBaseService
 {
     /// <summary>
     /// 
     /// </summary>
-    protected ILogger<MqttBaseServiceAbstraction> _logger = default!;
+    protected ILogger<MqttBaseServiceAbstraction> _logger = logger;
     /// <summary>
     /// 
     /// </summary>
-    protected readonly MqttConfigModel _mqtt_settings;
+    protected readonly MqttConfigModel _mqtt_settings = mqtt_settings;
     /// <summary>
     /// 
     /// </summary>
-    protected readonly MqttFactory _mqttFactory;
+    protected readonly MqttFactory _mqttFactory = mqttFactory;
     /// <summary>
     /// 
     /// </summary>
-    protected readonly IMqttClient _mqttClient;
+    protected readonly IMqttClient _mqttClient = mqttClient;
 
     /// <summary>
     /// 
@@ -60,25 +62,6 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
                 .WithKeepAlivePeriod(TimeSpan.FromSeconds(10))
                 .Build();
 
-    readonly CancellationToken CancellationTokenMain;
-
-
-
-    /// <summary>
-    /// MQTT служба
-    /// </summary>
-    public MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, ILogger<MqttBaseServiceAbstraction> logger, CancellationToken cancellationTokenMain)
-    {
-        _mqtt_settings = mqtt_settings;
-        _mqttFactory = mqttFactory;
-        _mqttClient = mqttClient;
-        _logger = logger;
-
-        _logger.LogInformation($"init >> {GetType().Name}");
-
-        CancellationTokenMain = cancellationTokenMain;
-    }
-
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> StartService(CancellationToken cancellation_token = default)
     {
@@ -89,15 +72,20 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             _mqttClient.DisconnectedAsync += DisconnectedHandleAsync;
             _mqttClient.ApplicationMessageReceivedAsync += ApplicationMessageReceiveHandledAsync;
 
-            MqttClientConnectResult ccr = await _mqttClient.ConnectAsync(MqttClientOptions, CancellationToken.None);
+            MqttClientConnectResult ccr = await _mqttClient.ConnectAsync(MqttClientOptions, cancellation_token);
 
             if (ccr.ResultCode == MqttClientConnectResultCode.Success)
                 res.AddSuccess($"Connect: {Enum.GetName(ccr.ResultCode)}; {ccr.ReasonString}".Trim());
             else
                 res.AddError($"Connect: {Enum.GetName(ccr.ResultCode)}; {ccr.ReasonString}".Trim());
 
-            MqttClientSubscribeResult csr = await _mqttClient.SubscribeAsync(MqttSubscribeOptions, CancellationToken.None);
+            MqttClientSubscribeResult csr = await _mqttClient.SubscribeAsync(MqttSubscribeOptions, cancellation_token);
             _logger.LogWarning($"{csr.ReasonString} _mqttClient.Subscribe >> {JsonConvert.SerializeObject(MqttSubscribeOptions.TopicFilters.Select(x => x.Topic))}");
+        }
+        catch (MqttCommunicationException ex)
+        {
+            _logger.LogError(ex, nameof(StartService));
+            res.AddError(ex.Message);
         }
         catch (Exception ex)
         {
@@ -125,7 +113,7 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
         _logger.LogWarning($"mqttClient.DisconnectedAsync => ClientWasConnected:{e.ClientWasConnected}");
         MqttClientConnectResult ccr;
         if (e.ClientWasConnected)
-            ccr = await _mqttClient.ConnectAsync(_mqttClient.Options, CancellationTokenMain);
+            ccr = await _mqttClient.ConnectAsync(_mqttClient.Options, cancellationTokenMain);
     }
 
     /// <inheritdoc/>
@@ -249,14 +237,14 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             ResponseTopics = [response_topic]
         };
 
-        Func<MqttApplicationMessageReceivedEventArgs, Task> MessageReceivedEvent = async (MqttApplicationMessageReceivedEventArgs e) =>
+        async Task MessageReceivedEvent(MqttApplicationMessageReceivedEventArgs e)
         {
             if (e.ApplicationMessage.Topic.Equals(response_topic))
             {
-                byte[] payload_bytes = await CipherService.DecryptAsync(e.ApplicationMessage.PayloadSegment.ToArray(), _mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
+                byte[] payload_bytes = await CipherService.DecryptAsync([.. e.ApplicationMessage.PayloadSegment], _mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
                 res.Response = Encoding.UTF8.GetString(payload_bytes);
             }
-        };
+        }
 
         _mqttClient.ApplicationMessageReceivedAsync += MessageReceivedEvent;
         MqttPublishMessageResultModel send_msg;
@@ -269,9 +257,23 @@ public abstract class MqttBaseServiceAbstraction : IMqttBaseService
             res.AddError(ex.Message);
             return res;
         }
-
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+        int mqtt_dbg_step = 0;
         while (res.Response is null)
+        {
             await Task.Delay(100, cancellation_token);
+
+            if (++mqtt_dbg_step > 15)
+            {
+                mqtt_dbg_step = 0;
+                notifyService.MqttDebug((stopwatch.Elapsed, null, topic));
+            }
+
+
+        }
+        notifyService.MqttDebug((stopwatch.Elapsed, res.Response, topic));
+        stopwatch.Stop();
 
         _mqttClient.ApplicationMessageReceivedAsync -= MessageReceivedEvent;
         MqttClientUnsubscribeOptions unsubscr_opt = _mqttFactory.CreateUnsubscribeOptionsBuilder()

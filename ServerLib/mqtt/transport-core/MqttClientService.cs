@@ -27,8 +27,8 @@ public class MqttClientService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttClientService(IMqttClient mqttClient, ILogger<MqttClientService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, CancellationToken cancellation_token = default)
-        : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
+    public MqttClientService(IMqttClient mqttClient, ILogger<MqttClientService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, INotifyService notifyService, CancellationToken cancellation_token = default)
+        : base(mqttClient, mqtt_settings, mqttFactory, logger, notifyService, cancellation_token)
     {
         _logger = logger;
     }

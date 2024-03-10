@@ -12,11 +12,9 @@ public class NoiseModel
     /// <summary>
     /// Цифровой шум
     /// </summary>
-    public IEnumerable<string> Noise = new string[]
-    {
-        Guid.NewGuid().ToString(),
-        Guid.NewGuid().ToString(),
+    public IEnumerable<string> Noise =
+    [
         Guid.NewGuid().ToString(),
         Guid.NewGuid().ToString()
-    };
+    ];
 }

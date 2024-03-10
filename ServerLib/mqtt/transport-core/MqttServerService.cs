@@ -74,8 +74,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, MqttConfigModel mqtt_conf, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IEmailService email, IServiceProvider service_provider, CancellationToken cancellation_token = default)
-        : base(mqttClient, mqtt_settings, mqttFactory, logger, cancellation_token)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, MqttConfigModel mqtt_conf, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IEmailService email, IServiceProvider service_provider, INotifyService notifyService, CancellationToken cancellation_token = default)
+        : base(mqttClient, mqtt_settings, mqttFactory, logger, notifyService, cancellation_token)
     {
         _logger = logger;
         _hardwares_service = hardwares_service;
