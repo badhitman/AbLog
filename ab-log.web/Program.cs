@@ -39,21 +39,25 @@ public class Program
         logger.Warn($"main-db: {GlobalStatic.MainDatabasePath}");
         logger.Warn($"storage-db: {GlobalStatic.ParametersStorageDatabasePath}");
 
-
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        builder.WebHost.UseUrls("http://0.0.0.0:5000");
+
         IWebHostEnvironment _env = builder.Environment;
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
         builder.Host.UseSystemd();
-
-        logger.Warn($"load configs: *.{_env.EnvironmentName}.json");
-        builder.Configuration.AddJsonFile("conf.json");
-        builder.Configuration.AddJsonFile("appsettings.json");
-        builder.Configuration.AddJsonFile($"appsettings.{_env.EnvironmentName}.json");
+        FileInfo fi;
+        logger.Warn($"load configs for: {_env.EnvironmentName}");
+        foreach (string cp in new string[] { "conf.json", "appsettings.json", $"appsettings.{_env.EnvironmentName}.json" })
+        {
+            fi = new(cp);
+            if (fi.Exists)
+                builder.Configuration.AddJsonFile(cp);
+        }
 
         // Secrets
         string secretPath = Path.Combine("..", "..", "secrets");
-        FileInfo fi = new(secretPath);
+        fi = new(secretPath);
         logger.Warn($"load secrets from {secretPath} ({fi.FullName}).");
         if (Directory.Exists(secretPath))
         {
@@ -63,6 +67,7 @@ public class Program
             foreach (string secret in Directory.GetFiles(secretPath, $"*.{_env.EnvironmentName}.json"))
                 builder.Configuration.AddJsonFile(Path.GetFullPath(secret), optional: true, reloadOnChange: true);
         }
+        builder.Configuration.AddCommandLine(args);
 
         ClientConfigModel settings = new();
         builder.Configuration.Bind(settings);
@@ -142,6 +147,8 @@ public class Program
         }
 
         WebApplication app = builder.Build();
+
+        // .UseUrls("http://localhost:5003", "https://localhost:5004")
 
         if (mqtt_settings.AutoStart && mqtt_settings.IsConfigured)
         {
