@@ -2,6 +2,7 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace SharedLib;
@@ -48,6 +49,7 @@ public class EntryDescriptionModel : EntryModel
 /// <summary>
 /// Базовая модель entry с сортировкой db модель
 /// </summary>
+[Index(nameof(Sorting))]
 public class EntrySortingModel : EntryModel
 {
     /// <summary>
