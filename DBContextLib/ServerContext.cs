@@ -172,8 +172,13 @@ public class ServerContext : DbContext
     /// </summary>
     public void ReorderScriptsCommands()
     {
-        IQueryable<int> scripts_ids = Commands.Where(x => !EF.Functions.Like(x.Sorting.ToString(), "%.0")).Select(x => x.ScriptId).Distinct().AsQueryable();
-        ScriptModelDB[] scripts = Scripts.Where(x => scripts_ids.Contains(x.Id)).Include(x => x.Commands).ToArray();
+        IQueryable<int> scripts_ids = Commands
+            .Where(x => !EF.Functions.Like(x.Sorting.ToString(), "%.0"))
+            .Select(x => x.ScriptId)
+            .Distinct()
+            .AsQueryable();
+
+        ScriptModelDB[] scripts = [.. Scripts.Where(x => scripts_ids.Contains(x.Id)).Include(x => x.Commands)];
 
         if (scripts.Length != 0)
         {
