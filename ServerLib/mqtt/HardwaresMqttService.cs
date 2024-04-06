@@ -29,13 +29,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {DB031034-891C-4C8B-8BDE-8546C6888E71}");
             return res;
         }
 
-        HardwaresResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwaresResponseModel>(rpc.Response);
+        HardwaresResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwaresResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {7AB0CF56-0A0F-4CDE-9DFE-F43D3E4C0119}");
@@ -64,13 +64,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {D06F8DE6-4189-49E3-907A-2996823C1A87}");
             return res;
         }
 
-        HttpResponseModel? response_mqtt = JsonConvert.DeserializeObject<HttpResponseModel>(rpc.Response);
+        HttpResponseModel? response_mqtt = JsonConvert.DeserializeObject<HttpResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {F868C3D5-1761-4965-8120-9B42B9281521}");
@@ -98,13 +98,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {C514933D-965B-4AB0-9B77-EE9BD2D145B0}");
             return res;
         }
 
-        HardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwareResponseModel>(rpc.Response);
+        HardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwareResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {B4E1C721-BA86-43B1-B2CB-ED637134BE61}");
@@ -132,13 +132,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {8A686A51-710F-41DD-A0F5-43891548A1E6}");
             return res;
         }
 
-        EntriyResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriyResponseModel>(rpc.Response);
+        EntriyResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriyResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {B27011ED-F460-47A2-9BBC-F2551AF66FE8}");
@@ -166,13 +166,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {0F024FA9-D04A-4625-BCF2-DF94C1794495}");
             return res;
         }
 
-        PortHardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<PortHardwareResponseModel>(rpc.Response);
+        PortHardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<PortHardwareResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {0CC2267F-5F91-4064-95B7-671701B71860}");
@@ -200,13 +200,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {BE75698E-7956-48AA-A56E-85EFD75FDC63}");
             return res;
         }
 
-        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.Response);
+        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {DFA6BCC6-ACC5-48DC-95CE-2549CD45431B}");
@@ -234,13 +234,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {9EC93B0A-13E5-4063-877B-0BAA59A23956}");
             return res;
         }
 
-        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.Response);
+        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {00FCF155-060F-4F5D-915A-0356BA3F3F59}");
@@ -263,13 +263,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {40220344-F391-4C8B-B3A9-4542745E3320}");
             return res;
         }
 
-        EntriesResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriesResponseModel>(rpc.Response);
+        EntriesResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriesResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {937229AF-CD9E-48FF-A6F4-9641B12A73F9}");
@@ -292,13 +292,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {C403AF02-CB86-4666-BEC2-39CA7BF3796C}");
             return res;
         }
 
-        EntriesNestedResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriesNestedResponseModel>(rpc.Response);
+        EntriesNestedResponseModel? response_mqtt = JsonConvert.DeserializeObject<EntriesNestedResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {234721F9-4B3F-428D-BCE0-D763615018A0}");
@@ -321,13 +321,13 @@ public class HardwaresMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_co
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {496EF23C-8190-43BD-A300-F4DB21B2F5D8}");
             return res;
         }
 
-        HardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwareResponseModel>(rpc.Response);
+        HardwareResponseModel? response_mqtt = JsonConvert.DeserializeObject<HardwareResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {6E5FD7AB-300D-40E9-A5AC-C6E386C571F6}");

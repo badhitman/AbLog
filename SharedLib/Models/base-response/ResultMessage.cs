@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Сообщение результата выполнения запроса rest/api
+/// Сообщение результата выполнения запроса
 /// </summary>
 public class ResultMessage
 {

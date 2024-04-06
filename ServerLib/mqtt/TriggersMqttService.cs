@@ -23,12 +23,12 @@ public class TriggersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_con
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {EF39DBD4-8916-4D90-957F-120815B198B0}");
             return res;
         }
-        TriggersResponseModel? response_mqtt = JsonConvert.DeserializeObject<TriggersResponseModel>(rpc.Response);
+        TriggersResponseModel? response_mqtt = JsonConvert.DeserializeObject<TriggersResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {05692E9A-912E-4EBD-AB34-B7B8A0DC87AD}");
@@ -49,12 +49,12 @@ public class TriggersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_con
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {7A911EF6-7F07-4CC8-9EA7-419DFB03D02C}");
             return res;
         }
-        TriggersResponseModel? response_mqtt = JsonConvert.DeserializeObject<TriggersResponseModel>(rpc.Response);
+        TriggersResponseModel? response_mqtt = JsonConvert.DeserializeObject<TriggersResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {2F64B22E-49B0-4E2E-AC13-036D51FF58AB}");
@@ -76,13 +76,13 @@ public class TriggersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_con
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {3E3C8000-FA89-4E87-9FA1-648B5046ABDF}");
             return res;
         }
 
-        TriggersResponseModel? response_mqtt = JsonConvert.DeserializeObject<TriggersResponseModel>(rpc.Response);
+        TriggersResponseModel? response_mqtt = JsonConvert.DeserializeObject<TriggersResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {9E793982-783B-4897-A24E-5B9F7FA43C6B}");

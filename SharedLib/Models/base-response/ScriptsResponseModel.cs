@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Перечень скриптов: Ответ rest/api
+/// Перечень скриптов
 /// </summary>
 public class ScriptsResponseModel : ResponseBaseModel
 {

@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Перечень идентификаторов: Ответ rest/api
+/// Перечень идентификаторов
 /// </summary>
 public class IdsResponseModel : ResponseBaseModel
 {

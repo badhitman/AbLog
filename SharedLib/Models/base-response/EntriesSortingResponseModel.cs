@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Базовые элементы [Entry] с полем сортиировки. Ответ rest/api
+/// Базовые элементы [Entry] с полем сортиировки
 /// </summary>
 public class EntriesSortingResponseModel : ResponseBaseModel
 {

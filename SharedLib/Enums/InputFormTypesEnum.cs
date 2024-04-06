@@ -5,32 +5,22 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// Типы полей формы (html forms)
 /// </summary>
 public enum InputFormTypesEnum
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     Text,
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     Hidden,
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     Checkbox,
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     Submit,
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     Password
 }

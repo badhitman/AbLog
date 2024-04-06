@@ -23,12 +23,12 @@ public class ContentionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {45DDFB65-2075-4364-8290-EB60AD729F7A}");
             return res;
         }
-        IdsResponseModel? response_mqtt = JsonConvert.DeserializeObject<IdsResponseModel>(rpc.Response);
+        IdsResponseModel? response_mqtt = JsonConvert.DeserializeObject<IdsResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {755DEB39-3AEB-4140-92B2-40F38782F937}");
@@ -49,12 +49,12 @@ public class ContentionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {0434B2F8-C172-4C18-B60E-E94411191441}");
             return res;
         }
-        IdsResponseModel? response_mqtt = JsonConvert.DeserializeObject<IdsResponseModel>(rpc.Response);
+        IdsResponseModel? response_mqtt = JsonConvert.DeserializeObject<IdsResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {A1A7A5E7-A592-49D4-9D21-1509C3E117F0}");

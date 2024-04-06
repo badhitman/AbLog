@@ -5,12 +5,12 @@
 namespace SharedLib;
 
 /// <summary>
-/// Настройки Email: Ответ rest/api
+/// Настройки Email
 /// </summary>
 public class EmailConfigResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Порт устройства
+    /// Настройки Email
     /// </summary>
     public EmailConfigModel? Conf { get; set; }
 }

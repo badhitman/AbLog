@@ -23,12 +23,12 @@ public class ConditionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_c
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {61E678BA-D547-4C96-83DA-471F5F1468D6}");
             return res;
         }
-        ConditionsAnonimResponseModel? response_mqtt = JsonConvert.DeserializeObject<ConditionsAnonimResponseModel>(rpc.Response);
+        ConditionsAnonimResponseModel? response_mqtt = JsonConvert.DeserializeObject<ConditionsAnonimResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {EEF2F5BC-7678-45C7-B190-F20558F746AA}");
@@ -49,12 +49,12 @@ public class ConditionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_c
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {76D0FFFA-F0BA-4995-8912-1EE3C0831BC0}");
             return res;
         }
-        ConditionsAnonimResponseModel? response_mqtt = JsonConvert.DeserializeObject<ConditionsAnonimResponseModel>(rpc.Response);
+        ConditionsAnonimResponseModel? response_mqtt = JsonConvert.DeserializeObject<ConditionsAnonimResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {355C71F3-B5B8-4C65-A74D-DD5838DC1324}");
@@ -75,12 +75,12 @@ public class ConditionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_c
             res.AddMessages(rpc.Messages);
             return res;
         }
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {68613B5C-681F-4B5D-A532-2D48F65D5FBE}");
             return res;
         }
-        ConditionsAnonimResponseModel? response_mqtt = JsonConvert.DeserializeObject<ConditionsAnonimResponseModel>(rpc.Response);
+        ConditionsAnonimResponseModel? response_mqtt = JsonConvert.DeserializeObject<ConditionsAnonimResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {5BE9431F-C504-4C2C-A8CA-F232829BBA90}");

@@ -9,7 +9,7 @@ namespace SharedLib;
 /// <summary>
 /// Ответ/результат на HTTP запрос
 /// </summary>
-public class HttpResponseModel : TextedResponseModel
+public class HttpResponseModel : SimpleStringResponseModel
 {
     /// <summary>
     /// Ответ/результат на HTTP запрос

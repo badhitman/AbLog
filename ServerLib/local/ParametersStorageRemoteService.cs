@@ -28,7 +28,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
         if (!res.IsSuccess)
             return res;
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {3DD98642-8743-459D-8FC0-9AAC4C180F6F}");
             return res;
@@ -55,13 +55,13 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {3DD98642-8743-459D-8FC0-9AAC4C180F6F}");
             return res;
         }
 
-        res = JsonConvert.DeserializeObject<TelegramBotConfigResponseModel>(rpc.Response) ?? new();
+        res = JsonConvert.DeserializeObject<TelegramBotConfigResponseModel>(rpc.TextPayload) ?? new();
         if (res.Conf is null)
         {
             res.Conf = new();
@@ -89,13 +89,13 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {8B807537-270E-452C-8D6A-C4EF5FAF8DF6}");
             return res;
         }
 
-        res = JsonConvert.DeserializeObject<EmailConfigResponseModel>(rpc.Response) ?? new();
+        res = JsonConvert.DeserializeObject<EmailConfigResponseModel>(rpc.TextPayload) ?? new();
         if (res.Conf is null)
         {
             res.Conf = new();
@@ -121,7 +121,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
         if (!res.IsSuccess)
             return res;
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {8AA0A955-7E07-4689-88D3-14AE2B8FDA64}");
             return res;

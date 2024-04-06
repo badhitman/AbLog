@@ -30,7 +30,6 @@ public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
     public bool AutoLoadAndExpand { get; set; } = false;
 
     bool IsExpand = false;
-    readonly CancellationToken cancellationToken = new();
     EntryModel PortEntry = new();
 
     /// <summary>
@@ -46,7 +45,7 @@ public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
     }
     static readonly SemaphoreSlim _syncLock = new(5, 5);
 
-    static Regex port_num = new(@"^\d+$", RegexOptions.Compiled);
+    static Regex port_num = NumberMyRegex();
 
     /// <summary>
     /// Update port-name
@@ -88,11 +87,7 @@ public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
             });
         }
     }
-    /// <inheritdoc/>
 
-    public void Dispose()
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        GC.SuppressFinalize(this);
-    }
+    [GeneratedRegex(@"^\d+$", RegexOptions.Compiled)]
+    private static partial Regex NumberMyRegex();
 }

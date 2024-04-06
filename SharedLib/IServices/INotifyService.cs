@@ -24,17 +24,17 @@ public interface INotifyService
 
     #region mqtt debug
     /// <summary>
-    /// 
+    /// Mqtt debug handler
     /// </summary>
     public delegate void MqttDebugHandler((TimeSpan Duration, string? Message, string TopicName) sender);
 
     /// <summary>
-    /// 
+    /// Mqtt debug notify
     /// </summary>
     public event MqttDebugHandler? MqttDebugNotify;
 
     /// <summary>
-    /// 
+    /// Mqtt debug
     /// </summary>
     public void MqttDebug((TimeSpan Duration, string? Message, string TopicName) sender);
     #endregion

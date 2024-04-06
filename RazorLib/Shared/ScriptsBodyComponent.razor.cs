@@ -6,6 +6,9 @@ using SharedLib;
 
 namespace RazorLib.Shared;
 
+/// <summary>
+/// Скриты с командами
+/// </summary>
 public partial class ScriptsBodyComponent : BlazorBusyComponentBaseModel
 {
     /// <summary>

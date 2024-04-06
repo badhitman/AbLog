@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// Entriy
 /// </summary>
 public class EntriyResponseModel : ResponseBaseModel
 {

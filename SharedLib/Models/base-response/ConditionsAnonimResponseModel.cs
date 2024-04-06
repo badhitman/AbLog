@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Условия/Ограничения, зависящее от заданного значения/состояния заданного порта. Ответ rest/api
+/// Условия/Ограничения, зависящее от заданного значения/состояния заданного порта
 /// </summary>
 public class ConditionsAnonimResponseModel : ResponseBaseModel
 {

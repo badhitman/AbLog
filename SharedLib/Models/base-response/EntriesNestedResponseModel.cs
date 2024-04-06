@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Базовые элементы [Entry] вложенной структуры. Ответ rest/api
+/// Базовые элементы [Entry] вложенной структуры
 /// </summary>
 public class EntriesNestedResponseModel : ResponseBaseModel
 {

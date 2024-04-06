@@ -100,7 +100,7 @@ public class ServerContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         ConnectString = $"Filename={GlobalStatic.MainDatabasePath}";
-        System.Diagnostics.Debug.WriteLine(ConnectString);
+        Debug.WriteLine(ConnectString);
         optionsBuilder.UseSqlite(ConnectString);
         base.OnConfiguring(optionsBuilder);
     }
@@ -195,12 +195,14 @@ public class ServerContext : DbContext
     public override void Dispose()
     {
         Debug.WriteLine($"{ContextId} context disposed.");
+        GC.SuppressFinalize(this);
         base.Dispose();
     }
 
     public override ValueTask DisposeAsync()
     {
         Debug.WriteLine($"{ContextId} context disposed async.");
+        GC.SuppressFinalize(this);
         return base.DisposeAsync();
     }
 

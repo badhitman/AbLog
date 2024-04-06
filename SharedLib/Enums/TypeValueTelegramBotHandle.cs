@@ -5,17 +5,13 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// Типы обработчиков TelegramBot
 /// </summary>
 public enum TypeValueTelegramBotHandle
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     Message,
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     CallbackQuery
 }

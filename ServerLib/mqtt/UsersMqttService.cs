@@ -25,13 +25,13 @@ public class UsersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) 
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {AD9E54A0-00BD-48AB-B368-801EE542220D}");
             return res;
         }
 
-        UserResponseModel? response_mqtt = JsonConvert.DeserializeObject<UserResponseModel>(rpc.Response);
+        UserResponseModel? response_mqtt = JsonConvert.DeserializeObject<UserResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {2309FE2B-4588-4F01-9700-5DC14AA6A4CD}");
@@ -53,13 +53,13 @@ public class UsersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) 
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {745E7C66-EEEF-40A7-B9A9-B156F1E61A5D}");
             return res;
         }
 
-        UsersPaginationResponseModel? response_mqtt = JsonConvert.DeserializeObject<UsersPaginationResponseModel>(rpc.Response);
+        UsersPaginationResponseModel? response_mqtt = JsonConvert.DeserializeObject<UsersPaginationResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {68703F46-E066-4613-B3A8-87880E7E6489}");
@@ -81,13 +81,13 @@ public class UsersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) 
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {884CA216-067A-4AF1-B730-A7C93D45FA89}");
             return res;
         }
 
-        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.Response);
+        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {D80AC4A3-5974-4F39-AE0D-E2065A4500D8}");

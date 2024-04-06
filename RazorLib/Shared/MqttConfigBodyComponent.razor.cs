@@ -5,6 +5,9 @@ using SharedLib;
 
 namespace RazorLib.Shared;
 
+/// <summary>
+/// Настройки MQTT транспорта
+/// </summary>
 public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
 {
     /// <summary>

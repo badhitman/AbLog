@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Команда скрипта. ответ на запрос rest/api
+/// Команда скрипта
 /// </summary>
 public class CommandResponseModel : ResponseBaseModel
 {

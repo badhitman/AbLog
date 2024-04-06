@@ -256,7 +256,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
             if (e.ApplicationMessage.Topic.Equals(response_topic))
             {
                 byte[] payload_bytes = await CipherService.DecryptAsync([.. e.ApplicationMessage.PayloadSegment], _mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
-                res.Response = Encoding.UTF8.GetString(payload_bytes);
+                res.TextPayload = Encoding.UTF8.GetString(payload_bytes);
             }
         }
 
@@ -274,7 +274,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
         Stopwatch stopwatch = new();
         stopwatch.Start();
         int mqtt_dbg_step = 0;
-        while (res.Response is null)
+        while (res.TextPayload is null)
         {
             await Task.Delay(100, cancellation_token);
 
@@ -286,7 +286,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
 
 
         }
-        notifyService.MqttDebug((stopwatch.Elapsed, res.Response, topic));
+        notifyService.MqttDebug((stopwatch.Elapsed, res.TextPayload, topic));
         stopwatch.Stop();
 
         _mqttClient.ApplicationMessageReceivedAsync -= MessageReceivedEvent;

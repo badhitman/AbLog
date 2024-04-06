@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Ограничения
+/// Ограничения (для команд, триггеров ...)
 /// </summary>
 public interface IConditionsService
 {

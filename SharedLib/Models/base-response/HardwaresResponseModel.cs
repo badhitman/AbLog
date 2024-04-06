@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Перечень устройств: Ответ rest/api
+/// Перечень устройств
 /// </summary>
 public class HardwaresResponseModel : ResponseBaseModel
 {

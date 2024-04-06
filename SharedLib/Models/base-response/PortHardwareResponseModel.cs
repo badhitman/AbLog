@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Порт устройства: Ответ rest/api
+/// Порт устройства
 /// </summary>
 public class PortHardwareResponseModel : ResponseBaseModel
 {

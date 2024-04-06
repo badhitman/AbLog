@@ -5,12 +5,12 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// Simple string - response
 /// </summary>
 public class SimpleStringResponseModel : ResponseBaseModel
 {
     /// <summary>
     /// Данные ответа
     /// </summary>
-    public string? Response { get; set; }
+    public string? TextPayload { get; set; }
 }

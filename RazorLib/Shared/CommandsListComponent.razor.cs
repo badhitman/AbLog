@@ -5,6 +5,9 @@ using SharedLib;
 
 namespace RazorLib.Shared;
 
+/// <summary>
+/// Список команд
+/// </summary>
 public partial class CommandsListComponent : BlazorBusyComponentBaseModel
 {
     /// <summary>

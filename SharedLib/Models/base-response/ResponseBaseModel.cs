@@ -7,17 +7,17 @@ using Newtonsoft.Json;
 namespace SharedLib;
 
 /// <summary>
-/// Базовая модель ответа сервера rest/api
+/// Базовая модель ответа сервера
 /// </summary>
 public class ResponseBaseModel
 {
     /// <summary>
-    /// Базовая модель ответа сервера rest/api
+    /// Базовая модель ответа сервера
     /// </summary>
     public ResponseBaseModel() { }
 
     /// <summary>
-    /// Базовая модель ответа сервера rest/api
+    /// Базовая модель ответа сервера
     /// </summary>
     public ResponseBaseModel(string msg, ResultTypesEnum msgType = ResultTypesEnum.Success)
     {
@@ -52,17 +52,17 @@ public class ResponseBaseModel
     /// <summary>
     /// Создать ответ с ошибкой
     /// </summary>
-    public static ResponseBaseModel CreateError(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = msg } } };
+    public static ResponseBaseModel CreateError(string msg) => new() { Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Error, Text = msg }] };
 
     /// <summary>
     /// Создать ответ с Success
     /// </summary>
-    public static ResponseBaseModel CreateSuccess(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Success, Text = msg } } };
+    public static ResponseBaseModel CreateSuccess(string msg) => new() { Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Success, Text = msg }] };
 
     /// <summary>
     /// Создать ответ с Warning
     /// </summary>
-    public static ResponseBaseModel CreateWarning(string msg) => new() { Messages = new List<ResultMessage>() { new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = msg } } };
+    public static ResponseBaseModel CreateWarning(string msg) => new() { Messages = [new ResultMessage() { TypeMessage = ResultTypesEnum.Warning, Text = msg }] };
 
     /// <summary>
     /// Добавить сообщение: Успех
@@ -109,7 +109,7 @@ public class ResponseBaseModel
     /// </summary>
     public ResponseBaseModel AddMessage(ResultTypesEnum type, string text)
     {
-        Messages ??= new();
+        Messages ??= [];
         Messages.Add(new ResultMessage() { TypeMessage = type, Text = text });
         return this;
     }

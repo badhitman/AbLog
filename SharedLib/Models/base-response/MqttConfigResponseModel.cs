@@ -5,12 +5,12 @@
 namespace SharedLib;
 
 /// <summary>
-/// Настройки MQTT: Ответ rest/api
+/// Настройки MQTT
 /// </summary>
 public class MqttConfigResponseModel : ResponseBaseModel
 {
     /// <summary>
-    /// Настройки
+    /// Настройки MQTT
     /// </summary>
     public MqttConfigModel? Conf { get; set; }
 }

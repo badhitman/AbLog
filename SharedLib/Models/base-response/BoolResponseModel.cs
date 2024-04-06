@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// bool - response
 /// </summary>
 public class BoolResponseModel : ResponseBaseModel
 {

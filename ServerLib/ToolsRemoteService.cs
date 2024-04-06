@@ -37,13 +37,13 @@ public class ToolsRemoteService : ToolsLocalService
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {8FC97429-E1D6-4D0F-89B8-F998A1FC098A}");
             return res;
         }
 
-        TelegramBotCheckResponseModel? response_mqtt = JsonConvert.DeserializeObject<TelegramBotCheckResponseModel>(rpc.Response);
+        TelegramBotCheckResponseModel? response_mqtt = JsonConvert.DeserializeObject<TelegramBotCheckResponseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {63B3DB7C-A730-41E9-B3BE-57EFB4F17EB5}");
@@ -67,13 +67,13 @@ public class ToolsRemoteService : ToolsLocalService
             return res;
         }
 
-        if (string.IsNullOrEmpty(rpc.Response))
+        if (string.IsNullOrEmpty(rpc.TextPayload))
         {
             res.AddError("string.IsNullOrEmpty(rpc.Response). error {E4ECC37F-9896-42BE-8539-3D893FAA125A}");
             return res;
         }
 
-        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.Response);
+        ResponseBaseModel? response_mqtt = JsonConvert.DeserializeObject<ResponseBaseModel>(rpc.TextPayload);
 
         if (response_mqtt is null)
             res.AddError("response_mqtt is null. error {04591427-3537-4687-8199-4EC6EF0A0C7E}");

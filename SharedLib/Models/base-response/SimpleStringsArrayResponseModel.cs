@@ -7,7 +7,7 @@ namespace SharedLib;
 /// <summary>
 /// Универсальная модель ответа коллекцией строк
 /// </summary>
-public class SimpleStringArrayResponseModel : ResponseBaseModel
+public class SimpleStringsArrayResponseModel : ResponseBaseModel
 {
     /// <summary>
     /// Данные ответа
