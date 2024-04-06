@@ -122,7 +122,7 @@ public class Program
         IMqttClient mqttClient = mqttFactory.CreateMqttClient();
         builder.Services.AddSingleton(x => mqttClient);
 
-        MqttConfigModel mqtt_settings = new();
+        MqttConfigModel mqtt_settings = new() { Password = "", Secret = "", Server = "", Username = "" };
         builder.Services.AddSingleton(x => mqtt_settings);
 
         using ParametersContext _context = new();

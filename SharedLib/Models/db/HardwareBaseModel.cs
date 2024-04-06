@@ -2,8 +2,8 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace SharedLib;
 
@@ -16,7 +16,7 @@ public class HardwareBaseModel : UniversalModelDB
     /// <summary>
     /// Управляющий блок (устройство) - Базовая модель
     /// </summary>
-    public HardwareBaseModel() { Address = ""; }
+    public HardwareBaseModel() { Address = string.Empty; }
     /// <summary>
     /// Управляющий блок (устройство) - Базовая модель
     /// </summary>
@@ -34,11 +34,11 @@ public class HardwareBaseModel : UniversalModelDB
     /// Сетевой адрес (заводской: 192.168.0.14)
     /// </summary>
     [Required(ErrorMessage = "Адрес обязателен для заполнения")]
-    public string Address { get; set; } = default!;
+    public string Address { get; set; } = "http://192.168.0.14/";
 
     /// <summary>
     /// Пароль (заводской: sec)
     /// </summary>
     [Required(ErrorMessage = "Заполните пароль доступа к контроллеру")]
-    public string Password { get; set; } = default!;
+    public string Password { get; set; } = "sec";
 }

@@ -175,11 +175,11 @@ public class UpdateHandler : IUpdateHandler
                             }
                             else
                             {
-                                conf_db.Conf.Username = username_prop.PropValue;
-                                conf_db.Conf.Password = password_prop.PropValue;
-                                conf_db.Conf.Server = server_prop.PropValue;
+                                conf_db.Conf.Username = username_prop.PropValue ?? "";
+                                conf_db.Conf.Password = password_prop.PropValue ?? "";
+                                conf_db.Conf.Server = server_prop.PropValue ?? "";
                                 conf_db.Conf.Port = port_int;
-                                conf_db.Conf.Secret = secret_prop.PropValue;
+                                conf_db.Conf.Secret = secret_prop.PropValue ?? "";
                                 conf_db.Conf.PrefixMqtt = topics_prefix_prop.PropValue;
 
                                 await _storage.SaveMqttConfig(conf_db.Conf);

@@ -117,7 +117,7 @@ public class PortHtmlDomModel : HtmlDomModel
                         ReadNode(ref tg_resp_html, sub_item, deep_num);
                 }
                 if (tg_resp_html.TrimEnd().EndsWith("○"))
-                    tg_resp_html = $"{tg_resp_html[..tg_resp_html.LastIndexOf("○")]}\n";
+                    tg_resp_html = $"{tg_resp_html[..tg_resp_html.LastIndexOf('○')]}\n";
                 break;
         }
         last_tag_name = item.NodeName;

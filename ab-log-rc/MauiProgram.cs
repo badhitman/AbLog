@@ -70,7 +70,7 @@ public static class MauiProgram
 
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
-        MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
+        MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new() { Password = "", Secret = "", Server = "", Username = "" };
         builder.Services.AddSingleton(x => mqtt_settings);
 
         MqttFactory mqttFactory = new();

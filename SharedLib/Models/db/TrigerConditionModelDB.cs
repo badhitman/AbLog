@@ -2,9 +2,9 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SharedLib;
 
@@ -25,14 +25,14 @@ public class TrigerConditionModelDB : ConditionBaseModelDB
     /// <param name="condition_request"></param>
     public TrigerConditionModelDB(ConditionUpdateModel condition_request)
     {
-        this.Id = condition_request.Id < 0 ? 0 : condition_request.Id;
-        this.PortId = condition_request.PortId;
-        this.HardwareId = condition_request.HardwareId;
-        this.OwnerId = condition_request.OwnerId;
-        this.Name = condition_request.Name;
-        this.Value = condition_request.Value;
-        this.ConditionValueType = condition_request.ConditionValueType;
-        this.СomparisonMode = condition_request.СomparisonMode;
+        Id = condition_request.Id < 0 ? 0 : condition_request.Id;
+        PortId = condition_request.PortId;
+        HardwareId = condition_request.HardwareId;
+        OwnerId = condition_request.OwnerId;
+        Name = condition_request.Name;
+        Value = condition_request.Value;
+        ConditionValueType = condition_request.ConditionValueType;
+        СomparisonMode = condition_request.СomparisonMode;
     }
 
     /// <summary>

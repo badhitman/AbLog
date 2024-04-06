@@ -85,7 +85,7 @@ else
     const string http_schema_prefix = "http://";
     bool InitDelete = false;
     bool ShowPass = false;
-    HardwareBaseModel hw = new();
+    HardwareBaseModel hw = new() { Address = "http://192.168.0.14/", Password = "sec" };
 
 #if DEBUG
     bool IsDebug = true;

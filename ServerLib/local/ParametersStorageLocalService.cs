@@ -111,7 +111,7 @@ public class ParametersStorageLocalService : IParametersStorageService
             res.AddWarning("MQTT не настроен");
             return Task.FromResult(res);
         }
-        res.Conf = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
+        res.Conf = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig);
 
         return Task.FromResult(res);
     }

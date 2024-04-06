@@ -16,7 +16,7 @@ public class MqttConfigModel
     /// Адрес сервера MQTT
     /// </summary>
     [Required]
-    public string? Server { get; set; }
+    public required string Server { get; set; }
 
     /// <summary>
     /// Порт сервера MQTT
@@ -39,13 +39,13 @@ public class MqttConfigModel
     /// Логин пользователя для авторизации на сервере MQTT
     /// </summary>
     [Required]
-    public string? Username { get; set; }
+    public required string Username { get; set; }
 
     /// <summary>
     /// Пароль пользователя для авторизации на сервере MQTT
     /// </summary>
     [Required]
-    public string? Password { get; set; }
+    public required string Password { get; set; }
 
     /// <summary>
     /// Идентификатор
@@ -54,18 +54,18 @@ public class MqttConfigModel
     public string? ClientId { get; set; }
 
     /// <summary>
-    /// 
+    /// Автоматический старт при запуске приложения
     /// </summary>
     public bool AutoStart { get; set; }
 
     /// <summary>
-    /// 
+    /// Парольная фраза для шифрования трафика MQTT
     /// </summary>
     [Required]
-    public string? Secret { get; set; }
+    public required string Secret { get; set; } = "change-me";
 
     /// <summary>
-    /// 
+    /// Load configuration from json string (raw)
     /// </summary>
     public void LoadConfigFromJson(string json_raw)
     {
@@ -94,7 +94,7 @@ public class MqttConfigModel
     }
 
     /// <summary>
-    /// 
+    /// Is configured
     /// </summary>
     public bool IsConfigured =>
         !string.IsNullOrWhiteSpace(Server) &&

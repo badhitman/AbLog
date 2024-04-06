@@ -35,8 +35,8 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
     public required INotifyService NotifyService { get; set; }
 
 
-    MqttConfigModel conf = new();
-    MqttConfigModel conf_self = new();
+    MqttConfigModel conf = new() { Password = "", Secret = "", Server = "", Username = "" };
+    MqttConfigModel conf_self = new() { Password = "", Secret = "", Server = "", Username = "" };
     private EditContext? editContext;
     bool IsEdit => conf != conf_self;
     bool ShowSecret = false;

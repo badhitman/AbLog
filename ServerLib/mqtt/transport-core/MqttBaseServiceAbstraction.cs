@@ -127,7 +127,13 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
         _logger.LogWarning($"mqttClient.DisconnectedAsync => ClientWasConnected:{e.ClientWasConnected}");
         MqttClientConnectResult ccr;
         if (e.ClientWasConnected)
+        {
             ccr = await _mqttClient.ConnectAsync(_mqttClient.Options, cancellationTokenMain);
+            if (ccr.ResultCode == MqttClientConnectResultCode.Success)
+                _logger.LogInformation($"Connect: {Enum.GetName(ccr.ResultCode)}; {ccr.ReasonString}".Trim());
+            else
+                _logger.LogError($"Connect: {Enum.GetName(ccr.ResultCode)}; {ccr.ReasonString}".Trim());
+        }
     }
 
     /// <inheritdoc/>
@@ -148,9 +154,9 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
 
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
-        MqttConfigModel mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig) ?? new();
+        MqttConfigModel? mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig);
 
-        if (_mqtt_settings != mqtt_settings)
+        if (mqtt_settings is not null && _mqtt_settings != mqtt_settings)
         {
             _mqtt_settings.Username = mqtt_settings.Username;
             _mqtt_settings.Password = mqtt_settings.Password;
@@ -200,7 +206,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
             foreach (string response_topic in message.ResponseTopics)
                 msg.WithResponseTopic(response_topic);
 
-        if (message.Topics.Any())
+        if (message.Topics.Length != 0)
             foreach (string topic in message.Topics)
                 msg.WithTopic(topic);
 

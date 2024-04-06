@@ -5,12 +5,12 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// Свойство формы (заполняемая через TelegramBot)
 /// </summary>
 public class UserFormPropertyModelDb : EntryModel
 {
     /// <summary>
-    /// 
+    /// имя поля формы
     /// </summary>
     public string Code { get; set; } = default!;
 
@@ -24,7 +24,7 @@ public class UserFormPropertyModelDb : EntryModel
     public int OwnerFormId { get; set; }
 
     /// <summary>
-    /// 
+    /// Значение поля формы
     /// </summary>
     public string? PropValue { get; set; }
 }

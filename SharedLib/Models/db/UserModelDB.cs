@@ -23,7 +23,7 @@ public class UserModelDB : UniversalModelDB
     public long TelegramId { get; set; }
 
     /// <summary>
-    /// 
+    /// Отклюён?
     /// </summary>
     public bool IsDisabled { get; set; } = true;
 
@@ -43,27 +43,27 @@ public class UserModelDB : UniversalModelDB
     public long ChatId { get; set; }
 
     /// <summary>
-    /// 
+    /// MessageId (telegram)
     /// </summary>
     public int MessageId { get; set; }
 
     /// <summary>
-    /// 
+    /// FirstName
     /// </summary>
     public string FirstName { get; set; } = default!;
 
     /// <summary>
-    /// 
+    /// Last update
     /// </summary>
     public DateTime LastUpdate { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// 
+    /// LastName
     /// </summary>
     public string? LastName { get; set; }
 
     /// <summary>
-    /// 
+    /// Форма, которую пользователь заполняет чрез TelegramBot
     /// </summary>
     public UserFormModelDb? UserForm { get; set; }
 
