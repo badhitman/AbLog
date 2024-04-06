@@ -40,7 +40,7 @@ public interface IToolsService
     public Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null, CancellationToken cancellation_token = default);
 
     /// <summary>
-    /// 
+    /// MQTT Message publish
     /// </summary>
     public Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default);
 }

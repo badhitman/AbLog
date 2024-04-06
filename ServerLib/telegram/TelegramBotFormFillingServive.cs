@@ -5,12 +5,12 @@ using Telegram.Bot;
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Заполнение формы данными через TelegramBot
 /// </summary>
 public class TelegramBotFormFillingServive : TelegramBotFormFillingServiveAbstract
 {
     /// <summary>
-    /// 
+    /// Заполнение формы данными через TelegramBot
     /// </summary>
     public TelegramBotFormFillingServive(IServiceProvider _services, ILogger<TelegramBotFormFillingServive> logger)
     {

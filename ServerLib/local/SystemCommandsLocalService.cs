@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Системные команды
 /// </summary>
 public class SystemCommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : ISystemCommandsService
 {

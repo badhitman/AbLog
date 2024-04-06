@@ -9,7 +9,7 @@ using System.Runtime.Versioning;
 namespace ServerLib;
 
 /// <summary>
-/// Системные команды
+/// Системные команды (запускаемые на сервере)
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]

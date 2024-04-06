@@ -8,7 +8,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Хранение параметров IMqttClient
 /// </summary>
 public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigModel conf) : ParametersStorageLocalService
 {

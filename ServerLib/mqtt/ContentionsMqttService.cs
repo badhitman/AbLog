@@ -8,7 +8,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Конкуренция
+/// Конкуренции команд скриптов
 /// </summary>
 public class ContentionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : IContentionsService
 {

@@ -9,7 +9,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Пользователи
+/// Команды скриптов для управляющего контролера
 /// </summary>
 public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : ICommandsService
 {

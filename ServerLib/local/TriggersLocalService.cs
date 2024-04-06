@@ -9,7 +9,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Пользователи
+/// Тригеры событий
 /// </summary>
 public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : ITriggersService
 {
@@ -31,7 +31,7 @@ public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : 
             }
             db.Remove(trigger_db);
             db.SaveChanges();
-            res_trigs.Triggers = db.Trigers.ToArray();
+            res_trigs.Triggers = [.. db.Trigers];
         }
 
         return res_trigs;

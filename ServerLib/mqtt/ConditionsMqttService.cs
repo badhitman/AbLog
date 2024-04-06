@@ -8,7 +8,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Ограничения
+/// Ограничения (для команд, триггеров ...)
 /// </summary>
 public class ConditionsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : IConditionsService
 {

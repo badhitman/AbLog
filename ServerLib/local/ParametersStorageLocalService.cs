@@ -9,14 +9,14 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Хранение параметров IMqttClient
+/// Хранение параметров в БД
 /// </summary>
 public class ParametersStorageLocalService : IParametersStorageService
 {
     //readonly MqttFactory _mqtt_fact;
 
     /// <summary>
-    /// Хранение параметров IMqttClient
+    /// Хранение параметров в БД
     /// </summary>
     public ParametersStorageLocalService()
     {

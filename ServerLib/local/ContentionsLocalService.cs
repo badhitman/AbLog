@@ -9,7 +9,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Конкуренция
+/// Конкуренции команд скриптов
 /// </summary>
 public class ContentionsLocalService(IDbContextFactory<ServerContext> DbFactory) : IContentionsService
 {

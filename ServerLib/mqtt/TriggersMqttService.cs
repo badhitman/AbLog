@@ -8,7 +8,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Пользователи
+/// Тригеры событий
 /// </summary>
 public class TriggersMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : ITriggersService
 {

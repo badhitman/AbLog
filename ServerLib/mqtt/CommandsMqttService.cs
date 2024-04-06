@@ -8,7 +8,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Команды порта
+/// Команды скриптов для управляющего контролера
 /// </summary>
 public class CommandsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : ICommandsService
 {

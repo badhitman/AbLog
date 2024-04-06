@@ -11,7 +11,7 @@ namespace ServerLib;
 public class NotifyService(ILogger<NotifyService> Logger) : INotifyService
 {
     /// <summary>
-    /// 
+    /// User notify handler
     /// </summary>
     public event UserNotifyHandler? Notify;
 

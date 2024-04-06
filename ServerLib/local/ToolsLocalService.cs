@@ -12,7 +12,7 @@ using Telegram.Bot;
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Tools: MQTT and Email
 /// </summary>
 public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersStorageService ParameterStorage, MqttFactory MqttFact, HttpClient HttpClient, IEmailService Email, IServiceProvider ServiceProvider) : IToolsService
 {

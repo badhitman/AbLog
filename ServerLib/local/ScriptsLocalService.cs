@@ -9,7 +9,7 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Скрипты
 /// </summary>
 public class ScriptsLocalService(IDbContextFactory<ServerContext> DbFactory) : IScriptsService
 {
