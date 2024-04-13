@@ -16,13 +16,13 @@
     public byte PortState { get; set; }
 
     [Parameter, EditorRequired]
-    public string BtnText { get; set; } = default!;
+    public required string BtnText { get; set; }
 
     [CascadingParameter, EditorRequired]
     public int Id { get; set; }
 
     [CascadingParameter]
-    public Action ReloadPage { get; set; } = default!;
+    public required Action ReloadPage { get; set; }
 
     async Task RequestPortStateSet()
     {

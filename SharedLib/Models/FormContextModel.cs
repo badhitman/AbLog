@@ -12,7 +12,7 @@ public class FormContextModel
     /// <summary>
     /// Action
     /// </summary>
-    public Uri FormAction { get; set; } = default!;
+    public required Uri FormAction { get; set; }
 
     /// <summary>
     /// Data context

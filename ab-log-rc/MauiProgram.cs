@@ -4,6 +4,7 @@
 
 using ab.context;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using MQTTnet;
 using MQTTnet.Client;
 using MudBlazor.Services;
@@ -79,11 +80,11 @@ public static class MauiProgram
         builder.Services.AddSingleton(x => mqttClient);
 
         MauiApp maui_app = builder.Build();
-
         if (mqtt_settings.AutoStart && mqtt_settings.IsConfigured)
         {
+            IHostApplicationLifetime _applicationLifetime = maui_app.Services.GetRequiredService<IHostApplicationLifetime>();
             IMqttBaseService _mqtt_cli_srv = maui_app.Services.GetRequiredService<IMqttBaseService>();
-            Task.Run(async () => { await _mqtt_cli_srv.StartService(); });
+            Task.Run(async () => { await _mqtt_cli_srv.StartService(_applicationLifetime.ApplicationStopping); });
         }
 
         return maui_app;

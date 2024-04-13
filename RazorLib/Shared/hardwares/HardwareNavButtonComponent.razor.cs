@@ -52,7 +52,7 @@ public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
     /// </summary>
     protected async Task UpdatePortName()
     {
-        ResponseBaseModel rest = await _hardwares.SetNamePort(PortEntry);
+        ResponseBaseModel rest = await Hardwares.SetNamePort(PortEntry);
 
         Snackbar.ShowMessagesResponse(rest.Messages);
     }
@@ -70,7 +70,7 @@ public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
                 StateHasChanged();
                 await _syncLock.WaitAsync();
 
-                EntriyResponseModel rest = await _hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = uint.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true }, CancellationToken);
+                EntriyResponseModel rest = await Hardwares.CheckPortHardware(new PortHardwareCheckRequestModel() { PortNum = uint.Parse(path_parameters.Get("pt")!), HardwareId = Id, CreatePortIfNoptExist = true }, CancellationToken);
 
                 Snackbar.ShowMessagesResponse(rest.Messages);
                 if (rest.IsSuccess)

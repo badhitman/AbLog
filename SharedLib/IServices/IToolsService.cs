@@ -12,12 +12,12 @@ public interface IToolsService
     /// <summary>
     /// Запустить MQTT службу
     /// </summary>
-    public Task<ResponseBaseModel> StartMqtt();
+    public Task<ResponseBaseModel> StartMqtt(CancellationToken cancellationTokenMain);
 
     /// <summary>
     /// Остановить MQTT службу
     /// </summary>
-    public Task<ResponseBaseModel> StopMqtt();
+    public Task<ResponseBaseModel> StopMqtt(CancellationToken cancellationTokenMain);
 
     /// <summary>
     /// Получить статус MQTT службы
@@ -42,5 +42,5 @@ public interface IToolsService
     /// <summary>
     /// MQTT Message publish
     /// </summary>
-    public Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default);
+    public Task<MqttPublishMessageResultModel> PublishMqttMessage(MqttPublishMessageModel message, CancellationToken cancellation_token);
 }

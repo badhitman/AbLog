@@ -15,7 +15,7 @@ public class SystemCommandModelDB : EntryModel
     /// Файл запуска
     /// </summary>
     [Required]
-    public string FileName { get; set; } = default!;
+    public string? FileName { get; set; }
 
     /// <summary>
     /// Параметры запуска

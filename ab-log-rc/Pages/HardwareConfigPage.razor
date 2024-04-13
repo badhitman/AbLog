@@ -1,10 +1,5 @@
 ﻿@page "/hardware-page/{Id:int}"
 
-@using RazorLib.Shared.navs.tabs
-@using RazorLib.Shared.hardwares
-@using RazorLib.Shared;
-@using SharedLib
-
 @inherits BlazorBusyComponentBaseModel
 
 <PageTitle>
@@ -19,12 +14,7 @@
             <HardwareFormComponent />
         </TabComponent>
         <TabComponent Tooltip="Ретранслятор" Title="Ретранслятор">
-            <HardwareTranslateMainLayerComponent />
+            <HardwareTranslateMainLayerComponent PagePath="/" />
         </TabComponent>
     </TabSetComponent>
 </CascadingValue>
-
-@code {
-    [Parameter, EditorRequired]
-    public int Id { get; set; }
-}

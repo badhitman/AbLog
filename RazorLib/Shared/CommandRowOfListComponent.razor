@@ -83,25 +83,25 @@
 
 @code {
     [Parameter, EditorRequired]
-    public EntrySortingModel Command { get; set; } = default!;
+    public required EntrySortingModel Command { get; set; }
 
     [Parameter, EditorRequired]
-    public int SequenceNumber { get; set; } = default!;
+    public required int SequenceNumber { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<int> AddCommandAct { get; set; } = default!;
+    public required Action<int> AddCommandAct { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<int> DeleteCommand { get; set; } = default!;
+    public required Action<int> DeleteCommand { get; set; }
 
     [Parameter, EditorRequired]
     public int ScriptId { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<CommandModelDB> UpdateCommand { get; set; } = default!;
+    public required Action<CommandModelDB> UpdateCommand { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<ScriptModelDB> AllCsripts { get; set; } = default!;
+    public required IEnumerable<ScriptModelDB> AllCsripts { get; set; }
 
     [Parameter, EditorRequired]
     public bool AllowUpMove { get; set; }
@@ -110,7 +110,7 @@
     public bool AllowDownMove { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<VerticalDirectionsEnum, int> MoveCommandAction { get; set; } = default!;
+    public required Action<VerticalDirectionsEnum, int> MoveCommandAction { get; set; }
 
     bool IsOpen = false;
 

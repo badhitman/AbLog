@@ -24,11 +24,11 @@ public abstract class BlazorBusyComponentBaseModel : ComponentBase, IDisposable
     public virtual void StateHasChangedCall() => StateHasChanged();
 
     /// <summary>
-    /// 
+    /// Signals to a System.Threading.CancellationToken that it should be canceled.
     /// </summary>
-    protected CancellationTokenSource _cts = new();
+    protected CancellationTokenSource? _cts;
     /// <summary>
-    /// 
+    /// Propagates notification that operations should be canceled.
     /// </summary>
     protected CancellationToken CancellationToken => (_cts ??= new()).Token;
 
@@ -36,7 +36,7 @@ public abstract class BlazorBusyComponentBaseModel : ComponentBase, IDisposable
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        _cts.Cancel();
-        _cts.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

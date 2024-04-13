@@ -12,9 +12,7 @@ namespace SharedLib;
 [Index(nameof(TelegramId), IsUnique = true)]
 public class UserModelDB : UniversalModelDB
 {
-    /// <summary>
-    /// Email пользователя
-    /// </summary>
+    /// <inheritdoc/>
     public string? Email { get; set; }
 
     /// <summary>
@@ -22,9 +20,7 @@ public class UserModelDB : UniversalModelDB
     /// </summary>
     public long TelegramId { get; set; }
 
-    /// <summary>
-    /// Отклюён?
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsDisabled { get; set; } = true;
 
     /// <summary>
@@ -47,19 +43,13 @@ public class UserModelDB : UniversalModelDB
     /// </summary>
     public int MessageId { get; set; }
 
-    /// <summary>
-    /// FirstName
-    /// </summary>
-    public string FirstName { get; set; } = default!;
+    /// <inheritdoc/>
+    public string? FirstName { get; set; }
 
-    /// <summary>
-    /// Last update
-    /// </summary>
+    /// <inheritdoc/>
     public DateTime LastUpdate { get; set; } = DateTime.Now;
 
-    /// <summary>
-    /// LastName
-    /// </summary>
+    /// <inheritdoc/>
     public string? LastName { get; set; }
 
     /// <summary>
@@ -67,9 +57,7 @@ public class UserModelDB : UniversalModelDB
     /// </summary>
     public UserFormModelDb? UserForm { get; set; }
 
-    /// <summary>
-    /// Reload
-    /// </summary>
+    /// <inheritdoc/>
     public void Reload(UserModelDB elementBeforeEdit)
     {
         Email = elementBeforeEdit.Email;

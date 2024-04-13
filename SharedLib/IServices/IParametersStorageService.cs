@@ -14,12 +14,12 @@ public interface IParametersStorageService
     /// <summary>
     /// Сохранить конфигурацию TelegramBot токена
     /// </summary>
-    public Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config);
+    public Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config, CancellationToken cancellationToken);
 
     /// <summary>
     /// Получить конфигурацию TelegramBot токена
     /// </summary>
-    public Task<TelegramBotConfigResponseModel> GetTelegramBotConfig();
+    public Task<TelegramBotConfigResponseModel> GetTelegramBotConfig(CancellationToken cancellationToken);
 
     #endregion
 
@@ -28,12 +28,12 @@ public interface IParametersStorageService
     /// <summary>
     /// Сохранить конфигурацию Email подключения
     /// </summary>
-    public Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config);
+    public Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config, CancellationToken cancellationToken);
 
     /// <summary>
     /// Получить конфигурацию Email подключения
     /// </summary>
-    public Task<EmailConfigResponseModel> GetEmailConfig();
+    public Task<EmailConfigResponseModel> GetEmailConfig(CancellationToken cancellationToken);
 
     #endregion
 
@@ -42,12 +42,12 @@ public interface IParametersStorageService
     /// <summary>
     /// Сохранить настройки MQTT
     /// </summary>
-    public Task<ResponseBaseModel> SaveMqttConfig(MqttConfigModel conf);
+    public Task<ResponseBaseModel> SaveMqttConfig(MqttConfigModel conf, CancellationToken cancellationToken);
 
     /// <summary>
     /// Получить настройки MQTT
     /// </summary>
-    public Task<MqttConfigResponseModel> GetMqttConfig();
+    public Task<MqttConfigResponseModel> GetMqttConfig(CancellationToken cancellationToken);
 
     #endregion
 }

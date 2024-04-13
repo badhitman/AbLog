@@ -12,12 +12,12 @@ public class FormPropertyModel
     /// <summary>
     /// Code
     /// </summary>
-    public string Code { get; set; } = default!;
+    public required string Code { get; set; }
 
     /// <summary>
     /// Name
     /// </summary>
-    public string Name { get; set; } = default!;
+    public required string Name { get; set; }
 
     /// <summary>
     /// Allowed values

@@ -12,15 +12,15 @@ public class TelegramMessageModelDB : EntryModel
     /// <summary>
     /// Идентификатор сообщения
     /// </summary>
-    public string MessageId { get; set; } = default!;
+    public required string MessageId { get; set; }
 
     /// <summary>
     /// Идентификатор отправителя сообщения
     /// </summary>
-    public string UserSenderId { get; set; } = default!;
+    public required string UserSenderId { get; set; }
 
     /// <summary>
     /// Идентификатр чата сообщения
     /// </summary>
-    public string ChatId { get; set; } = default!;
+    public required string ChatId { get; set; }
 }

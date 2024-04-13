@@ -45,13 +45,13 @@
 
 @code {
     [Parameter, EditorRequired]
-    public ConditionAnonimModel Condition { get; set; } = default!;
+    public required ConditionAnonimModel Condition { get; set; }
 
     /// <summary>
     /// Перечень устройств (вместе с портами)
     /// </summary>
     [Parameter, EditorRequired]
-    public EntryNestedModel[] TreeHardwares { get; set; } = default!;
+    public required EntryNestedModel[] TreeHardwares { get; set; }
 
     /// <summary>
     /// Номер строки (по порядку)
@@ -69,10 +69,10 @@
     public int OwnerId { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<IEnumerable<ConditionAnonimModel>> UpdateAct { get; set; } = default!;
+    public required Action<IEnumerable<ConditionAnonimModel>> UpdateAct { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<int> DeleteNewConditionAct { get; set; } = default!;
+    public required Action<int> DeleteNewConditionAct { get; set; }
 
     string ModalBodyText { get; set; } = string.Empty;
 

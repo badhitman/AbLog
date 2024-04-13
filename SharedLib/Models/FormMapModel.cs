@@ -9,13 +9,9 @@ namespace SharedLib;
 /// </summary>
 public class FormMapModel
 {
-    /// <summary>
-    /// Name
-    /// </summary>
-    public string Name { get; set; } = default!;
+    /// <inheritdoc/>
+    public required string Name { get; set; }
 
-    /// <summary>
-    /// Properties
-    /// </summary>
-    public FormPropertyModel[] Properties { get; set; } = default!;
+    /// <inheritdoc/>
+    public required FormPropertyModel[] Properties { get; set; }
 }

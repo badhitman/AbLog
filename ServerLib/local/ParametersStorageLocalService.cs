@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SharedLib;
 
@@ -11,110 +12,92 @@ namespace ServerLib;
 /// <summary>
 /// Хранение параметров в БД
 /// </summary>
-public class ParametersStorageLocalService : IParametersStorageService
+public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> DbFactory) : IParametersStorageService
 {
-    //readonly MqttFactory _mqtt_fact;
-
-    /// <summary>
-    /// Хранение параметров в БД
-    /// </summary>
-    public ParametersStorageLocalService()
-    {
-        // _mqtt_fact = mqtt_fact;
-    }
-
     #region Telegram Bot
-
     /// <inheritdoc/>
-    public virtual Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
+    public virtual async Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config, CancellationToken cancellationToken)
     {
-        using ParametersContext _context = new();
+        using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         ParametersStorageModelDB p = _context.SetStoredParameter(nameof(TelegramBotConfigModel), JsonConvert.SerializeObject(connect_config));
         ResponseBaseModel res = new();
         res.AddSuccess($"Данные успешно записаны в БД #{p.Id}");
-        return Task.FromResult(res);
+        return res;
     }
 
     /// <inheritdoc/>
-    public virtual Task<TelegramBotConfigResponseModel> GetTelegramBotConfig()
+    public virtual async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig(CancellationToken cancellationToken)
     {
         TelegramBotConfigResponseModel res = new();
-        using ParametersContext _context = new();
+        using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         string _telegramBotConfig = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_telegramBotConfig))
         {
             res.AddWarning("Конфигурация не обнаружена");
-            return Task.FromResult(res);
+            return res;
         }
 
         res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig) ?? new();
-
-        return Task.FromResult(res);
+        return res;
     }
-
     #endregion
 
     #region Email
-
     /// <inheritdoc/>
-    public virtual Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
+    public virtual async Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config, CancellationToken cancellationToken)
     {
         if (!connect_config.IsConfigured)
-            return Task.FromResult(ResponseBaseModel.CreateError("Настройки не заполнены. Заполните поля: email, login, pasword, host"));
+            return ResponseBaseModel.CreateError("Настройки не заполнены. Заполните поля: email, login, pasword, host");
 
-        using ParametersContext _context = new();
+        using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         ParametersStorageModelDB p = _context.SetStoredParameter(nameof(EmailConfigModel), JsonConvert.SerializeObject(connect_config));
         ResponseBaseModel res = new();
         res.AddSuccess($"Данные успешно записаны в БД #{p.Id}");
-        return Task.FromResult(res);
+        return res;
     }
 
     /// <inheritdoc/>
-    public virtual Task<EmailConfigResponseModel> GetEmailConfig()
+    public virtual async Task<EmailConfigResponseModel> GetEmailConfig(CancellationToken cancellationToken)
     {
         EmailConfigResponseModel res = new();
-        using ParametersContext _context = new();
+        using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         string _emailConfig = _context.GetStoredParameter(nameof(EmailConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_emailConfig))
         {
             res.AddWarning("Конфигурация не настроена");
-            return Task.FromResult(res);
+            return res;
         }
 
         res.Conf = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig) ?? new();
 
-        return Task.FromResult(res);
+        return res;
     }
-
     #endregion
 
     #region Mqtt
-
     /// <inheritdoc/>
-    public Task<ResponseBaseModel> SaveMqttConfig(MqttConfigModel connect_config)
+    public async Task<ResponseBaseModel> SaveMqttConfig(MqttConfigModel connect_config, CancellationToken cancellationToken)
     {
-        using ParametersContext _context = new();
+        using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         ParametersStorageModelDB p = _context.SetStoredParameter(nameof(MqttConfigModel), JsonConvert.SerializeObject(connect_config));
         ResponseBaseModel res = new();
         res.AddSuccess($"Данные успешно записаны в БД #{p.Id}");
-        return Task.FromResult(res);
+        return res;
     }
 
     /// <inheritdoc/>
-    public Task<MqttConfigResponseModel> GetMqttConfig()
+    public async Task<MqttConfigResponseModel> GetMqttConfig(CancellationToken cancellationToken)
     {
         MqttConfigResponseModel res = new();
-        using ParametersContext _context = new();
+        using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_mqttConfig))
         {
             res.AddWarning("MQTT не настроен");
-            return Task.FromResult(res);
+            return res;
         }
         res.Conf = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig);
-
-        return Task.FromResult(res);
+        return res;
     }
-
     #endregion
 }

@@ -15,13 +15,13 @@
     /// Обработчик события обновления [команды контроллера] в родителя
     /// </summary>
     [Parameter, EditorRequired]
-    public Action HandlerAction { get; set; } = default!;
+    public required Action HandlerAction { get; set; }
 
     /// <summary>
     /// Команда
     /// </summary>
     [Parameter, EditorRequired]
-    public CommandModelDB CurrentCommand { get; set; } = default!;
+    public required CommandModelDB CurrentCommand { get; set; }
 
     /// <summary>
     /// Текст команды

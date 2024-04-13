@@ -2,6 +2,8 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using ab.context;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SharedLib;
 
@@ -10,10 +12,10 @@ namespace ServerLib;
 /// <summary>
 /// Хранение параметров IMqttClient
 /// </summary>
-public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigModel conf) : ParametersStorageLocalService
+public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigModel conf, IDbContextFactory<ParametersContext> DbFactory) : ParametersStorageLocalService(DbFactory)
 {
     /// <inheritdoc/>
-    public override async Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config)
+    public override async Task<ResponseBaseModel> SaveTelegramBotConfig(TelegramBotConfigModel connect_config, CancellationToken cancellationToken)
     {
         ResponseBaseModel res = new();
         if (!conf.IsConfigured)
@@ -22,7 +24,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
             return res;
         }
 
-        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(connect_config, $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}");
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(connect_config, $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.UPDATE}", cancellationToken);
 
         res.AddMessages(rpc.Messages);
         if (!res.IsSuccess)
@@ -38,7 +40,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
     }
 
     /// <inheritdoc/>
-    public override async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig()
+    public override async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig(CancellationToken cancellationToken)
     {
         TelegramBotConfigResponseModel res = new();
         if (!conf.IsConfigured)
@@ -47,7 +49,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
             return res;
         }
 
-        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new NoiseModel(), $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}");
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new NoiseModel(), $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}", cancellationToken);
 
         if (!rpc.IsSuccess)
         {
@@ -72,7 +74,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
     }
 
     /// <inheritdoc/>
-    public override async Task<EmailConfigResponseModel> GetEmailConfig()
+    public override async Task<EmailConfigResponseModel> GetEmailConfig(CancellationToken cancellationToken)
     {
         EmailConfigResponseModel res = new();
         if (!conf.IsConfigured)
@@ -81,7 +83,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
             return res;
         }
 
-        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new NoiseModel(), $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}");
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(new NoiseModel(), $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.GET}", cancellationToken);
 
         if (!rpc.IsSuccess)
         {
@@ -106,7 +108,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
     }
 
     /// <inheritdoc/>
-    public override async Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config)
+    public override async Task<ResponseBaseModel> SaveEmailConfig(EmailConfigModel connect_config, CancellationToken cancellationToken)
     {
         ResponseBaseModel res = new();
         if (!conf.IsConfigured)
@@ -115,7 +117,7 @@ public class ParametersStorageRemoteService(IMqttBaseService mqtt, MqttConfigMod
             return res;
         }
 
-        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(connect_config, $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}");
+        SimpleStringResponseModel rpc = await mqtt.MqttRemoteCall(connect_config, $"{conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.UPDATE}", cancellationToken);
 
         res.AddMessages(rpc.Messages);
         if (!res.IsSuccess)

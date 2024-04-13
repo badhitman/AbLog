@@ -14,13 +14,13 @@
     /// Сообщение для отображения
     /// </summary>
     [Parameter, EditorRequired]
-    public MessageThemeModel Message { get; set; } = default!;
+    public required MessageThemeModel Message { get; set; }
 
     /// <summary>
     /// Событие удаления сообщения по нажатию по кнопке/крестику
     /// </summary>
     [Parameter, EditorRequired]
-    public Action<string> DeleteMessage { get; set; } = default!;
+    public required Action<string> DeleteMessage { get; set; }
 
     /// <summary>
     /// Срок жизни сообщения секунд (минимум: 3 сек)

@@ -49,7 +49,7 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel, 
     {
         NotifyService.Notify += CheckTelegramUserHandleNotify;
         IsBusyProgress = true;
-        TelegramBotConfigResponseModel _bot_conf = await Storage.GetTelegramBotConfig();
+        TelegramBotConfigResponseModel _bot_conf = await Storage.GetTelegramBotConfig(CancellationToken);
         IsBusyProgress = false;
         SnackBar.ShowMessagesResponse(_bot_conf.Messages);
 
@@ -85,7 +85,7 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel, 
     async Task OnValidSubmitHandle()
     {
         IsBusyProgress = true;
-        ResponseBaseModel rest = await Storage.SaveTelegramBotConfig(_conf);
+        ResponseBaseModel rest = await Storage.SaveTelegramBotConfig(_conf, CancellationToken);
         SnackBar.ShowMessagesResponse(rest.Messages);
         IsBusyProgress = false;
 

@@ -54,22 +54,22 @@
 
 @code {
     [Parameter, EditorRequired]
-    public EntrySortingModel CommandEntry { get; set; } = default!;
+    public required EntrySortingModel CommandEntry { get; set; }
 
     [Parameter, EditorRequired]
     public double CommandSorting { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<int> DeleteCommand { get; set; } = default!;
+    public required Action<int> DeleteCommand { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<CommandModelDB> UpdateCommand { get; set; } = default!;
+    public required Action<CommandModelDB> UpdateCommand { get; set; }
 
     [Parameter, EditorRequired]
     public int ScriptId { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<ScriptModelDB> AllCsripts { get; set; } = default!;
+    public required IEnumerable<ScriptModelDB> AllCsripts { get; set; }
 
     EntryNestedModel[] EntriesTreeHW { get; set; } = Array.Empty<EntryNestedModel>();
 

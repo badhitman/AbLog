@@ -87,7 +87,7 @@ else
     public ConditionsTypesEnum ConditionType { get; set; }
 
     [Parameter, EditorRequired]
-    public EntryNestedModel[] EntriesTreeHW { get; set; } = default!;
+    public required EntryNestedModel[] EntriesTreeHW { get; set; }
 
     List<ConditionAnonimModel> Data = new List<ConditionAnonimModel>();
 

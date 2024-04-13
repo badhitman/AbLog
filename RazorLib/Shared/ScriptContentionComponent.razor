@@ -82,7 +82,7 @@ else
     /// Все скрипты
     /// </summary>
     [Parameter, EditorRequired]
-    public IEnumerable<ScriptModelDB> AllScripts { get; set; } = default!;
+    public required IEnumerable<ScriptModelDB> AllScripts { get; set; }
 
     IEnumerable<int> SelectedIds = Enumerable.Empty<int>();
 

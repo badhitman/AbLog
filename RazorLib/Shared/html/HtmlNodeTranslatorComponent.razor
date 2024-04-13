@@ -76,7 +76,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
+    public required HtmlDomTreeItemDataModel NodeData { get; set; }
 
     static string[] input_tags = new string[] { "input", "select" };
 

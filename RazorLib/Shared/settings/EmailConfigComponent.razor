@@ -104,7 +104,7 @@
         }
 
         IsBusyProgress = true;
-        ResponseBaseModel rest = await _storage.SaveEmailConfig(connect_config);
+        ResponseBaseModel rest = await _storage.SaveEmailConfig(connect_config, this.CancellationToken);
 
         if (rest.IsSuccess)
         {
@@ -125,7 +125,7 @@
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        EmailConfigResponseModel rest = await _storage.GetEmailConfig();
+        EmailConfigResponseModel rest = await _storage.GetEmailConfig(this.CancellationToken);
 
         _snackbar.ShowMessagesResponse(rest.Messages);
 

@@ -29,7 +29,7 @@ public class ToolsRemoteService : ToolsLocalService
         TelegramBotCheckResponseModel res = new();
         conf ??= new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}");
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CHECK}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {
@@ -59,7 +59,7 @@ public class ToolsRemoteService : ToolsLocalService
         ResponseBaseModel res = new();
         conf ??= new();
 
-        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}");
+        SimpleStringResponseModel rpc = await _mqtt.MqttRemoteCall(conf, $"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CHECK}", cancellation_token);
 
         if (!rpc.IsSuccess)
         {

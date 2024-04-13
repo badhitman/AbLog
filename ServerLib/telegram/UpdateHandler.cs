@@ -167,7 +167,7 @@ public class UpdateHandler : IUpdateHandler
                         }
                         else
                         {
-                            MqttConfigResponseModel conf_db = await _storage.GetMqttConfig();
+                            MqttConfigResponseModel conf_db = await _storage.GetMqttConfig(cancellationToken);
                             if (conf_db.Conf is null)
                             {
                                 callbackQuery.Message.Text = "/start";
@@ -182,7 +182,7 @@ public class UpdateHandler : IUpdateHandler
                                 conf_db.Conf.Secret = secret_prop.PropValue ?? "";
                                 conf_db.Conf.PrefixMqtt = topics_prefix_prop.PropValue;
 
-                                await _storage.SaveMqttConfig(conf_db.Conf);
+                                await _storage.SaveMqttConfig(conf_db.Conf, cancellationToken);
                                 callbackQuery.Message.Text = "/start";
                                 res_msg = await GetStartMessage(check_user.User, callbackQuery.Message, "<u>Параметры сохранены! Перезапустите MQTT что бы параметры применились...</u>\n", cancellationToken);
                             }
@@ -221,7 +221,7 @@ public class UpdateHandler : IUpdateHandler
                    cancellationToken: cancellationToken);
 
             string message_report = "";
-            MqttConfigResponseModel conf_db = await _storage.GetMqttConfig();
+            MqttConfigResponseModel conf_db = await _storage.GetMqttConfig(cancellationToken);
             if (!conf_db.IsSuccess)
             {
                 message_report += $"Ошибка чтения конфигурации: {conf_db.Message}";
@@ -293,7 +293,7 @@ public class UpdateHandler : IUpdateHandler
                    cancellationToken: cancellationToken);
 
             string message_report = "Перезапуск/запуск службы MQTT.\n";
-            ResponseBaseModel start_mqtt = await _tools.StartMqtt();
+            ResponseBaseModel start_mqtt = await _tools.StartMqtt(cancellationToken);
             message_report += $"\n{start_mqtt.Message}";
             _ = await _botClient.SendTextMessageAsync(check_user.User.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
             return;

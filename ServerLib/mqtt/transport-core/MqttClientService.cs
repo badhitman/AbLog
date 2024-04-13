@@ -2,6 +2,8 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using ab.context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
@@ -11,7 +13,7 @@ using System.Runtime.Versioning;
 namespace ServerLib;
 
 /// <summary>
-/// 
+/// Mqtt client service
 /// </summary>
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
@@ -27,10 +29,10 @@ public class MqttClientService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttClientService(IMqttClient mqttClient, ILogger<MqttClientService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, INotifyService notifyService, CancellationToken cancellation_token = default)
-        : base(mqttClient, mqtt_settings, mqttFactory, logger, notifyService, cancellation_token)
+    public MqttClientService(IMqttClient mqttClient, ILogger<MqttClientService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, INotifyService notifyService, IDbContextFactory<ParametersContext> dbFactory)
+        : base(mqttClient: mqttClient, mqtt_settings: mqtt_settings, mqttFactory: mqttFactory, logger: logger, notifyService: notifyService, dbFactory: dbFactory)
     {
-        _logger = logger;
+
     }
 
     /// <summary>

@@ -26,7 +26,7 @@ else
 
 @code {
     [Parameter, EditorRequired]
-    public Action ReloadPage { get; set; } = default!;
+    public required Action ReloadPage { get; set; }
 
     [Parameter, EditorRequired]
     public string? HtmlSource { get; set; }

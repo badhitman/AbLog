@@ -17,10 +17,10 @@ namespace ServerLib;
 public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersStorageService ParameterStorage, MqttFactory MqttFact, HttpClient HttpClient, IEmailService Email, IServiceProvider ServiceProvider) : IToolsService
 {
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> StartMqtt() => await MqttClientService.StartService();
+    public async Task<ResponseBaseModel> StartMqtt(CancellationToken cancellation_token) => await MqttClientService.StartService(cancellation_token);
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> StopMqtt() => await MqttClientService.StopService();
+    public async Task<ResponseBaseModel> StopMqtt(CancellationToken cancellation_token) => await MqttClientService.StopService(cancellation_token);
 
     /// <inheritdoc/>
     public Task<BoolResponseModel> StatusMqtt() => MqttClientService.StatusService();
@@ -29,7 +29,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
     public virtual async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        conf ??= (await ParameterStorage.GetEmailConfig()).Conf;
+        conf ??= (await ParameterStorage.GetEmailConfig(cancellation_token)).Conf;
         if (!conf!.IsConfigured)
         {
             res.AddError("Конфигурация не установлена");
@@ -43,7 +43,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
     public async Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        conf ??= (await ParameterStorage.GetMqttConfig()).Conf;
+        conf ??= (await ParameterStorage.GetMqttConfig(cancellation_token)).Conf;
         if (!conf!.IsConfigured)
         {
             res.AddError("Конфигурация не установлена");
@@ -88,7 +88,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
     public virtual async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         TelegramBotCheckResponseModel res = new();
-        conf ??= (await ParameterStorage.GetTelegramBotConfig()).Conf;
+        conf ??= (await ParameterStorage.GetTelegramBotConfig(cancellation_token)).Conf;
 
         if (string.IsNullOrEmpty(conf?.TelegramBotToken))
         {

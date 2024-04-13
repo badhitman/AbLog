@@ -36,16 +36,16 @@
     /// Команда
     /// </summary>
     [Parameter, EditorRequired]
-    public CommandModelDB CurrentCommand { get; set; } = default!;
+    public required CommandModelDB CurrentCommand { get; set; }
 
     [Parameter, EditorRequired]
-    public PortHardwareModel CurrentPort { get; set; } = default!;
+    public required PortHardwareModel CurrentPort { get; set; }
 
     [Parameter, EditorRequired]
-    public EntryModel[] Ports { get; set; } = default!;
+    public required EntryModel[] Ports { get; set; }
 
     [Parameter, EditorRequired]
-    public Action SelectPortHandler { get; set; } = default!;
+    public required Action SelectPortHandler { get; set; } 
 
     /// <summary>
     /// Команды порта: вкл, выкл или переключение в противоположное состояние

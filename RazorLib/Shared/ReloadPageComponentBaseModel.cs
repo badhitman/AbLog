@@ -10,46 +10,34 @@ using SharedLib;
 namespace RazorLib;
 
 /// <summary>
-/// 
+/// Reload page component (base)
 /// </summary>
 public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseModel
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     [Inject]
-    protected IHardwaresService _hardwares { get; set; } = default!;
+    public required IHardwaresService Hardwares { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     [Inject]
-    protected ISnackbar Snackbar { get; set; } = default!;
+    public required ISnackbar Snackbar { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     [CascadingParameter, EditorRequired]
     public int Id { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    [Parameter]
-    public string PagePath { get; set; } = default!;
+    /// <inheritdoc/>
+    [Parameter, EditorRequired]
+    public required string PagePath { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected HardwaresNavPillsComponent? refHtmlRoot;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected string? HtmlSource;
 
     /// <summary>
-    /// 
+    /// Reload page
     /// </summary>
     protected void ReloadPage()
     {
@@ -58,9 +46,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
 
     bool IsUpdated = false;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected async Task GetData()
     {
         if (Id <= 0)
@@ -68,7 +54,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
         IsUpdated = false;
         IsBusyProgress = true;
         StateHasChanged();
-        HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = PagePath });
+        HttpResponseModel rest = await Hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = PagePath });
 
         if (!rest.IsSuccess)
         {

@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
@@ -21,35 +22,26 @@ namespace ServerLib;
 [SupportedOSPlatform("windows")]
 [SupportedOSPlatform("linux")]
 [SupportedOSPlatform("android")]
-public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, ILogger<MqttBaseServiceAbstraction> logger, INotifyService notifyService, CancellationToken cancellationTokenMain) : IMqttBaseService
+public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, ILogger<MqttBaseServiceAbstraction> logger, INotifyService notifyService, IDbContextFactory<ParametersContext> dbFactory) : IMqttBaseService
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
+    protected IDbContextFactory<ParametersContext> _dbFactory = dbFactory;
+
+    /// <inheritdoc/>
     protected ILogger<MqttBaseServiceAbstraction> _logger = logger;
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected readonly MqttConfigModel _mqtt_settings = mqtt_settings;
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected readonly MqttFactory _mqttFactory = mqttFactory;
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected readonly IMqttClient _mqttClient = mqttClient;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public event Func<MqttApplicationMessageReceivedEventArgs, Task>? ApplicationMessageReceivedAsync;
 
     /// <inheritdoc/>
     public abstract MqttClientSubscribeOptions MqttSubscribeOptions { get; }
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected MqttClientOptions MqttClientOptions => new MqttClientOptionsBuilder()
 #if DEBUG
                 .WithTlsOptions(p => p.WithCertificateValidationHandler(sx => true))
@@ -63,7 +55,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
                 .Build();
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> StartService(CancellationToken cancellation_token = default)
+    public async Task<ResponseBaseModel> StartService(CancellationToken cancellation_token)
     {
         ResponseBaseModel res = await StopService(cancellation_token);
         _logger.LogInformation($"call >> {nameof(StartService)}");
@@ -128,7 +120,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
         MqttClientConnectResult ccr;
         if (e.ClientWasConnected)
         {
-            ccr = await _mqttClient.ConnectAsync(_mqttClient.Options, cancellationTokenMain);
+            ccr = await _mqttClient.ConnectAsync(_mqttClient.Options);
             if (ccr.ResultCode == MqttClientConnectResultCode.Success)
                 _logger.LogInformation($"Connect: {Enum.GetName(ccr.ResultCode)}; {ccr.ReasonString}".Trim());
             else
@@ -137,7 +129,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
     }
 
     /// <inheritdoc/>
-    public async Task<ResponseBaseModel> StopService(CancellationToken cancellation_token = default)
+    public async Task<ResponseBaseModel> StopService(CancellationToken cancellation_token)
     {
         ResponseBaseModel res = new();
         _logger.LogInformation($"call >> {nameof(StopService)}");
@@ -152,7 +144,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
         else
             res.AddInfo("Соединение отсутсвует (закрывать нечего)");
 
-        using ParametersContext _context = new();
+        using ParametersContext _context = await _dbFactory.CreateDbContextAsync(cancellation_token);
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
         MqttConfigModel? mqtt_settings = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig);
 
@@ -190,7 +182,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
     }
 
     /// <inheritdoc/>
-    public async Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message, CancellationToken cancellation_token = default)
+    public async Task<MqttPublishMessageResultModel> PublishMessage(MqttPublishMessageModel message, CancellationToken cancellation_token)
     {
         _logger.LogInformation($"call >> {nameof(PublishMessage)}");
         MqttApplicationMessageBuilder msg = new MqttApplicationMessageBuilder()
@@ -231,7 +223,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
     }
 
     /// <inheritdoc/>
-    public async Task<SimpleStringResponseModel> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token = default)
+    public async Task<SimpleStringResponseModel> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token)
     {
         SimpleStringResponseModel res = new();
         BoolResponseModel status = await StatusService();

@@ -17,7 +17,7 @@ public class TaskModelDB : EntryModel
     /// <summary>
     /// FK: Инициализатора задачи/скрипта
     /// </summary>
-    public int TaskInitiatorId { get; set; } = default!;
+    public required int TaskInitiatorId { get; set; }
 
     /// <summary>
     /// Дата/время запуска/иниализации

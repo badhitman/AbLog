@@ -17,11 +17,11 @@ public class MqttPublishMessageResultModel : ResponseBaseModel
     /// <summary>
     /// Строка причины.
     /// </summary>
-    public string ReasonString { get; set; } = default!;
+    public required string ReasonString { get; set; }
 
     /// <summary>
     /// Свойства пользователя.
     /// В MQTT 5 пользовательские свойства представляют собой простые пары ключ-значение строки UTF-8, которые можно добавлять практически к каждому типу пакетов MQTT.
     /// </summary>
-    public KeyValuePair<string, string>[] UserProperties { get; set; } = default!;
+    public required KeyValuePair<string, string>[] UserProperties { get; set; }
 }

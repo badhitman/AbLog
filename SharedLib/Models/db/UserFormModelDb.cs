@@ -20,7 +20,7 @@ public class UserFormModelDb
     /// <summary>
     /// Имя типа формы
     /// </summary>
-    public string FormMapCode { get; set; } = default!;
+    public required string FormMapCode { get; set; }
 
     /// <summary>
     /// Пользователь, который заполняет форму

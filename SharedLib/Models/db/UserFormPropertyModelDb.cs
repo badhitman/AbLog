@@ -12,7 +12,7 @@ public class UserFormPropertyModelDb : EntryModel
     /// <summary>
     /// имя поля формы
     /// </summary>
-    public string Code { get; set; } = default!;
+    public required string Code { get; set; }
 
     /// <summary>
     /// 

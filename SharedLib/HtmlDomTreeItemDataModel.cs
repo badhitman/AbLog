@@ -13,20 +13,16 @@ namespace SharedLib;
 /// </summary>
 public class HtmlDomTreeItemDataModel
 {
-    /// <summary>
-    /// Title
-    /// </summary>
+    /// <inheritdoc/>
     public string Title
     {
         get
         {
             string _t = $"{Text} <{NodeName}/>"; ;
 
-            if (Attributes?.Any() == true)
+            if (Attributes is not null && Attributes.Length != 0)
                 foreach (KeyValuePair<string, string?> at in Attributes)
-                {
                     _t += $" [{at.Key}:{at.Value}];";
-                }
 
             return _t.Trim();
         }
@@ -42,9 +38,7 @@ public class HtmlDomTreeItemDataModel
     /// </summary>
     public string NodeHtml { get; set; }
 
-    /// <summary>
-    /// Parent
-    /// </summary>
+    /// <inheritdoc/>
     public HtmlDomTreeItemDataModel? Parent { get; set; }
 
     /// <summary>
@@ -114,7 +108,7 @@ public class HtmlDomTreeItemDataModel
         }
         else
         {
-            throw new Exception(cn.GetType().FullName);
+            throw new Exception($"cn.GetType().FullName. error {{DB26CDE8-BFE5-4945-BD9A-7DA7C0AD3985}}");
         }
     }
 }

@@ -39,19 +39,19 @@
     /// Устройства
     /// </summary>
     [Parameter, EditorRequired]
-    public EntryNestedModel[] EntriesTreeHW { get; set; } = default!;
+    public required EntryNestedModel[] EntriesTreeHW { get; set; }
 
     /// <summary>
     /// Выбранная/текущая команда перехода (если null, то выход)
     /// </summary>
     [Parameter, EditorRequired]
-    public CommandModelDB CurrentCommand { get; set; } = default!;
+    public required CommandModelDB CurrentCommand { get; set; }
 
     [Parameter, EditorRequired]
-    public Action<CommandModelDB> RootSelectorHandler { get; set; } = default!;
+    public required Action<CommandModelDB> RootSelectorHandler { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<ScriptModelDB> AllCsripts { get; set; } = default!;
+    public required IEnumerable<ScriptModelDB> AllCsripts { get; set; }
 
     /// <summary>
     /// Типы команд:

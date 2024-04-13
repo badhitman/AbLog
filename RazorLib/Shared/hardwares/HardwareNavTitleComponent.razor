@@ -25,10 +25,10 @@
 
 @code {
     [Parameter, EditorRequired]
-    public string TitleText { get; set; } = default!;
+    public required string TitleText { get; set; }
 
     [Parameter, EditorRequired]
-    public string PagePath { get; set; } = default!;
+    public required string PagePath { get; set; }
 
     string? _pik;
     string PageInfoKey

@@ -74,7 +74,7 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
         NotifyService.MqttDebugNotify += MqttDebug;
         editContext = new(conf);
         IsBusyProgress = true;
-        MqttConfigResponseModel res = await ParametersStorageService.GetMqttConfig();
+        MqttConfigResponseModel res = await ParametersStorageService.GetMqttConfig(this.CancellationToken);
         SnackBar.ShowMessagesResponse(res.Messages);
         if (!res.IsSuccess || res.Conf is null)
         {
@@ -100,7 +100,7 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
     async Task StopService()
     {
         IsBusyProgress = true;
-        ResponseBaseModel stop_res = await ToolsService.StopMqtt();
+        ResponseBaseModel stop_res = await ToolsService.StopMqtt(this.CancellationToken);
         SnackBar.ShowMessagesResponse(stop_res.Messages);
         await GetStatusService();
         IsBusyProgress = false;
@@ -109,7 +109,7 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
     async Task RestartService()
     {
         IsBusyProgress = true;
-        ResponseBaseModel start_res = await ToolsService.StartMqtt();
+        ResponseBaseModel start_res = await ToolsService.StartMqtt(this.CancellationToken);
         SnackBar.ShowMessagesResponse(start_res.Messages);
         await GetStatusService();
         IsBusyProgress = false;
@@ -125,7 +125,7 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
         }
 
         IsBusyProgress = true;
-        ResponseBaseModel res = await ParametersStorageService.SaveMqttConfig(conf);
+        ResponseBaseModel res = await ParametersStorageService.SaveMqttConfig(conf, this.CancellationToken);
         SnackBar.ShowMessagesResponse(res.Messages);
 
         if (res.IsSuccess)

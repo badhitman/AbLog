@@ -29,13 +29,13 @@
 
 @code {
     [Parameter, EditorRequired]
-    public ConditionAnonimModel Condition { get; set; } = default!;
+    public required ConditionAnonimModel Condition { get; set; }
 
     [Parameter, EditorRequired]
-    public EntryNestedModel[] TreeHardwares { get; set; } = default!;
+    public required EntryNestedModel[] TreeHardwares { get; set; }
 
     [Parameter, EditorRequired]
-    public Action StateHasChangedCall { get; set; } = default!;
+    public required Action StateHasChangedCall { get; set; }
 
     EntryModel[] Ports
     {

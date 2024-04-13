@@ -33,10 +33,10 @@ else
 
 @code {
     [Parameter, EditorRequired]
-    public PortHardwareModel Port { get; set; } = default!;
+    public required PortHardwareModel Port { get; set; }
 
     [CascadingParameter, EditorRequired]
-    public Action ReloadHardwaresHandle { get; set; } = default!;
+    public required Action ReloadHardwaresHandle { get; set; }
 
     HardwareNavButtonComponent? refBtn;
 

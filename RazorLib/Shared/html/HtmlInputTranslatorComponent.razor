@@ -27,12 +27,12 @@
                 if (string.IsNullOrWhiteSpace(_maxlength))
                 {
                     <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" aria-describedby="@($"{InputName}Help")" />
-                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
+                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.MetadataInput?.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value ?? "error {CCD7D4DF-E09A-4F3B-8DA4-2B724B98B537}"))</div>
                 }
                 else
                 {
                     <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" maxlength="@_maxlength" aria-describedby="@($"{InputName}Help")" />
-                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
+                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.MetadataInput?.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value ?? "error {F523907C-79FA-407F-A3F7-E1F41FBE0652}"))</div>
                 }
 
                 break;
@@ -56,7 +56,7 @@
                 </CascadingValue>
             }
         </select>
-        <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
+        <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.MetadataInput?.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value ?? "error {54BBE107-8568-473C-9ADD-5EF18F89D850}"))</div>
         break;
     default:
         <HtmlNodeTranslatorComponent NodeData="NodeData" />
@@ -65,7 +65,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
+    public required HtmlDomTreeItemDataModel NodeData { get; set; }
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }
@@ -77,7 +77,7 @@
     public Action? ReloadPageHandle { get; set; }
 
     [CascadingParameter]
-    public Action<string?, string?> SendForm { get; set; } = default!;
+    public required Action<string?, string?> SendForm { get; set; }
 
     public InputFormTypesEnum InputFormType { get; private set; } = InputFormTypesEnum.Text;
 

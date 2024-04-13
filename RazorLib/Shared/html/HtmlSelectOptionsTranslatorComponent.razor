@@ -43,7 +43,7 @@
 
 @code {
     [Parameter, EditorRequired]
-    public HtmlDomTreeItemDataModel NodeData { get; set; } = default!;
+    public required HtmlDomTreeItemDataModel NodeData { get; set; }
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }

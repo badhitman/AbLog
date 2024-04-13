@@ -73,9 +73,9 @@ public static class GlobalStatic
     public static string LogsSmtpPath => Path.Combine(RootMailPathBase, LogsSmtpFilename);
 
     /// <summary>
-    /// 
+    /// префикс файла базы данных (SQLite)
     /// </summary>
-    public static string PefixDbFile = "";
+    public static string PefixDbFile { get; set; } = "";
     /// <summary>
     /// имя файла основной базы данны
     /// </summary>

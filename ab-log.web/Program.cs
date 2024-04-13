@@ -153,8 +153,9 @@ public class Program
 
         if (mqtt_settings.AutoStart && mqtt_settings.IsConfigured)
         {
+            IHostApplicationLifetime _applicationLifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
             IMqttBaseService _mqtt_cli_srv = app.Services.GetRequiredService<IMqttBaseService>();
-            ResponseBaseModel res = await _mqtt_cli_srv.StartService();
+            ResponseBaseModel res = await _mqtt_cli_srv.StartService(_applicationLifetime.ApplicationStopped);
         }
 
         await using AsyncServiceScope scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();

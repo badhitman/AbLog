@@ -106,7 +106,7 @@ public class PortHtmlDomModel : HtmlDomModel
                 break;
             default:
                 tg_resp_html += $"{_pref}{item.Text ?? $"-{item.NodeName}-"}\n";
-                if (item.Attributes?.Any() == true)
+                if (item.Attributes is not null && item.Attributes.Length != 0)
                     tg_resp_html = $"{tg_resp_html.TrimEnd()} {$"({string.Join(",", item.Attributes.Select(x => $"[{x.Key}:'{x.Value}']"))})"}\n";
 
                 if (item.TreeItems?.Any() == true)

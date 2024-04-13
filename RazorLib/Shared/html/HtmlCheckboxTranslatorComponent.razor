@@ -7,14 +7,14 @@
 @inject ISnackbar _snackbar
 
 <input type="checkbox" @bind="isChecked" name="@InputValue" class="form-check-input" aria-describedby="@($"{InputName}Help")" />
-<div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)_conf.MetadataInput.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value)</div>
+<div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.MetadataInput?.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value ?? "error {08396691-95CC-4EC7-B91F-FDF4476D5A44}"))</div>
 
 @code {
     [Parameter, EditorRequired]
-    public string InputName { get; set; } = default!;
+    public required string InputName { get; set; }
 
     [Parameter, EditorRequired]
-    public string? InputValue { get; set; } = default!;
+    public required string InputValue { get; set; }
 
     public bool isChecked
     {
@@ -29,7 +29,7 @@
     }
 
     [Parameter, EditorRequired]
-    public Action<string?, string?> SetValueHandler { get; set; } = default!;
+    public required Action<string?, string?> SetValueHandler { get; set; }
 
     [CascadingParameter]
     public FormContextModel? FormContext { get; set; }

@@ -18,15 +18,15 @@ public class ToolsController(IToolsService tools_service) : ControllerBase
     /// Запустить MQTT службу
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.START}")]
-    public async Task<ResponseBaseModel> StartMqtt()
-        => await tools_service.StartMqtt();
+    public async Task<ResponseBaseModel> StartMqtt(CancellationToken cancellationToken = default)
+        => await tools_service.StartMqtt(cancellationToken);
 
     /// <summary>
     /// Остановить MQTT службу
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STOP}")]
-    public async Task<ResponseBaseModel> StopMqtt()
-        => await tools_service.StopMqtt();
+    public async Task<ResponseBaseModel> StopMqtt(CancellationToken cancellationToken = default)
+        => await tools_service.StopMqtt(cancellationToken);
 
     /// <summary>
     /// Получить статус MQTT службы
