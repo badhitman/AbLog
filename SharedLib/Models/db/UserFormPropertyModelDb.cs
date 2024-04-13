@@ -15,11 +15,11 @@ public class UserFormPropertyModelDb : EntryModel
     public required string Code { get; set; }
 
     /// <summary>
-    /// 
+    /// Форма для заполнения через TelegramBot.
     /// </summary>
     public UserFormModelDb? OwnerForm { get; set; }
     /// <summary>
-    /// 
+    /// FK: Форма для заполнения через TelegramBot.
     /// </summary>
     public int OwnerFormId { get; set; }
 

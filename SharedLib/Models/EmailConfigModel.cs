@@ -12,21 +12,15 @@ namespace SharedLib;
 /// </summary>
 public class EmailConfigModel
 {
-    /// <summary>
-    /// Email адрес
-    /// </summary>
+    /// <inheritdoc/>
     [Required]
     public string? Email { get; set; }
 
-    /// <summary>
-    /// Логин
-    /// </summary>
+    /// <inheritdoc/>
     [Required]
     public string? Login { get; set; }
 
-    /// <summary>
-    /// Пароль
-    /// </summary>
+    /// <inheritdoc/>
     [Required]
     public string? Password { get; set; }
 

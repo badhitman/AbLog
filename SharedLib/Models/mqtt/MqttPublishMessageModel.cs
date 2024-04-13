@@ -5,46 +5,26 @@
 namespace SharedLib;
 
 /// <summary>
-/// 
+/// MQTT publish message
 /// </summary>
-public class MqttPublishMessageModel
+public class MqttPublishMessageModel(byte[] payload, string[] topics)
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public MqttPublishMessageModel(byte[] payload, string[] topics)
-    {
-        Payload = payload;
-        Topics = topics;
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public byte[] Payload { get; set; }
+    /// <inheritdoc/>
+    public byte[] Payload { get; set; } = payload;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public string[] Topics { get; set; }
+    /// <inheritdoc/>
+    public string[] Topics { get; set; } = topics;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public bool RetainFlag { get; set; } = false;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public string[]? ResponseTopics { get; set; } = null;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public IEnumerable<KeyValuePair<string, string>>? UserProperties { get; set; } = null;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     public byte[]? CorrelationData { get; set; } = null;
 }

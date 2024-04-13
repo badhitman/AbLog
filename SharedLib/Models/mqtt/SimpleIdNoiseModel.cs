@@ -9,8 +9,6 @@ namespace SharedLib;
 /// </summary>
 public class SimpleIdNoiseModel : NoiseModel
 {
-    /// <summary>
-    /// Id
-    /// </summary>
+    /// <inheritdoc/>
     public int Id { get; set; }
 }

@@ -12,9 +12,7 @@ namespace SharedLib;
 /// </summary>
 public class PortHtmlDomModel : HtmlDomModel
 {
-    /// <summary>
-    /// Links
-    /// </summary>
+    /// <inheritdoc/>
     public List<(string text, string href)> Links = [];
 
     string last_tag_name = "";
@@ -116,7 +114,7 @@ public class PortHtmlDomModel : HtmlDomModel
                     foreach (HtmlDomTreeItemDataModel sub_item in item.TreeItems)
                         ReadNode(ref tg_resp_html, sub_item, deep_num);
                 }
-                if (tg_resp_html.TrimEnd().EndsWith("○"))
+                if (tg_resp_html.TrimEnd().EndsWith('○'))
                     tg_resp_html = $"{tg_resp_html[..tg_resp_html.LastIndexOf('○')]}\n";
                 break;
         }

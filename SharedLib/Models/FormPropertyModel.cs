@@ -9,14 +9,10 @@ namespace SharedLib;
 /// </summary>
 public class FormPropertyModel
 {
-    /// <summary>
-    /// Code
-    /// </summary>
+    /// <inheritdoc/>
     public required string Code { get; set; }
 
-    /// <summary>
-    /// Name
-    /// </summary>
+    /// <inheritdoc/>
     public required string Name { get; set; }
 
     /// <summary>

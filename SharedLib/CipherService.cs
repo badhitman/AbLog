@@ -57,12 +57,12 @@ public static class CipherService
 
 
     /// <summary>
-    /// Decrypt as string
+    /// Расшифровать строку
     /// </summary>
     public static async Task<string> DecryptAsStringAsync(string cipherText, string EncryptionKey, byte[] salt) => Convert.ToBase64String(await DecryptAsync(Convert.FromBase64String(cipherText.Replace(" ", "+")), EncryptionKey, salt));
 
     /// <summary>
-    /// Decrypt
+    /// Расшифровать
     /// </summary>        
     public static async Task<byte[]> DecryptAsync(byte[] cipherBytes, string EncryptionKey, byte[] salt)
     {
@@ -78,12 +78,12 @@ public static class CipherService
     }
 
     /// <summary>
-    /// 
+    /// Расшифровать
     /// </summary>
     public static async Task<MemoryStream> DecryptAsync(MemoryStream ms, string EncryptionKey, byte[] salt) => new MemoryStream(await DecryptAsync(ms.ToArray(), EncryptionKey, salt));
 
     /// <summary>
-    /// 
+    /// Энтропия
     /// </summary>
     public static byte[] GenerateRandomEntropy(int size)
     {
