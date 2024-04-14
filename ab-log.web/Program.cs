@@ -9,6 +9,7 @@ using NLog;
 using NLog.Web;
 using ServerLib;
 using SharedLib;
+using System.Net;
 using System.Runtime.Versioning;
 using System.Text.Json.Serialization;
 using Telegram.Bot;
@@ -41,7 +42,11 @@ public class Program
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        builder.WebHost.UseUrls("http://0.0.0.0:5000");
+        //builder.WebHost.UseUrls("https://*:5000");
+        builder.WebHost.ConfigureKestrel(kestrelServerOptions =>
+        {
+            kestrelServerOptions.Listen(IPAddress.Any, 5000);
+        });
 
         IWebHostEnvironment _env = builder.Environment;
         builder.Logging.ClearProviders();
@@ -148,9 +153,6 @@ public class Program
         }
 
         WebApplication app = builder.Build();
-
-        // .UseUrls("http://localhost:5003", "https://localhost:5004")
-
         if (mqtt_settings.AutoStart && mqtt_settings.IsConfigured)
         {
             IHostApplicationLifetime _applicationLifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
