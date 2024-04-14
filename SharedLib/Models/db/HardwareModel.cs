@@ -9,23 +9,19 @@ namespace SharedLib;
 /// </summary>
 public class HardwareModel : HardwareBaseModel
 {
-    /// <summary>
-    /// Управляющий блок (устройство) - View модель
-    /// </summary>
-    public HardwareModel() { }
-
-    /// <summary>
-    /// Управляющий блок (устройство) - View модель
-    /// </summary>
-    public HardwareModel(HardwareModelDB v)
+    /// <inheritdoc/>
+    public static new HardwareModel Build(HardwareModelDB v)
     {
-        Id = v.Id;
-        Name = v.Name;
-        Address = v.Address;
-        AlarmSubscriber = v.AlarmSubscriber;
-        CommandsAllowed = v.CommandsAllowed;
-        Password = v.Password;
-        Ports = v.Ports?.Select(p => new PortHardwareModel(p)).OrderBy(x => x.PortNum).ToList();
+        return new HardwareModel()
+        {
+            Id = v.Id,
+            Name = v.Name,
+            Address = v.Address,
+            AlarmSubscriber = v.AlarmSubscriber,
+            CommandsAllowed = v.CommandsAllowed,
+            Password = v.Password,
+            Ports = v.Ports?.Select(p => PortHardwareModel.Build(p)).OrderBy(x => x.PortNum).ToList(),
+        };
     }
 
     /// <summary>

@@ -43,10 +43,10 @@ public abstract class ConditionBaseModelDB : ConditionAnonimModel
                 if (string.IsNullOrWhiteSpace(Value))
                     Value = "0";
 
-                if (Value.StartsWith(".") || Value.StartsWith(","))
+                if (Value.StartsWith('.') || Value.StartsWith(','))
                     Value = $"0{Value}";
 
-                if (Value.EndsWith(".") || Value.EndsWith(","))
+                if (Value.EndsWith('.') || Value.EndsWith(','))
                     Value = $"{Value}0";
 
                 if (!double.TryParse(Value, out _))

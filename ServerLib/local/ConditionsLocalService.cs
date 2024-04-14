@@ -119,7 +119,7 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
                 switch (condition_request.ConditionType)
                 {
                     case ConditionsTypesEnum.Command:
-                        db.Update(new CommandConditionModelDB(condition_request));
+                        db.Update(CommandConditionModelDB.Build(condition_request));
                         break;
                     case ConditionsTypesEnum.Trigger:
                         TrigerConditionModelDB new_t = TrigerConditionModelDB.Build(condition_request);
@@ -135,7 +135,7 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
                 switch (condition_request.ConditionType)
                 {
                     case ConditionsTypesEnum.Command:
-                        db.Add(new CommandConditionModelDB(condition_request));
+                        db.Add(CommandConditionModelDB.Build(condition_request));
                         break;
                     case ConditionsTypesEnum.Trigger:
                         db.Add(TrigerConditionModelDB.Build(condition_request));

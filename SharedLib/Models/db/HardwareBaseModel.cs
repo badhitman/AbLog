@@ -13,21 +13,18 @@ namespace SharedLib;
 [Index(nameof(Address), IsUnique = true)]
 public class HardwareBaseModel : UniversalModelDB
 {
-    /// <summary>
-    /// Управляющий блок (устройство) - Базовая модель
-    /// </summary>
-    public HardwareBaseModel() { Address = string.Empty; }
-    /// <summary>
-    /// Управляющий блок (устройство) - Базовая модель
-    /// </summary>
-    public HardwareBaseModel(HardwareModelDB v)
+    /// <inheritdoc/>
+    public static HardwareBaseModel Build(HardwareModelDB v)
     {
-        Id = v.Id;
-        Name = v.Name;
-        Address = v.Address;
-        AlarmSubscriber = v.AlarmSubscriber;
-        CommandsAllowed = v.CommandsAllowed;
-        Password = v.Password;
+        return new HardwareBaseModel()
+        {
+            Id = v.Id,
+            Name = v.Name,
+            Address = v.Address,
+            AlarmSubscriber = v.AlarmSubscriber,
+            CommandsAllowed = v.CommandsAllowed,
+            Password = v.Password
+        };
     }
 
     /// <summary>

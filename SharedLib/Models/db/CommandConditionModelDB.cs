@@ -14,24 +14,20 @@ namespace SharedLib;
 [Index(nameof(OwnerId), nameof(HardwareId), nameof(PortId), IsUnique = true)]
 public class CommandConditionModelDB : ConditionBaseModelDB
 {
-    /// <summary>
-    /// Запрещающее условие (ограничение) для выполнения команды.
-    /// </summary>
-    public CommandConditionModelDB() { }
-
-    /// <summary>
-    /// Запрещающее условие (ограничение) для выполнения команды.
-    /// </summary>
-    public CommandConditionModelDB(ConditionUpdateModel condition_request)
+    /// <inheritdoc/>
+    public static CommandConditionModelDB Build(ConditionUpdateModel condition_request)
     {
-        Id = condition_request.Id;
-        PortId = condition_request.PortId;
-        HardwareId = condition_request.HardwareId;
-        OwnerId = condition_request.OwnerId;
-        Name = condition_request.Name;
-        Value = condition_request.Value;
-        ConditionValueType = condition_request.ConditionValueType;
-        СomparisonMode = condition_request.СomparisonMode;
+        return new CommandConditionModelDB()
+        {
+            Id = condition_request.Id,
+            PortId = condition_request.PortId,
+            HardwareId = condition_request.HardwareId,
+            OwnerId = condition_request.OwnerId,
+            Name = condition_request.Name,
+            Value = condition_request.Value,
+            ConditionValueType = condition_request.ConditionValueType,
+            СomparisonMode = condition_request.СomparisonMode
+        };
     }
 
     /// <summary>

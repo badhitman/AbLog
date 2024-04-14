@@ -9,7 +9,6 @@ namespace SharedLib;
 /// </summary>
 public class MqttPublishMessageModel(byte[] payload, string[] topics)
 {
-
     /// <inheritdoc/>
     public byte[] Payload { get; set; } = payload;
 

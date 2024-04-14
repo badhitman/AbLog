@@ -99,7 +99,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
                 res_hw.AddError("Ошибка выполнения запроса: {771C7F32-36A7-4EC8-9F6C-7ED48D6FA99B}");
                 return Task.FromResult(res_hw);
             }
-            res_hw.Hardware = new(db_hw);
+            res_hw.Hardware = HardwareBaseModel.Build(db_hw);
         }
         return Task.FromResult(res_hw);
     }
@@ -117,7 +117,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
                 res_port.AddError("Ошибка выполнения запроса: {5AD81739-6A9B-4753-A47C-C278CD64705B}");
                 return res_port;
             }
-            res_port.Port = new PortHardwareModel(db_port);
+            res_port.Port = PortHardwareModel.Build(db_port);
         }
 
         return res_port;
@@ -133,7 +133,7 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
             res_hws.Hardwares = db.Hardwares
                 .Include(x => x.Ports)
                 .ToArray()
-                .Select(x => new HardwareModel(x))
+                .Select(x => HardwareModel.Build(x))
                 .ToArray();
         }
         return res_hws;
@@ -256,13 +256,13 @@ public class HardwaresLocalService(ILogger<HardwaresLocalService> Logger, IDbCon
             }
             else
             {
-                db_hw = new(hardware);
+                db_hw = HardwareModelDB.Build(hardware);
                 db.Add(db_hw);
                 db.SaveChanges();
                 res.AddSuccess("Устройство создано");
             }
         }
-        res.Hardware = new(db_hw!);
+        res.Hardware = HardwareBaseModel.Build(db_hw!);
 
         HttpResponseModel? http_resp = null;
         HardwareGetHttpRequestModel hw_request = new() { HardwareId = db_hw.Id };

@@ -28,7 +28,6 @@ public class LogRowModelDB : EntryModel
     /// <inheritdoc/>
     public override string ToString()
     {
-        string ret_val = $"[{CreatedAt}]|[{Status}]|[{TAG}] {Name}";
-        return ret_val;
+        return $"[{CreatedAt}]|[{Status}]|[{TAG}] {Name}";
     }
 }

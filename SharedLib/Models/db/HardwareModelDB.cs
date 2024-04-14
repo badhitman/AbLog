@@ -9,22 +9,18 @@ namespace SharedLib;
 /// </summary>
 public class HardwareModelDB : HardwareBaseModel
 {
-    /// <summary>
-    /// Управляющий блок (устройство)
-    /// </summary>
-    public HardwareModelDB() { }
-
-    /// <summary>
-    /// Управляющий блок (устройство)
-    /// </summary>
-    public HardwareModelDB(HardwareBaseModel hardware)
+    /// <inheritdoc/>
+    public static HardwareModelDB Build(HardwareBaseModel hardware)
     {
-        Name = hardware.Name;
-        Address = hardware.Address;
-        Password = hardware.Password;
-        AlarmSubscriber = hardware.AlarmSubscriber;
-        CommandsAllowed = hardware.CommandsAllowed;
-        Ports = [];
+        return new HardwareModelDB()
+        {
+            Name = hardware.Name,
+            Address = hardware.Address,
+            Password = hardware.Password,
+            AlarmSubscriber = hardware.AlarmSubscriber,
+            CommandsAllowed = hardware.CommandsAllowed,
+            Ports = [],
+        };
     }
 
     /// <summary>
@@ -35,7 +31,6 @@ public class HardwareModelDB : HardwareBaseModel
     /// <inheritdoc/>
     public override string ToString()
     {
-        string hw_name = $"{Name} ({Address})";
-        return hw_name;
+        return $"{Name} ({Address})";
     }
 }

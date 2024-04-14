@@ -2,8 +2,8 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace SharedLib;
 
@@ -64,7 +64,6 @@ public class CommandModelDB : EntrySortingModel
     /// <inheritdoc/>
     public override string ToString()
     {
-        string command_name = $"{Name}{(Hidden ? " [H]" : "")}{(PauseSecondsBeforeExecution > 0 ? $" [p {PauseSecondsBeforeExecution} sec]" : "")}";
-        return command_name;
+        return $"{Name}{(Hidden ? " [H]" : "")}{(PauseSecondsBeforeExecution > 0 ? $" [p {PauseSecondsBeforeExecution} sec]" : "")}";
     }
 }

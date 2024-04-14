@@ -11,17 +11,13 @@ namespace SharedLib;
 /// </summary>
 public class HttpResponseModel : SimpleStringResponseModel
 {
-    /// <summary>
-    /// Ответ/результат на HTTP запрос
-    /// </summary>
-    public HttpResponseModel() { }
-
-    /// <summary>
-    /// Ответ/результат на HTTP запрос
-    /// </summary>
-    public HttpResponseModel(ResponseBaseModel responseBaseModel)
+    /// <inheritdoc/>
+    public static HttpResponseModel Build(ResponseBaseModel responseBaseModel)
     {
-        Messages = responseBaseModel.Messages;
+        return new HttpResponseModel()
+        {
+            Messages = responseBaseModel.Messages
+        };
     }
 
     /// <inheritdoc/>
@@ -37,7 +33,7 @@ public class HttpResponseModel : SimpleStringResponseModel
     /// </summary>
     public async Task<HtmlDomModel> GetDom()
     {
-        HtmlDomModel res = new();
+        HtmlDomModel res = [];
         await res.Reload(TextPayload ?? "");
         return res;
     }

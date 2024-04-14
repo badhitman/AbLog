@@ -44,8 +44,8 @@ public class ResponseBaseModel
     {
         get
         {
-            Messages ??= new List<ResultMessage>();
-            return Messages.Any() ? $"{string.Join($",{Environment.NewLine}", Messages.Select(x => $"[{x}]"))};" : string.Empty;
+            Messages ??= [];
+            return Messages.Count != 0 ? $"{string.Join($",{Environment.NewLine}", Messages.Select(x => $"[{x}]"))};" : string.Empty;
         }
     }
 

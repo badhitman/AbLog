@@ -30,5 +30,5 @@ public class ScriptModelDB : EntryDescriptionModel
     public bool IsEnabled { get; set; }
 
     /// <inheritdoc/>
-    public override string ToString() => $"[script:#{Id} '{Name}]'{(Commands?.Any() == true ? $"({Commands.Count} команд)" : "")}";
+    public override string ToString() => $"[script:#{Id} '{Name}]'{(Commands is not null && Commands.Count != 0 ? $"({Commands.Count} команд)" : "")}";
 }
