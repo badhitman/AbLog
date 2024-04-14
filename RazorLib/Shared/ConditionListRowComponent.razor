@@ -2,7 +2,7 @@
 @using MudBlazor;
 
 @inject ILogger<ConditionListRowComponent> _loger
-@* @inject IRefitConditionsService _refit *@
+@inject IConditionsService _conditions
 @inject ISnackbar _snackbar
 
 @inherits BlazorBusyComponentBaseModel
@@ -112,14 +112,14 @@
     {
         if (Condition.Id > 0)
         {
-            // Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.ConditionDelete( Condition.Id, ConditionType );
-            // if (rest.Content?.Conditions is null)
-            // {
-            //     _snackbar.Add("rest.Content?.Conditions is null ошибка {C2303A75-FD26-4A4C-977C-DD6BE28A6A95}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
-            //     return;
-            // }
+            ConditionsAnonimResponseModel rest = await _conditions.ConditionDelete(Condition.Id, ConditionType);
+            if (rest.Conditions is null)
+            {
+                _snackbar.Add("rest.Content?.Conditions is null ошибка {C2303A75-FD26-4A4C-977C-DD6BE28A6A95}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+                return;
+            }
 
-            // UpdateAct(rest.Content.Conditions);
+            UpdateAct(rest.Conditions);
         }
         else
             DeleteNewConditionAct(Condition.Id);
@@ -127,36 +127,22 @@
 
     async Task SaveClickHandler()
     {
-        // Refit.ApiResponse<ConditionsAnonimResponseModel> rest = await _refit.ConditionUpdateOrCreate(new UpdateConditionRequestModel(Condition)
-        //     {
-        //         ConditionType = ConditionType,
-        //         OwnerId = OwnerId
-        //     });
+        ConditionsAnonimResponseModel rest = await _conditions.ConditionUpdateOrCreate(new ConditionUpdateModel(Condition)
+            {
+                ConditionType = ConditionType,
+                OwnerId = OwnerId
+            });
 
-        // if (rest.Content is null)
-        // {
-        //     ModalBodyText = rest.Error?.Message ?? "не известная ошибка";
-        //     Modal?.Open("Ошибка");
-        //     return;
-        // }
+        _snackbar.ShowMessagesResponse(rest.Messages);
 
-        // if (!rest.Content.IsSuccess)
-        // {
-        //     ModalBodyText = "";
-        //     Modal?.Open("Ошибка", rest.Content.Messages);
-        //     return;
-        // }
+        _conditionName = Condition.Name;
+        _conditionHardwareId = Condition.HardwareId;
+        _conditionPortId = Condition.PortId;
+        _conditionValueType = Condition.ConditionValueType;
+        _conditionMode = Condition.СomparisonMode;
+        _conditionValue = Condition.Value;
 
-        // showMessages?.ShowMessages(rest.Content.Messages);
-
-        // _conditionName = Condition.Name;
-        // _conditionHardwareId = Condition.HardwareId;
-        // _conditionPortId = Condition.PortId;
-        // _conditionValueType = Condition.ConditionValueType;
-        // _conditionMode = Condition.СomparisonMode;
-        // _conditionValue = Condition.Value;
-
-        // if (rest.Content?.Conditions?.Any() == true)
-        //     UpdateAct(rest.Content.Conditions);
+        if (rest.Conditions?.Any() == true)
+            UpdateAct(rest.Conditions);
     }
 }

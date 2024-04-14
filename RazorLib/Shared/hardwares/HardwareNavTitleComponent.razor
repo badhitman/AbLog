@@ -5,12 +5,12 @@
 
 <p class="mb-0">
     @($"{TitleText} >> {PagePath}")
-    @if (_conf.MetadataPage.ContainsKey(PageInfoKey) && !IsExpand)
+    @if (_conf.MetadataPage is not null && _conf.MetadataPage.ContainsKey(PageInfoKey) && !IsExpand)
     {
         <a title="Открыть окно справки" @onclick="() => IsExpand = true" @onclick:preventDefault href="#" class="link-info ms-4">Информация</a>
     }
 </p>
-@if (_conf.MetadataPage.ContainsKey(PageInfoKey) && IsExpand)
+@if (_conf.MetadataPage?.ContainsKey(PageInfoKey) == true && IsExpand)
 {
     <div style="max-height: 350px; overflow-y: scroll;" class="alert alert-light" role="alert">
         @foreach (string p in _conf.MetadataPage[PageInfoKey])

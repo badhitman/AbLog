@@ -2,7 +2,7 @@
 @using MudBlazor;
 
 @inject ILogger<ConditionsComponent> _loger;
-@* @inject IRefitConditionsService _refit; *@
+ @inject IConditionsService _conditions;
 @inject ISnackbar _snackbar;
 
 @inherits BlazorBusyComponentBaseModel
@@ -134,20 +134,20 @@ else
 
     public async Task Rest(int owner_id, ConditionsTypesEnum condition_type)
     {
-        // if (OwnerId != owner_id || ConditionType != condition_type)
-        // {
-        //     Data.Clear();
-        //     OwnerId = owner_id;
-        //     ConditionType = condition_type;
-        // }
+        if (OwnerId != owner_id || ConditionType != condition_type)
+        {
+            Data.Clear();
+            OwnerId = owner_id;
+            ConditionType = condition_type;
+        }
 
-        // if (OwnerId < 1)
-        //     return;
-        // IsBusyProgress = true;
+        if (OwnerId < 1)
+            return;
+        IsBusyProgress = true;
 
-        // ApiResponse<ConditionsAnonimResponseModel> rest_conditions = await _refit.ConditionsGetByOwner(OwnerId, ConditionType);
-        // if (rest_conditions.Content?.Conditions?.Any() == true)
-        //     UpdateAct(rest_conditions.Content.Conditions);
+        ConditionsAnonimResponseModel rest_conditions = await _conditions.ConditionsGetByOwner(OwnerId, ConditionType);
+        if (rest_conditions.Conditions?.Any() == true)
+            UpdateAct(rest_conditions.Conditions);
 
         IsBusyProgress = false;
         StateHasChanged();
