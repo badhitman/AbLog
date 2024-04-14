@@ -9,6 +9,18 @@ namespace SharedLib;
 /// </summary>
 public class PaginationRequestModel
 {
+    /// <inheritdoc/>
+    public static PaginationRequestModel Build(PaginationRequestModel init)
+    {
+        return new PaginationRequestModel()
+        {
+            PageSize = init.PageSize,
+            PageNum = init.PageNum,
+            SortingDirection = init.SortingDirection,
+            SortBy = init.SortBy
+        };
+    }
+
     /// <summary>
     /// Размер страницы (количество элементов на странице)
     /// </summary>
@@ -28,21 +40,4 @@ public class PaginationRequestModel
     /// Имя поля по которому должна происходить сортировка
     /// </summary>
     public string? SortBy { get; set; }
-
-    /// <summary>
-    /// Базовая модель запроса с поддержкой пагинации
-    /// </summary>
-    public PaginationRequestModel() { }
-
-    /// <summary>
-    /// Базовая модель запроса с поддержкой пагинации
-    /// </summary>
-    /// <param name="init_object">Объект инициализации пагинатора</param>
-    public PaginationRequestModel(PaginationRequestModel init_object)
-    {
-        PageSize = init_object.PageSize;
-        PageNum = init_object.PageNum;
-        SortingDirection = init_object.SortingDirection;
-        SortBy = init_object.SortBy;
-    }
 }

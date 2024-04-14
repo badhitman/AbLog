@@ -31,18 +31,9 @@ public class PaginationResponseModel : PaginationRequestModel
         return (uint)Math.Ceiling((double)total_rows_count / (double)page_size);
     }
 
-    /// <summary>
-    /// Базовая модель ответа с поддержкой пагинации
-    /// </summary>
-    public PaginationResponseModel() { }
-
-    /// <summary>
-    /// Базовая модель ответа с поддержкой пагинации
-    /// </summary>
-    /// <param name="init_object">Объект инициализации пагинатора</param>
-    public PaginationResponseModel(PaginationRequestModel init_object) : base(init_object) { }
-
-
+    /// <inheritdoc/>
+    public static new PaginationResponseModel Build(PaginationRequestModel init_object)
+        => (PaginationResponseModel)PaginationRequestModel.Build(init_object);
 
     /// <summary>
     /// Результат обработки запроса.

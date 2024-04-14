@@ -9,23 +9,21 @@ namespace SharedLib;
 /// </summary>
 public class ConditionUpdateModel : ConditionBaseModelDB
 {
-    /// <summary>
-    /// Обновление условия/ограничения значения порта (для команды или тригера)
-    /// </summary>
-    public ConditionUpdateModel() { }
-
-    /// <summary>
-    /// Обновление условия/ограничения значения порта (для команды или тригера)
-    /// </summary>
-    public ConditionUpdateModel(ConditionAnonimModel init)
+    /// <inheritdoc/>
+    public static ConditionUpdateModel Build(ConditionAnonimModel init, ConditionsTypesEnum ConditionType, int OwnerId)
     {
-        Id = init.Id;
-        Name = init.Name;
-        HardwareId = init.HardwareId;
-        PortId = init.PortId;
-        ConditionValueType = init.ConditionValueType;
-        СomparisonMode = init.СomparisonMode;
-        Value = init.Value;
+        return new ConditionUpdateModel()
+        {
+            Id = init.Id,
+            Name = init.Name,
+            HardwareId = init.HardwareId,
+            PortId = init.PortId,
+            ConditionValueType = init.ConditionValueType,
+            СomparisonMode = init.СomparisonMode,
+            Value = init.Value,
+            ConditionType = ConditionType,
+            OwnerId = OwnerId
+        };
     }
 
     /// <summary>

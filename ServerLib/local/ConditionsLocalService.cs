@@ -122,7 +122,7 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
                         db.Update(new CommandConditionModelDB(condition_request));
                         break;
                     case ConditionsTypesEnum.Trigger:
-                        TrigerConditionModelDB new_t = new(condition_request);
+                        TrigerConditionModelDB new_t = TrigerConditionModelDB.Build(condition_request);
                         db.Update(new_t);
                         break;
                     default:
@@ -138,7 +138,7 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
                         db.Add(new CommandConditionModelDB(condition_request));
                         break;
                     case ConditionsTypesEnum.Trigger:
-                        db.Add(new TrigerConditionModelDB(condition_request));
+                        db.Add(TrigerConditionModelDB.Build(condition_request));
                         break;
                     default:
                         throw new NotImplementedException("{406FEE2B-BD49-44D6-9AB3-78902227ED9E}");

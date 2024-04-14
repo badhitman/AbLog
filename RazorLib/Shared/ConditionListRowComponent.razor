@@ -127,12 +127,7 @@
 
     async Task SaveClickHandler()
     {
-        ConditionsAnonimResponseModel rest = await _conditions.ConditionUpdateOrCreate(new ConditionUpdateModel(Condition)
-            {
-                ConditionType = ConditionType,
-                OwnerId = OwnerId
-            });
-
+        ConditionsAnonimResponseModel rest = await _conditions.ConditionUpdateOrCreate(ConditionUpdateModel.Build(Condition, ConditionType, OwnerId));
         _snackbar.ShowMessagesResponse(rest.Messages);
 
         _conditionName = Condition.Name;
