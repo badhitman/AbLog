@@ -10,15 +10,11 @@ namespace Telegram.Bot.Services;
 /// A background service consuming a scoped service.
 /// See more: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services#consuming-a-scoped-service-in-a-background-task
 /// </remarks>
-public class PollingService : PollingServiceBase<ReceiverService>
+/// <remarks>
+/// 
+/// </remarks>
+/// <param name="serviceProvider"></param>
+/// <param name="logger"></param>
+public class PollingService(IServiceProvider serviceProvider, ILogger<PollingService> logger) : PollingServiceBase<ReceiverService>(serviceProvider, logger)
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <param name="logger"></param>
-    public PollingService(IServiceProvider serviceProvider, ILogger<PollingService> logger)
-        : base(serviceProvider, logger)
-    {
-    }
 }

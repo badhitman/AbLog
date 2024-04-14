@@ -135,8 +135,8 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         await dom.Reload(http_resp.TextPayload);
 
         string _tg_resp_msg = dom.TelegramResponseHtmlRaw(port_db.Id);
-        foreach ((string text, string href) lb in dom.Links)
-            kb_rows.Add([InlineKeyboardButton.WithCallbackData($"🔗 {lb.text}", lb.href)]);
+        foreach ((string text, string href) in dom.Links)
+            kb_rows.Add([InlineKeyboardButton.WithCallbackData($"🔗 {text}", href)]);
         if (string.IsNullOrEmpty(set_value))
             return await BotClient.EditMessageTextAsync(chat_id, message_id, $"{output}\n{_tg_resp_msg}", replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
 

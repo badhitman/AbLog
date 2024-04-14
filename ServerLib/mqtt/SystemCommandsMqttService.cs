@@ -16,7 +16,6 @@ namespace ServerLib;
 [SupportedOSPlatform("android")]
 public class SystemCommandsMqttService(IMqttBaseService mqtt, MqttConfigModel mqtt_conf) : ISystemCommandsService
 {
-
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> CommandDelete(int comm_id, CancellationToken cancellation_token = default)
     {

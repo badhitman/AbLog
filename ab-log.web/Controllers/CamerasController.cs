@@ -14,7 +14,7 @@ namespace ABLogWeb;
 public class CamerasController(ICamerasService cam) : ControllerBase
 {
     /// <summary>
-    /// 
+    /// Сделать снимок с камеры
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Cameras}/{{index_cam}}/{{characteristic?}}")]
     public async Task<IActionResult> Poto([FromRoute] int? index_cam, [FromRoute] string? characteristic)
