@@ -48,7 +48,7 @@ public static class MauiProgram
         }
 
 
-        ClientConfigModel settings = new();
+        ClientConfigModel settings = builder.Configuration.Get<ClientConfigModel>() ?? throw new Exception("ClientConfigModel is null. error {465BFF7A-217B-4D82-B64D-CEB485B49520}");
         builder.Configuration.Bind(settings);
         builder.Services.AddSingleton(settings);
         builder.Services.AddHttpClient<ToolsRemoteService>();

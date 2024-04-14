@@ -36,8 +36,7 @@ else if (IsExpand)
                     <button disabled="@(string.IsNullOrWhiteSpace(PortEntry.Name))" @onclick="UpdatePortName" class="btn btn-outline-secondary" type="button" id="button-addon2">Сохранить</button>
                 </div>
             }
-
-            <HardwareNavTitleComponent PagePath="@PagePath" TitleText="@Text" />
+            <HardwareNavTitleComponent TitleText="@Text" />
             <HardwaresNavPillsComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" ReloadPage="@ReloadPage" />
             @if (!AutoLoadAndExpand)
             {

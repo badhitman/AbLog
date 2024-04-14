@@ -7,7 +7,7 @@
 @inject ISnackbar _snackbar
 
 <input type="checkbox" @bind="isChecked" name="@InputValue" class="form-check-input" aria-describedby="@($"{InputName}Help")" />
-<div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.MetadataInput?.FirstOrDefault(x => x.Key.Equals(InputName, StringComparison.OrdinalIgnoreCase)).Value ?? "error {08396691-95CC-4EC7-B91F-FDF4476D5A44}"))</div>
+<div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath) ?? $"error `{InputName}` 08396691-95CC-4EC7-B91F-FDF4476D5A44"))</div>
 
 @code {
     [Parameter, EditorRequired]
@@ -15,6 +15,12 @@
 
     [Parameter, EditorRequired]
     public required string InputValue { get; set; }
+
+    /// <summary>
+    /// Адрес страницы (URI) в управляющем контролере
+    /// </summary>
+    [CascadingParameter]
+    public required string PagePath { get; set; }
 
     public bool isChecked
     {

@@ -75,7 +75,7 @@ public class Program
         }
         builder.Configuration.AddCommandLine(args);
 
-        ClientConfigModel settings = new();
+        ClientConfigModel settings = builder.Configuration.Get<ClientConfigModel>() ?? throw new Exception("ClientConfigModel is null. error {5FB720C6-A2DB-4794-B0D1-AC3119C7D866}");
         builder.Configuration.Bind(settings);
         builder.Services.AddSingleton(settings);
 

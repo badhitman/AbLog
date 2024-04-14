@@ -26,8 +26,10 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
     [CascadingParameter, EditorRequired]
     public int Id { get; set; }
 
-    /// <inheritdoc/>
-    [Parameter, EditorRequired]
+    /// <summary>
+    /// Адрес страницы (URI) в управляющем контролере
+    /// </summary>
+    [CascadingParameter]
     public required string PagePath { get; set; }
 
     /// <inheritdoc/>

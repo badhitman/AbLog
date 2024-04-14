@@ -60,7 +60,7 @@ public partial class HardwareNavButtonComponent : ReloadPageComponentBaseModel
     /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
     {
-        string ext_path = PagePath[(PagePath.IndexOf("?") + 1)..];
+        string ext_path = PagePath[(PagePath.IndexOf('?') + 1)..];
         NameValueCollection path_parameters = HttpUtility.ParseQueryString(ext_path);
         if (path_parameters.Count == 1 && port_num.IsMatch(path_parameters.Get("pt") ?? ""))
         {

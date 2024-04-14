@@ -8,7 +8,9 @@
             <HardwareFormComponent />
         </TabComponent>
         <TabComponent Tooltip="Ретранслятор" Title="Ретранслятор">
-            <HardwareTranslateMainLayerComponent PagePath="/" />
+            <CascadingValue Value="@("/")">
+                <HardwareTranslateMainLayerComponent />
+            </CascadingValue>
         </TabComponent>
     </TabSetComponent>
 </CascadingValue>
