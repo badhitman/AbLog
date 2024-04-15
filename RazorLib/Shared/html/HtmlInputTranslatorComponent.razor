@@ -91,7 +91,7 @@
     /// <summary>
     /// Адрес страницы (URI) в управляющем контролере
     /// </summary>
-    [CascadingParameter]
+    [CascadingParameter(Name = "PagePath")]
     public required string PagePath { get; set; }
 
     public InputFormTypesEnum InputFormType { get; private set; } = InputFormTypesEnum.Text;

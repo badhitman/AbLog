@@ -27,7 +27,7 @@
     [Parameter, EditorRequired]
     public required string TitleText { get; set; }
 
-    [CascadingParameter]
+    [CascadingParameter(Name = "PagePath")]
     public required string PagePath { get; set; }
 
     string? _pik;

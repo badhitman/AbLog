@@ -30,12 +30,12 @@
                 }
                 else
                 {
-                    <HardwareNavButtonComponent PagePath="@(_uri.OriginalString)" Text="@NodeData.Text" />
+                    <HardwareNavButtonComponent Text="@NodeData.Text" />
                 }
             }
             else
             {
-                <HardwareNavButtonComponent PagePath="@(_uri.OriginalString)" Text="@NodeData.Text" />
+                <HardwareNavButtonComponent Text="@NodeData.Text" />
             }
         }
         else if (Uri.TryCreate(href, UriKind.Absolute, out _uri))

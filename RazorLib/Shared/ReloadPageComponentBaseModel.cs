@@ -29,7 +29,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
     /// <summary>
     /// Адрес страницы (URI) в управляющем контролере
     /// </summary>
-    [CascadingParameter]
+    [CascadingParameter(Name = "PagePath")]
     public required string PagePath { get; set; }
 
     /// <inheritdoc/>
@@ -41,9 +41,9 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
     /// <summary>
     /// Reload page
     /// </summary>
-    protected void ReloadPage()
+    protected async void ReloadPage()
     {
-        InvokeAsync(async () => await GetData());
+        await GetData();
     }
 
     bool IsUpdated = false;

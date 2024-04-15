@@ -34,7 +34,7 @@ public class ClientConfigModel
             return MetadataInput.FirstOrDefault(x => x.Key.Equals(input_name, StringComparison.OrdinalIgnoreCase)).Value;
 
         return
-            MetadataInput.FirstOrDefault(x => x.Key.Equals($"{page_path}|{input_name}", StringComparison.OrdinalIgnoreCase)).Value
+            MetadataInput.FirstOrDefault(x => x.Key.Equals($"{page_path}#{input_name}", StringComparison.OrdinalIgnoreCase)).Value
             ?? MetadataInput.FirstOrDefault(x => x.Key.Equals(input_name, StringComparison.OrdinalIgnoreCase)).Value;
 
     }
