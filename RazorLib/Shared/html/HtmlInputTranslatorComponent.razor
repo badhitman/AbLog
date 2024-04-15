@@ -88,9 +88,7 @@
     [CascadingParameter]
     public required Action<string?, string?> SendForm { get; set; }
 
-    /// <summary>
-    /// Адрес страницы (URI) в управляющем контролере
-    /// </summary>
+    /// <inheritdoc/>
     [CascadingParameter(Name = "PagePath")]
     public required string PagePath { get; set; }
 

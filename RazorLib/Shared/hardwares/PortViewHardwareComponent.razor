@@ -25,7 +25,9 @@ else
             <button @onclick="OpeningToggle" type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <HardwareNavButtonComponent @ref="refBtn" Text="@(Port.Name)" AutoLoadAndExpand="true" />
+            <CascadingValue Value="@($"?pt={Port.PortNum}")" Name="PagePath">
+                <HardwareNavButtonComponent @ref="refBtn" Text="@(Port.Name)" AutoLoadAndExpand="true" />
+            </CascadingValue>
         </div>
     </div>
     <div @onclick="OpeningToggle" class="offcanvas-backdrop fade show"></div>

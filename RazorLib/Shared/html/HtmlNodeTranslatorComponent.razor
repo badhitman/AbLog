@@ -21,22 +21,24 @@
                 : href.ToLower();
             System.Collections.Specialized.NameValueCollection parsed_url = HttpUtility.ParseQueryString(ext_href);
             string? cmd = parsed_url.Get("cmd");
-            if (!string.IsNullOrEmpty(cmd))
-            {
-                Match match_cmd = cmd_on_off.Match(cmd);
-                if (match_cmd.Success)
+            <CascadingValue Value="@(_uri.OriginalString)" Name="PagePath">
+                @if (!string.IsNullOrEmpty(cmd))
                 {
-                    <HardwarePortToggleComponent BtnText="@NodeData.Text" PortNum="@(byte.Parse(match_cmd.Groups["port_num"].Value))" PortState="@(byte.Parse(match_cmd.Groups["port_state"].Value))" />
+                    Match match_cmd = cmd_on_off.Match(cmd);
+                    if (match_cmd.Success)
+                    {
+                        <HardwarePortToggleComponent BtnText="@NodeData.Text" PortNum="@(byte.Parse(match_cmd.Groups["port_num"].Value))" PortState="@(byte.Parse(match_cmd.Groups["port_state"].Value))" />
+                    }
+                    else
+                    {
+                        <HardwareNavButtonComponent Text="@NodeData.Text" />
+                    }
                 }
                 else
                 {
                     <HardwareNavButtonComponent Text="@NodeData.Text" />
                 }
-            }
-            else
-            {
-                <HardwareNavButtonComponent Text="@NodeData.Text" />
-            }
+            </CascadingValue>
         }
         else if (Uri.TryCreate(href, UriKind.Absolute, out _uri))
         {
