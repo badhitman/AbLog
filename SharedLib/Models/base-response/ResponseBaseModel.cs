@@ -102,7 +102,7 @@ public class ResponseBaseModel
     /// <summary>
     /// Сообщения к ответу rest/api
     /// </summary>
-    public List<ResultMessage> Messages { get; set; } = new();
+    public List<ResultMessage> Messages { get; set; } = [];
 
     /// <summary>
     /// Добавить сообщение к результату-ответу rest/api

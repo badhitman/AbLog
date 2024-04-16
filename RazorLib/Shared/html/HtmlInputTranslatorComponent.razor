@@ -36,12 +36,12 @@
                 if (string.IsNullOrWhiteSpace(_maxlength))
                 {
                     <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" aria-describedby="@($"{InputName}Help")" />
-                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath) ?? $"error `{InputName}` CCD7D4DF-E09A-4F3B-8DA4-2B724B98B537"))</div>
+                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath, FormContext) ?? $"error `{InputName}` CCD7D4DF-E09A-4F3B-8DA4-2B724B98B537"))</div>
                 }
                 else
                 {
                     <input type="@(InputFormType.ToString().ToLower())" @bind="InputValue" name="@InputName" class="form-control" size="@_size" maxlength="@_maxlength" aria-describedby="@($"{InputName}Help")" />
-                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath) ?? $"error `{InputName}` F523907C-79FA-407F-A3F7-E1F41FBE0652"))</div>
+                    <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath, FormContext) ?? $"error `{InputName}` F523907C-79FA-407F-A3F7-E1F41FBE0652"))</div>
                 }
 
                 break;
@@ -65,7 +65,7 @@
                 </CascadingValue>
             }
         </select>
-        <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath) ?? $"error `{InputName}` 54BBE107-8568-473C-9ADD-5EF18F89D850"))</div>
+        <div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath, FormContext) ?? $"error `{InputName}` 54BBE107-8568-473C-9ADD-5EF18F89D850"))</div>
         break;
     default:
         <HtmlNodeTranslatorComponent NodeData="NodeData" />
