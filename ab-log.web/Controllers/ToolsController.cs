@@ -32,7 +32,7 @@ public class ToolsController(IToolsService tools_service) : ControllerBase
     /// Получить статус MQTT службы
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Tools}/{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.STATUS}")]
-    public async Task<BoolResponseModel> StatusMqtt()
+    public async Task<TResponseModel<bool>> StatusMqtt()
         => await tools_service.StatusMqtt();
 
     /// <summary>

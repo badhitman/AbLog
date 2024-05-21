@@ -1,0 +1,150 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject IHardwiresService _hardwires
+@inject NavigationManager _nav
+@inject ISnackbar Snackbar
+
+@if (IsBusyProgress)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+else if (hw is null)
+{
+    <MudAlert Severity="Severity.Error">Устройство не загружено из службы!</MudAlert>
+}
+else
+{
+    <EditForm Model="hw" OnValidSubmit="OnValidSubmitHandle">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="exampleInputName" class="form-label">Имя</label>
+            <input @bind-value="hw.Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp">
+            <div id="nameHelp" class="form-text">Пользовательское название</div>
+        </div>
+
+        <label for="exampleInputAddress" class="form-label">IP</label>
+        <div class="input-group">
+            <input @bind-value="hw.Address" type="text" class="form-control" id="exampleInputAddress" aria-describedby="addresHelp">
+            <a title="Открыть устройство на новой вкладке" target="_blank" href="@($"{(hw.Address.StartsWith(http_schema_prefix, StringComparison.OrdinalIgnoreCase) ? hw.Address : $"{http_schema_prefix}{hw.Address}")}/{hw.Password}")" class="btn btn-outline-primary" role="button">Открыть</a>
+        </div>
+        <div id="addresHelp" class="form-text mb-3">Сетевой адрес.</div>
+
+        <label for="exampleInputPassword" class="form-label">Пароль</label>
+        <div class="input-group">
+            <input @bind-value="hw.Password" type="@(ShowPass ? "text" : "password")" class="form-control" id="exampleInputPassword" aria-describedby="passwordHelp">
+            <button @onclick="() => { ShowPass = !ShowPass; }" class="btn btn@(ShowPass ? "" : "-outline")-secondary" type="button">@(ShowPass ? "Скрыть" : "Показать пароль")</button>
+        </div>
+        <div id="passwordHelp" class="form-text mb-3">Пароль доступа к устройству</div>
+
+        @if (IsDebug)
+        {
+            @*<div class="mb-3">
+                <div title="Оповещения. Устройство может генерировать рассылку уведомлений/оповещений" class="form-check form-check-inline form-switch">
+                    <input @bind-value="hw.AlarmSubscriber" class="form-check-input" type="checkbox" id="inlineCheckboxAlarmSubscriber">
+                    <label class="form-check-label" for="inlineCheckboxAlarmSubscriber">Уведомления</label>
+                </div>
+                <div title="Поддержка удалённых команд (удалённое управление)" class="form-check form-check-inline form-switch">
+                    <input @bind-value="hw.CommandsAllowed" class="form-check-input" type="checkbox" id="inlineCheckboxCommandsAllowed">
+                    <label class="form-check-label" for="inlineCheckboxCommandsAllowed">Команды</label>
+                </div>
+            </div>*@
+        }
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            @if (hw.Id > 0)
+            {
+                <div class="btn-group me-md-2" role="group" aria-label="Basic example">
+                    <button @onclick="InitDeleteAsync" class="btn btn-@(InitDelete ? "" : "outline-")danger" type="button">@(InitDelete ? "Подтвердить удаление" : "Удалить")</button>
+                    @if (InitDelete)
+                    {
+                        <button @onclick="() => InitDelete = false" class="btn btn-outline-warning" type="button">Отменить удаление</button>
+                    }
+                </div>
+            }
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [CascadingParameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public Action? UpdateFormEvent { get; set; }
+
+    const string http_schema_prefix = "http://";
+    bool InitDelete = false;
+    bool ShowPass = false;
+    HardwareBaseModel hw = new() { Address = "http://192.168.0.14/", Password = "sec" };
+
+#if DEBUG
+    bool IsDebug = true;
+#else
+    bool IsDebug = false;
+#endif
+
+    async Task InitDeleteAsync()
+    {
+        if (!InitDelete)
+        {
+            InitDelete = true;
+            return;
+        }
+
+        IsBusyProgress = true;
+        ResponseBaseModel rest = await _hardwires.HardwareDelete(Id);
+        if (!rest.IsSuccess)
+        {
+            Snackbar.ShowMessagesResponse(rest.Messages);
+            IsBusyProgress = false;
+            return;
+        }
+
+        _nav.NavigateTo("/hardwires-page");
+    }
+
+    async Task OnValidSubmitHandle()
+    {
+        IsBusyProgress = true;
+        TResponseModel<HardwareBaseModel> rest = await _hardwires.HardwareUpdate(hw);
+        Snackbar.ShowMessagesResponse(rest.Messages);
+        if (!rest.IsSuccess || rest.Response is null)
+        {
+            IsBusyProgress = false;
+            return;
+        }
+
+        hw = rest.Response;
+        IsBusyProgress = false;
+        if (UpdateFormEvent is not null)
+            UpdateFormEvent();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id <= 0)
+            return;
+
+        IsBusyProgress = true;
+        TResponseModel<HardwareBaseModel> rest = await _hardwires.HardwareGet(Id);
+
+        if (!rest.IsSuccess || rest.Response is null)
+        {
+            Snackbar.ShowMessagesResponse(rest.Messages);
+            return;
+        }
+
+        hw = rest.Response;
+        IsBusyProgress = false;
+    }
+}

@@ -9,7 +9,7 @@ public interface INotifyService
     /// <summary>
     /// User notify handler
     /// </summary>
-    public delegate void UserNotifyHandler(UserResponseModel user);
+    public delegate void UserNotifyHandler(TResponseModel<UserModelDB> user);
 
     /// <summary>
     /// Событие уведомления
@@ -19,7 +19,7 @@ public interface INotifyService
     /// <summary>
     /// Проверка пользователя Telegram
     /// </summary>
-    public void CheckTelegramUser(UserResponseModel user);
+    public void CheckTelegramUser(TResponseModel<UserModelDB> user);
     #endregion
 
     #region mqtt debug

@@ -26,7 +26,7 @@ namespace ServerLib;
 public class MqttServerService : MqttBaseServiceAbstraction
 {
     readonly ISystemCommandsService _sys_com_service;
-    readonly IHardwaresService _hardwares_service;
+    readonly IHardwiresService _hardwires_service;
     readonly IServiceProvider _service_provider;
     readonly IUsersService _users_service;
     readonly IServiceCollection _services;
@@ -43,9 +43,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Cameras}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.SHOT}"); })
 
-                .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwires}/{GlobalStatic.Routes.HTTP}"); })
                 //
-                .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}"); })
+                .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwires}/{GlobalStatic.Routes.LIST}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.ENTRIES}"); })
                 .WithTopicFilter(f => { f.WithTopic($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.NESTED_ENTRIES}"); })
@@ -77,11 +77,11 @@ public class MqttServerService : MqttBaseServiceAbstraction
     /// <summary>
     /// 
     /// </summary>
-    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, MqttConfigModel mqtt_conf, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwaresService hardwares_service, IEmailService email, IServiceProvider service_provider, INotifyService notifyService, IDbContextFactory<ParametersContext> dbFactory, IHostApplicationLifetime applicationLifetime)
+    public MqttServerService(IMqttClient mqttClient, IServiceCollection services, MqttConfigModel mqtt_conf, ISystemCommandsService sys_com_service, IUsersService users_service, HttpClient http_client, ILogger<MqttServerService> logger, MqttConfigModel mqtt_settings, MqttFactory mqttFactory, IHardwiresService hardwires_service, IEmailService email, IServiceProvider service_provider, INotifyService notifyService, IDbContextFactory<ParametersContext> dbFactory, IHostApplicationLifetime applicationLifetime)
         : base(mqttClient: mqttClient, mqtt_settings: mqtt_settings, mqttFactory: mqttFactory, logger: logger, notifyService: notifyService, dbFactory: dbFactory)
     {
         _logger = logger;
-        _hardwares_service = hardwares_service;
+        _hardwires_service = hardwires_service;
         _http_client = http_client;
         _services = services;
         _sys_com_service = sys_com_service;
@@ -103,8 +103,8 @@ public class MqttServerService : MqttBaseServiceAbstraction
         string salt = Guid.NewGuid().ToString();
 
         PortHardwareCheckRequestModel? req_port_check;
-        TelegramBotConfigResponseModel tbc_res;
-        EmailConfigResponseModel ec_res;
+        TResponseModel<TelegramBotConfigModel> tbc_res;
+        TResponseModel<EmailConfigModel> ec_res;
         HardwareGetHttpRequestModel? req_http;
         SystemCommandModelDB? req_sys_com_db;
         TelegramBotConfigModel? req_conf_tbot;
@@ -117,7 +117,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
         NoiseModel? req_noise;
         EntryModel? req_e;
 
-        if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.HTTP}"))
+        if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwires}/{GlobalStatic.Routes.HTTP}"))
         {
             req_http = JsonConvert.DeserializeObject<HardwareGetHttpRequestModel>(payload_json);
             if (req_http is null)
@@ -126,10 +126,10 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 1EB8300D-9436-44B0-9413-31BAA01018F2")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.GetHardwareHtmlPage(req_http)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.GetHardwareHtmlPage(req_http)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
 
-        else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.LIST}"))
+        else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwires}/{GlobalStatic.Routes.LIST}"))
         {
             req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
             if (req_noise is null)
@@ -138,9 +138,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 1C55124E-8DF4-4CCC-A9FF-8CC2C0AF6B65")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwiresGetAll()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
-        else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.ENTRIES}"))
+        else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwires}/{GlobalStatic.Routes.ENTRIES}"))
         {
             req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
             if (req_noise is null)
@@ -149,9 +149,9 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error C1595114-C3E5-4AE1-937B-8B45C59C8507")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetAllAsEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwiresGetAllAsEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
-        else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwares}/{GlobalStatic.Routes.NESTED_ENTRIES}"))
+        else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardwires}/{GlobalStatic.Routes.NESTED_ENTRIES}"))
         {
             req_noise = JsonConvert.DeserializeObject<NoiseModel>(payload_json);
             if (req_noise is null)
@@ -160,7 +160,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 787DE141-F012-4369-AD88-95ACBB7BD937")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwaresGetTreeNestedEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwiresGetTreeNestedEntries()), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
 
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.GET}"))
@@ -172,7 +172,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 98C12EAC-73A9-4946-8850-7B075613833E")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwareGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.UPDATE}"))
         {
@@ -183,7 +183,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error F7657C6A-2601-49BE-8F65-F302F5B1B4A3")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareUpdate(req_hw)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwareUpdate(req_hw)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Hardware}/{GlobalStatic.Routes.DELETE}"))
         {
@@ -194,7 +194,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 86375673-BAA9-41EA-83F9-0F30DB918D05")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwareDelete(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwareDelete(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
 
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.GET}"))
@@ -206,7 +206,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error D4D48AE6-C24E-4532-AA92-07ECB1AFB549")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.HardwarePortGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.HardwarePortGet(req_nid.Id)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.CHECK}"))
         {
@@ -217,7 +217,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. error 2CB7CA8A-18B3-4FDF-84F0-CD8BBEA4BA45")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.CheckPortHardware(req_port_check)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.CheckPortHardware(req_port_check)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Port}/{GlobalStatic.Routes.UPDATE}"))
         {
@@ -228,7 +228,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 await PublishMessage(JsonConvert.SerializeObject(ResponseBaseModel.CreateError("req is null. 2415B593-DAD5-4B61-849F-7B95A174739F")), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                 return;
             }
-            await PublishMessage(JsonConvert.SerializeObject(await _hardwares_service.SetNamePort(req_e)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
+            await PublishMessage(JsonConvert.SerializeObject(await _hardwires_service.SetNamePort(req_e)), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
         }
 
         else if (e.ApplicationMessage.Topic.Equals($"{_mqtt_conf.PrefixMqtt}{GlobalStatic.Routes.Storage}/{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.GET}"))
@@ -251,7 +251,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     await PublishMessage(JsonConvert.SerializeObject(tbc_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                     return;
                 }
-                tbc_res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig);
+                tbc_res.Response = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig);
                 await PublishMessage(JsonConvert.SerializeObject(tbc_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
             }
             catch (Exception ex)
@@ -349,7 +349,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                     await PublishMessage(JsonConvert.SerializeObject(ec_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
                     return;
                 }
-                ec_res.Conf = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig);
+                ec_res.Response = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig);
                 await PublishMessage(JsonConvert.SerializeObject(ec_res), e.ApplicationMessage.ResponseTopic, _mqtt_settings.Secret, salt, _applicationLifetime.ApplicationStopped);
             }
             catch (Exception ex)

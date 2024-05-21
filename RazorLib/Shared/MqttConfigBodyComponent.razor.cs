@@ -74,14 +74,14 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
         NotifyService.MqttDebugNotify += MqttDebug;
         editContext = new(conf);
         IsBusyProgress = true;
-        MqttConfigResponseModel res = await ParametersStorageService.GetMqttConfig(this.CancellationToken);
+        TResponseModel<MqttConfigModel> res = await ParametersStorageService.GetMqttConfig(this.CancellationToken);
         SnackBar.ShowMessagesResponse(res.Messages);
-        if (!res.IsSuccess || res.Conf is null)
+        if (!res.IsSuccess || res.Response is null)
         {
             IsBusyProgress = false;
             return;
         }
-        conf = res.Conf;
+        conf = res.Response;
         editContext = new(conf);
         conf_self = GlobalStatic.CreateDeepCopy(conf);
 
@@ -92,7 +92,7 @@ public partial class MqttConfigBodyComponent : BlazorBusyComponentBaseModel
 
     async Task GetStatusService()
     {
-        BoolResponseModel status = await ToolsService.StatusMqtt();
+        TResponseModel<bool> status = await ToolsService.StatusMqtt();
         ServiceIsRunning = status.Response;
         SnackBar.ShowMessagesResponse(status.Messages);
     }

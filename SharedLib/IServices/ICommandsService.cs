@@ -12,12 +12,12 @@ public interface ICommandsService
     /// <summary>
     /// Получить команды скрипта
     /// </summary>
-    public Task<EntriesSortingResponseModel> GetCommandsEntriesByScript(int script_id, CancellationToken cancellation_token = default);
+    public Task<TResponseModel<List<EntrySortingModel>>> GetCommandsEntriesByScript(int script_id, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Получить команду (по его идентификатору)
     /// </summary>
-    public Task<CommandResponseModel> CommandGet(int command_id, CancellationToken cancellation_token = default);
+    public Task<TResponseModel<CommandModelDB>> CommandGet(int command_id, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Создать/Обновить команду
@@ -27,10 +27,10 @@ public interface ICommandsService
     /// <summary>
     /// Установить индексы сортировки команды (упорядочивание)
     /// </summary>
-    public Task<EntriesSortingResponseModel> CommandSortingSet(IdsPairModel req, CancellationToken cancellation_token = default);
+    public Task<TResponseModel<List<EntrySortingModel>>> CommandSortingSet(IdsPairModel req, CancellationToken cancellation_token = default);
 
     /// <summary>
-    /// Удалть команду контролера из скрипта
+    /// Удалить команду контролера из скрипта
     /// </summary>
     public Task<ResponseBaseModel> CommandDelete(int id_command, CancellationToken cancellation_token = default);
 }

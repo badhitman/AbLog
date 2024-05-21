@@ -20,7 +20,7 @@ public class ScriptModelDB : EntryDescriptionModel
     public IEnumerable<ContentionsModelDB>? Contentions { get; set; }
 
     /// <summary>
-    /// Тригеры скрипта
+    /// Триггеры скрипта
     /// </summary>
     public IEnumerable<TrigerModelDB>? Triggers { get; set; }
 

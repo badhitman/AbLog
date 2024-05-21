@@ -5,10 +5,10 @@
 namespace SharedLib;
 
 /// <inheritdoc/>
-public abstract class ConditionBaseModelDB : ConditionAnonimModel
+public abstract class ConditionBaseModelDB : ConditionAnonymModel
 {
     /// <summary>
-    /// FK: Владельца условия/ограничения (команда или тригер)
+    /// FK: Владельца условия/ограничения (команда или триггер)
     /// </summary>
     public int OwnerId { get; set; }
 

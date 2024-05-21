@@ -24,7 +24,7 @@ public class UsersController(IUsersService users_service) : ControllerBase
     /// Пользователь
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Users}/{{telegram_id}}")]
-    public async Task<UserResponseModel> UserGet([FromRoute] long telegram_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<UserModelDB>> UserGet([FromRoute] long telegram_id, CancellationToken cancellation_token = default)
         => await users_service.GetUser(telegram_id, cancellation_token);
 
     /// <summary>

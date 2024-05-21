@@ -18,11 +18,11 @@ namespace ServerLib;
 /// <summary>
 /// 
 /// </summary>
-public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient, ILogger<TelegramBotHardwareViewServive> Logger, IHardwaresService Hardware, IDbContextFactory<ServerContext> DbFactory) : ITelegramBotHardwareViewServive
+public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient, ILogger<TelegramBotHardwareViewServive> Logger, IHardwiresService Hardware, IDbContextFactory<ServerContext> DbFactory) : ITelegramBotHardwareViewServive
 {
     static readonly Regex port_extract = PortExtractRegex();
 
-    //public TelegramBotHardwareViewServive(IServiceProvider _services, ILogger<TelegramBotHardwareViewServive> logger, IHardwaresService hw)
+    //public TelegramBotHardwareViewServive(IServiceProvider _services, ILogger<TelegramBotHardwareViewServive> logger, IHardwiresService hw)
     //{
     //    using IServiceScope scope = _services.CreateScope();
     //    _botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
@@ -38,7 +38,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         using ServerContext db = DbFactory.CreateDbContext();
         lock (ServerContext.DbLocker)
         {
-            hw_db = db.Hardwares.Include(x => x.Ports).FirstOrDefault(x => x.Id == hardware_id);
+            hw_db = db.Hardwires.Include(x => x.Ports).FirstOrDefault(x => x.Id == hardware_id);
         }
         string output = "";
         if (hw_db is null)
@@ -132,7 +132,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         }
 
         PortHtmlDomModel dom = [];
-        await dom.Reload(http_resp.TextPayload);
+        await dom.Reload(http_resp.Response);
 
         string _tg_resp_msg = dom.TelegramResponseHtmlRaw(port_db.Id);
         foreach ((string text, string href) in dom.Links)

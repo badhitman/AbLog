@@ -26,9 +26,9 @@ public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> 
     }
 
     /// <inheritdoc/>
-    public virtual async Task<TelegramBotConfigResponseModel> GetTelegramBotConfig(CancellationToken cancellationToken)
+    public virtual async Task<TResponseModel<TelegramBotConfigModel>> GetTelegramBotConfig(CancellationToken cancellationToken)
     {
-        TelegramBotConfigResponseModel res = new();
+        TResponseModel<TelegramBotConfigModel> res = new();
         using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         string _telegramBotConfig = _context.GetStoredParameter(nameof(TelegramBotConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_telegramBotConfig))
@@ -37,7 +37,7 @@ public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> 
             return res;
         }
 
-        res.Conf = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig) ?? new();
+        res.Response = JsonConvert.DeserializeObject<TelegramBotConfigModel>(_telegramBotConfig) ?? new();
         return res;
     }
     #endregion
@@ -57,9 +57,9 @@ public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> 
     }
 
     /// <inheritdoc/>
-    public virtual async Task<EmailConfigResponseModel> GetEmailConfig(CancellationToken cancellationToken)
+    public virtual async Task<TResponseModel<EmailConfigModel>> GetEmailConfig(CancellationToken cancellationToken)
     {
-        EmailConfigResponseModel res = new();
+        TResponseModel<EmailConfigModel> res = new();
         using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         string _emailConfig = _context.GetStoredParameter(nameof(EmailConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_emailConfig))
@@ -68,7 +68,7 @@ public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> 
             return res;
         }
 
-        res.Conf = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig) ?? new();
+        res.Response = JsonConvert.DeserializeObject<EmailConfigModel>(_emailConfig) ?? new();
 
         return res;
     }
@@ -86,9 +86,9 @@ public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> 
     }
 
     /// <inheritdoc/>
-    public async Task<MqttConfigResponseModel> GetMqttConfig(CancellationToken cancellationToken)
+    public async Task<TResponseModel<MqttConfigModel>> GetMqttConfig(CancellationToken cancellationToken)
     {
-        MqttConfigResponseModel res = new();
+        TResponseModel<MqttConfigModel> res = new();
         using ParametersContext _context = await DbFactory.CreateDbContextAsync(cancellationToken);
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
         if (string.IsNullOrWhiteSpace(_mqttConfig))
@@ -96,7 +96,7 @@ public class ParametersStorageLocalService(IDbContextFactory<ParametersContext> 
             res.AddWarning("MQTT не настроен");
             return res;
         }
-        res.Conf = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig);
+        res.Response = JsonConvert.DeserializeObject<MqttConfigModel>(_mqttConfig);
         return res;
     }
     #endregion

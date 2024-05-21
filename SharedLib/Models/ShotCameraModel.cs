@@ -7,6 +7,11 @@ namespace SharedLib;
 /// <summary>
 /// Снимок с камеры
 /// </summary>
-/// <param name="Data">Данные фото</param>
-/// <param name="Format">Расширение</param>
-public record struct ShotCameraModel(byte[] Data, string Format);
+public class ShotCameraModel(byte[] data, string format)
+{
+    /// <inheritdoc/>
+    public byte[] Data { get; set; } = data;
+
+    /// <inheritdoc/>
+    public string Format { get; set; } = format;
+}

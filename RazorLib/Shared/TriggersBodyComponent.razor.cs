@@ -18,10 +18,10 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
     public required IScriptsService ScriptsService { get; set; }
 
     /// <summary>
-    /// Hardwares service
+    /// Hardwires service
     /// </summary>
     [Inject]
-    public required IHardwaresService HardwaresService { get; set; }
+    public required IHardwiresService HardwiresService { get; set; }
 
     /// <summary>
     /// Triggers service
@@ -42,9 +42,9 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
     public required ISnackbar SnackBar { get; set; }
 
     /// <summary>
-    /// Entries tree hardwares
+    /// Entries tree hardwires
     /// </summary>
-    public EntryNestedModel[] EntriesTreeHW { get; set; } = [];
+    public List<EntryNestedModel> EntriesTreeHW { get; set; } = [];
 
     ConditionsComponent? conditions_ref;
 
@@ -133,43 +133,43 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
     {
         IsBusyProgress = true;
 
-        ScriptsResponseModel rest_all_scripts = await ScriptsService.ScriptsGetAll(CancellationToken);
+        TResponseModel<List<ScriptModelDB>> rest_all_scripts = await ScriptsService.ScriptsGetAll(CancellationToken);
         SnackBar.ShowMessagesResponse(rest_all_scripts.Messages);
         if (!rest_all_scripts.IsSuccess)
             return;
 
-        if (rest_all_scripts.Scripts is null)
+        if (rest_all_scripts.Response is null)
         {
             SnackBar.Add("rest_all_scripts.Scripts is null ошибка {5B557F50-0F44-40CD-A5B4-10A58F78D701}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
-        Scripts = rest_all_scripts.Scripts;
+        Scripts = rest_all_scripts.Response;
 
-        TriggersResponseModel rest_all_triggers = await TriggersService.TriggersGetAll(CancellationToken);
+        TResponseModel<List<TrigerModelDB>> rest_all_triggers = await TriggersService.TriggersGetAll(CancellationToken);
         SnackBar.ShowMessagesResponse(rest_all_triggers.Messages);
         if (!rest_all_triggers.IsSuccess)
             return;
 
-        if (rest_all_triggers.Triggers is null)
+        if (rest_all_triggers.Response is null)
         {
             SnackBar.Add("rest_all_triggers.Triggers is null ошибка {4334BFB1-481E-460D-9E21-B8782DEA3DCA}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
-        Triggers = new(rest_all_triggers.Triggers.OrderBy(x => x.Name));
-        if (Triggers.Any())
+        Triggers = new(rest_all_triggers.Response.OrderBy(x => x.Name));
+        if (Triggers.Count != 0)
             _curTrig = Triggers.First();
 
-        EntriesNestedResponseModel rest_hw_tree = await HardwaresService.HardwaresGetTreeNestedEntries(CancellationToken);
+        TResponseModel<List<EntryNestedModel>> rest_hw_tree = await HardwiresService.HardwiresGetTreeNestedEntries(CancellationToken);
         SnackBar.ShowMessagesResponse(rest_hw_tree.Messages);
         if (!rest_hw_tree.IsSuccess)
             return;
 
-        if (rest_hw_tree.Entries is null)
+        if (rest_hw_tree.Response is null)
         {
             SnackBar.Add("rest_hw_tree.Entries is null ошибка {7A0F6B2C-8286-4CB5-84AB-7F954831FE94}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
-        EntriesTreeHW = rest_hw_tree.Entries;
+        EntriesTreeHW = rest_hw_tree.Response;
 
         trigger_name_orign = _curTrig.Name;
         trigger_desc_orign = _curTrig.Description ?? "";
@@ -225,7 +225,7 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
         IsBusyProgress = true;
         if (CurrentTrigger.Id > 0)
         {
-            TriggersResponseModel rest = await TriggersService.TriggerDelete(CurrentTrigger.Id, CancellationToken);
+            TResponseModel<List<TrigerModelDB>> rest = await TriggersService.TriggerDelete(CurrentTrigger.Id, CancellationToken);
             SnackBar.ShowMessagesResponse(rest.Messages);
             if (!rest.IsSuccess)
                 return;
@@ -245,19 +245,19 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
     async Task SaveTriggerHandle()
     {
         IsBusyProgress = true;
-        TriggersResponseModel rest = await TriggersService.TriggerUpdateOrCreate(CurrentTrigger, CancellationToken);
+        TResponseModel<List<TrigerModelDB>> rest = await TriggersService.TriggerUpdateOrCreate(CurrentTrigger, CancellationToken);
         IsBusyProgress = false;
         SnackBar.ShowMessagesResponse(rest.Messages);
         if (!rest.IsSuccess)
             return;
 
-        if (rest.Triggers is null)
+        if (rest.Response is null)
         {
             SnackBar.Add("rest.Triggers is null. error {F73EA570-0594-41B1-A2E0-7CEB33B07370}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
-        TrigerModelDB src = rest.Triggers.First(x => x.Name == CurrentTrigger.Name);
+        TrigerModelDB src = rest.Response.First(x => x.Name == CurrentTrigger.Name);
         _curTrig.Id = src.Id;
         _curTrig.Name = src.Name;
         _curTrig.Description = src.Description;
@@ -270,12 +270,12 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
         trigger_script = src.ScriptId;
         ResetFormToOrignState();
 
-        int[] rows_for_del = Triggers.Where(x => x.Id > 0 && !rest.Triggers.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
+        int[] rows_for_del = Triggers.Where(x => x.Id > 0 && !rest.Response.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
         while (Triggers.Any(x => rows_for_del.Contains(x.Id)))
         {
             Triggers.RemoveAt(Triggers.FindIndex(x => rows_for_del.Contains(x.Id)));
         }
-        TrigerModelDB[] rows_for_add = rest.Triggers.Where(x => x.Id != src.Id && !Triggers.Any(y => y.Id == x.Id)).ToArray();
+        TrigerModelDB[] rows_for_add = rest.Response.Where(x => x.Id != src.Id && !Triggers.Any(y => y.Id == x.Id)).ToArray();
         if (rows_for_add.Length != 0)
         {
             Triggers.AddRange(rows_for_add);

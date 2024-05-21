@@ -73,12 +73,12 @@ public partial class ScriptsBodyComponent : BlazorBusyComponentBaseModel
         if (CurrentScript.Id > 0)
         {
             IsBusyProgress = true;
-            ScriptsResponseModel rest = await ScriptsService.ScriptDelete(CurrentScript.Id, CancellationToken);
+            TResponseModel<List<ScriptModelDB>> rest = await ScriptsService.ScriptDelete(CurrentScript.Id, CancellationToken);
             Snackbar.ShowMessagesResponse(rest.Messages);
             if (!rest.IsSuccess)
                 return;
 
-            if (rest.Scripts is null)
+            if (rest.Response is null)
             {
                 msg = $"rest.Content is null error {{0D331AB6-20AE-43DB-8078-12B13EEAB3B0}}";
                 Logger.LogError(msg);
@@ -108,7 +108,7 @@ public partial class ScriptsBodyComponent : BlazorBusyComponentBaseModel
     void ResetFormState(ResetFormModesEnum mode)
     {
         script_init_del = false;
-        if (mode == ResetFormModesEnum.EditToOrign)
+        if (mode == ResetFormModesEnum.EditToOrigin)
         {
             script_name_orign = CurrentScript.Name;
             script_desc_orign = CurrentScript.Description;
@@ -124,22 +124,22 @@ public partial class ScriptsBodyComponent : BlazorBusyComponentBaseModel
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        ScriptsResponseModel res = await ScriptsService.ScriptsGetAll(CancellationToken);
+        TResponseModel<List<ScriptModelDB>> res = await ScriptsService.ScriptsGetAll(CancellationToken);
         Snackbar.ShowMessagesResponse(res.Messages);
         if (!res.IsSuccess)
             return;
 
-        if (res.Scripts is null)
+        if (res.Response is null)
         {
             Snackbar.Add("res.Content?.Scripts is null ошибка {EB6B7427-DB32-4B76-8F85-D4B10E5B2488}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
-        ScriptsAll = res.Scripts;
+        ScriptsAll = res.Response;
 
         if (ScriptsAll.Count != 0)
             CurrentScript = ScriptsAll.First();
 
-        ResetFormState(ResetFormModesEnum.EditToOrign);
+        ResetFormState(ResetFormModesEnum.EditToOrigin);
         IsBusyProgress = false;
     }
 
@@ -164,29 +164,29 @@ public partial class ScriptsBodyComponent : BlazorBusyComponentBaseModel
     async Task SaveScriptHandle()
     {
         IsBusyProgress = true;
-        ScriptsResponseModel rest = await ScriptsService.ScriptUpdateOrCreate(new EntryDescriptionModel() { Id = CurrentScript.Id, Name = CurrentScript.Name, Description = CurrentScript.Description }, CancellationToken);
+        TResponseModel<List<ScriptModelDB>> rest = await ScriptsService.ScriptUpdateOrCreate(new EntryDescriptionModel() { Id = CurrentScript.Id, Name = CurrentScript.Name, Description = CurrentScript.Description }, CancellationToken);
         Snackbar.ShowMessagesResponse(rest.Messages);
         if (!rest.IsSuccess)
             return;
 
-        if (rest.Scripts is null)
+        if (rest.Response is null)
         {
             Snackbar.Add("rest.Content?.Scripts is null ошибка {093F4C03-E89C-40F9-931D-EDB389FF56A6}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
-        ScriptModelDB src = rest.Scripts.First(x => x.Name == CurrentScript.Name);
+        ScriptModelDB src = rest.Response.First(x => x.Name == CurrentScript.Name);
         CurrentScript.Id = src.Id;
         CurrentScript.Name = src.Name;
         CurrentScript.Description = src.Description;
-        ResetFormState(ResetFormModesEnum.EditToOrign);
+        ResetFormState(ResetFormModesEnum.EditToOrigin);
 
-        int[] rows_for_del = ScriptsAll.Where(x => x.Id > 0 && !rest.Scripts.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
+        int[] rows_for_del = ScriptsAll.Where(x => x.Id > 0 && !rest.Response.Any(y => y.Id == x.Id)).Select(x => x.Id).Distinct().ToArray();
         while (ScriptsAll.Any(x => rows_for_del.Contains(x.Id)))
         {
             ScriptsAll.RemoveAt(ScriptsAll.FindIndex(x => rows_for_del.Contains(x.Id)));
         }
-        ScriptModelDB[] rows_for_add = rest.Scripts.Where(x => x.Id != src.Id && !ScriptsAll.Any(y => y.Id == x.Id)).ToArray();
+        ScriptModelDB[] rows_for_add = rest.Response.Where(x => x.Id != src.Id && !ScriptsAll.Any(y => y.Id == x.Id)).ToArray();
         if (rows_for_add.Length != 0)
         {
             ScriptsAll.AddRange(rows_for_add);

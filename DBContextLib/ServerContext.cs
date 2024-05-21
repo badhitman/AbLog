@@ -17,7 +17,9 @@ public class ServerContext : DbContext
     /// Атрибут блокировки (для lock {}).
     /// В частности SQLite на слабом Android железе иногда не поспевала записывать данные
     /// </summary>
+#pragma warning disable CA2211 // Поля, не являющиеся константами, не должны быть видимыми
     public static object DbLocker = new();
+#pragma warning restore CA2211 // Поля, не являющиеся константами, не должны быть видимыми
 
     /// <summary>
     /// Magic string.
@@ -29,7 +31,7 @@ public class ServerContext : DbContext
     /// <summary>
     /// Управляющие блоки (устройства)
     /// </summary>
-    public DbSet<HardwareModelDB> Hardwares { get; set; }
+    public DbSet<HardwareModelDB> Hardwires { get; set; }
 
     /// <summary>
     /// Порты устройства
@@ -52,7 +54,7 @@ public class ServerContext : DbContext
     public DbSet<TaskModelDB> Tasks { get; set; }
 
     /// <summary>
-    /// Отчёты выполнния этапов задач скриптов
+    /// Отчёты выполнения этапов задач скриптов
     /// </summary>
     public DbSet<ReportModelDB> Reports { get; set; }
 
@@ -62,14 +64,14 @@ public class ServerContext : DbContext
     public DbSet<CommandConditionModelDB> ConditionsCommands { get; set; }
 
     /// <summary>
-    /// Условия/причины запуска тригеров
+    /// Условия/причины запуска триггеров
     /// </summary>
     public DbSet<TrigerConditionModelDB> TrigersConditions { get; set; }
 
     /// <summary>
-    /// Тригеры/события запуска скриптов
+    /// Триггеры/события запуска скриптов
     /// </summary>
-    public DbSet<TrigerModelDB> Trigers { get; set; }
+    public DbSet<TrigerModelDB> Triggers { get; set; }
 
     /// <summary>
     /// Конкуренция (взаимоблокировка выполнения скриптов)
@@ -211,10 +213,10 @@ public class ServerContext : DbContext
     /// </summary>
     public void DemoSeed()
     {
-        if (!Hardwares.Any() && !Ports.Any())
+        if (!Hardwires.Any() && !Ports.Any())
         {
-            Hardwares.Add(new HardwareModelDB { Name = "DEMO 2", Address = "192.168.2.114", Password = "sec", AlarmSubscriber = true, CommandsAllowed = true });
-            Hardwares.Add(new HardwareModelDB { Name = "DEMO 1", Address = "192.168.0.14", Password = "sec", AlarmSubscriber = false, CommandsAllowed = true });
+            Hardwires.Add(new HardwareModelDB { Name = "DEMO 2", Address = "192.168.2.114", Password = "sec", AlarmSubscriber = true, CommandsAllowed = true });
+            Hardwires.Add(new HardwareModelDB { Name = "DEMO 1", Address = "192.168.0.14", Password = "sec", AlarmSubscriber = false, CommandsAllowed = true });
             SaveChanges();
 
             for (uint i = 1; i <= 38; i++)
@@ -236,8 +238,8 @@ public class ServerContext : DbContext
 
             Contentions.Add(new ContentionsModelDB() { MasterScriptId = 1, SlaveScriptId = 2 });
 
-            Commands.Add(new CommandModelDB { Name = "Выключить уличный свет", Sorting = 0, CommandType = TypesCommandsEnum.Controller, ScriptId = 1, Execution = 2, ExecutionParametr = "15:0;10:0", Hidden = true });
-            Commands.Add(new CommandModelDB { Name = "Включить полив", Sorting = 1, CommandType = TypesCommandsEnum.Port, ScriptId = 1, Execution = 30, ExecutionParametr = "on" });
+            Commands.Add(new CommandModelDB { Name = "Выключить уличный свет", Sorting = 0, CommandType = TypesCommandsEnum.Controller, ScriptId = 1, Execution = 2, ExecutionParameter = "15:0;10:0", Hidden = true });
+            Commands.Add(new CommandModelDB { Name = "Включить полив", Sorting = 1, CommandType = TypesCommandsEnum.Port, ScriptId = 1, Execution = 30, ExecutionParameter = "on" });
             SaveChanges();
 
             ConditionsCommands.Add(new CommandConditionModelDB() { OwnerId = 1, Name = "condition #1", HardwareId = 1, PortId = 1 });

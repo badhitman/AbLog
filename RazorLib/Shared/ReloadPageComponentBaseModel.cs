@@ -4,7 +4,7 @@
 
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using RazorLib.Shared.hardwares;
+using RazorLib.Shared.hardwires;
 using SharedLib;
 
 namespace RazorLib;
@@ -16,7 +16,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
 {
     /// <inheritdoc/>
     [Inject]
-    public required IHardwaresService Hardwares { get; set; }
+    public required IHardwiresService Hardwires { get; set; }
 
     /// <inheritdoc/>
     [Inject]
@@ -31,7 +31,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
     public required string PagePath { get; set; }
 
     /// <inheritdoc/>
-    protected HardwaresNavPillsComponent? refHtmlRoot;
+    protected HardwiresNavPillsComponent? refHtmlRoot;
 
     /// <inheritdoc/>
     protected string? HtmlSource;
@@ -54,7 +54,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
         IsUpdated = false;
         IsBusyProgress = true;
         StateHasChanged();
-        HttpResponseModel rest = await Hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = PagePath });
+        HttpResponseModel rest = await Hardwires.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = PagePath });
 
         if (!rest.IsSuccess)
         {
@@ -64,7 +64,7 @@ public abstract class ReloadPageComponentBaseModel : BlazorBusyComponentBaseMode
             return;
         }
 
-        HtmlSource = rest.TextPayload;
+        HtmlSource = rest.Response;
         IsBusyProgress = false;
         StateHasChanged();
         if (!IsUpdated && refHtmlRoot?.refHtmlRoot is not null)

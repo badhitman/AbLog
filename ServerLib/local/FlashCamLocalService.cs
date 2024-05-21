@@ -26,22 +26,22 @@ public class FlashCamLocalService(ILogger<FlashCamLocalService> logger) : ICamer
     }
 
     /// <inheritdoc/>
-    public async Task<ShotCameraAsBase64ResponseModel> TakeOneShotAsBase64Async(int? index_camera, string? characteristic)
+    public async Task<TResponseModel<ShotCameraAsBase64Model>> TakeOneShotAsBase64Async(int? index_camera, string? characteristic)
     {
-        ShotCameraAsBase64ResponseModel res = new();
+        TResponseModel<ShotCameraAsBase64Model> res = new();
 
-        ShotCameraResponseModel cam_photo = await TakeOneShotAsync(index_camera, characteristic);
+        TResponseModel<ShotCameraModel> cam_photo = await TakeOneShotAsync(index_camera, characteristic);
 
-        if (cam_photo.IsSuccess)
-            res.ShotCameraImage = new ShotCameraAsBase64Model(Convert.ToBase64String(cam_photo.ShotCameraImage.Data), cam_photo.ShotCameraImage.Format);
+        if (cam_photo.IsSuccess && cam_photo.Response is not null)
+            res.Response = new ShotCameraAsBase64Model(Convert.ToBase64String(cam_photo.Response.Data), cam_photo.Response.Format);
 
         return res;
     }
 
     /// <inheritdoc/>
-    public async Task<ShotCameraResponseModel> TakeOneShotAsync(int? index_camera, string? characteristic)
+    public async Task<TResponseModel<ShotCameraModel>> TakeOneShotAsync(int? index_camera, string? characteristic)
     {
-        ShotCameraResponseModel res = new();
+        TResponseModel<ShotCameraModel> res = new();
         string msg;
         IEnumerable<CaptureDeviceDescriptor> devices = new CaptureDevices().EnumerateDescriptors().ToArray();
         if (!devices.Any() || (index_camera is not null && index_camera + 1 > devices.Count()))
@@ -97,7 +97,7 @@ public class FlashCamLocalService(ILogger<FlashCamLocalService> logger) : ICamer
             _ => ".bmp",
         };
 
-        res.ShotCameraImage = new ShotCameraModel(image, extension);
+        res.Response = new ShotCameraModel(image, extension);
         return res;
     }
 }

@@ -17,14 +17,14 @@ public class CommandsController(ICommandsService commands) : ControllerBase
     /// Получить команды скрипта
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.ENTRIES}/{GlobalStatic.Routes.BY_OWNER}/{{script_id}}")]
-    public async Task<EntriesSortingResponseModel> GetCommandsEntriesByScript([FromRoute] int script_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<EntrySortingModel>>> GetCommandsEntriesByScript([FromRoute] int script_id, CancellationToken cancellation_token = default)
         => await commands.GetCommandsEntriesByScript(script_id, cancellation_token);
 
     /// <summary>
     /// Получить команду по идентификатору
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.GET}/{{command_id}}")]
-    public async Task<CommandResponseModel> CommandGet([FromRoute] int command_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<CommandModelDB>> CommandGet([FromRoute] int command_id, CancellationToken cancellation_token = default)
         => await commands.CommandGet(command_id, cancellation_token);
 
     /// <summary>
@@ -38,7 +38,7 @@ public class CommandsController(ICommandsService commands) : ControllerBase
     /// Установить индекс сортировки (упорядочивание)
     /// </summary>
     [HttpPut($"/{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.SORTING}")]
-    public async Task<EntriesSortingResponseModel> CommandSortingSet(IdsPairModel req, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<EntrySortingModel>>> CommandSortingSet(IdsPairModel req, CancellationToken cancellation_token = default)
         => await commands.CommandSortingSet(req, cancellation_token);
 
     /// <summary>

@@ -22,7 +22,7 @@ public interface IToolsService
     /// <summary>
     /// Получить статус MQTT службы
     /// </summary>
-    public Task<BoolResponseModel> StatusMqtt();
+    public Task<TResponseModel<bool>> StatusMqtt();
 
     /// <summary>
     /// Проверить подключение MQTT

@@ -24,7 +24,7 @@ public class MessageThemeModel(string id, string text_message, ThemeModel css_th
     public string Text { get; set; } = text_message;
 
     /// <summary>
-    /// Дата/вфремя создания
+    /// Дата/время создания
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

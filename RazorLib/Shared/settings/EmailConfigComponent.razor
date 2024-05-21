@@ -125,17 +125,17 @@
     protected override async Task OnInitializedAsync()
     {
         IsBusyProgress = true;
-        EmailConfigResponseModel rest = await _storage.GetEmailConfig(this.CancellationToken);
+        TResponseModel<EmailConfigModel> rest = await _storage.GetEmailConfig(this.CancellationToken);
 
         _snackbar.ShowMessagesResponse(rest.Messages);
 
-        if (!rest.IsSuccess || rest.Conf is null)
+        if (!rest.IsSuccess || rest.Response is null)
         {
             IsBusyProgress = false;
             return;
         }
 
-        connect_config_orign = rest.Conf;
+        connect_config_orign = rest.Response;
         connect_config = GlobalStatic.CreateDeepCopy(connect_config_orign);
         IsBusyProgress = false;
     }

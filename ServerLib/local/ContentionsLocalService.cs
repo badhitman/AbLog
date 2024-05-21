@@ -14,9 +14,9 @@ namespace ServerLib;
 public class ContentionsLocalService(IDbContextFactory<ServerContext> DbFactory) : IContentionsService
 {
     /// <inheritdoc/>
-    public async Task<IdsResponseModel> ContentionSet(ContentionUpdateModel contention_json, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<int>>> ContentionSet(ContentionUpdateModel contention_json, CancellationToken cancellation_token = default)
     {
-        IdsResponseModel res_ids = new();
+        TResponseModel<List<int>> res_ids = new();
         if (contention_json is null)
         {
             res_ids.AddError("Ошибка выполнения запроса: {B642799D-9335-4A62-855C-2949E5CA9B20}");
@@ -35,7 +35,7 @@ public class ContentionsLocalService(IDbContextFactory<ServerContext> DbFactory)
             if ((contention_json.IsSet && contain_slave) || (!contention_json.IsSet && !contain_slave))
             {
                 res_ids.AddInfo("Уже установлено");
-                res_ids.Ids = script_db!.Contentions.Select(x => x.Id).ToArray();
+                res_ids.Response = script_db!.Contentions.Select(x => x.Id).ToList();
                 return res_ids;
             }
 
@@ -49,16 +49,16 @@ public class ContentionsLocalService(IDbContextFactory<ServerContext> DbFactory)
             }
             db.SaveChanges();
             script_db = db.Scripts.Include(x => x.Contentions).FirstOrDefault(x => x.Id == contention_json.ScriptMasterId);
-            res_ids.Ids = script_db!.Contentions!.Select(x => x.SlaveScriptId).ToArray();
+            res_ids.Response = script_db!.Contentions!.Select(x => x.SlaveScriptId).ToList();
         }
 
         return res_ids;
     }
-    /// <inheritdoc/>
 
-    public async Task<IdsResponseModel> ContentionsGetByScript(int script_id, CancellationToken cancellation_token = default)
+    /// <inheritdoc/>
+    public async Task<TResponseModel<List<int>>> ContentionsGetByScript(int script_id, CancellationToken cancellation_token = default)
     {
-        IdsResponseModel res_ids = new();
+        TResponseModel<List<int>> res_ids = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
@@ -69,7 +69,7 @@ public class ContentionsLocalService(IDbContextFactory<ServerContext> DbFactory)
                 res_ids.AddError("Ошибка выполнения запроса: {2738D41C-CE83-4394-8669-EDFB13C82852}");
                 return res_ids;
             }
-            res_ids.Ids = script_db.Contentions.Select(x => x.SlaveScriptId).ToArray();
+            res_ids.Response = script_db.Contentions.Select(x => x.SlaveScriptId).ToList();
         }
 
         return res_ids;

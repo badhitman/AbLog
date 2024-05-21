@@ -14,15 +14,15 @@ namespace ServerLib;
 public class UsersLocalService(IDbContextFactory<ServerContext> DbFactory) : IUsersService
 {
     /// <inheritdoc/>
-    public Task<UserResponseModel> GetUser(long telegram_id, CancellationToken cancellation_token = default)
+    public Task<TResponseModel<UserModelDB>> GetUser(long telegram_id, CancellationToken cancellation_token = default)
     {
         using ServerContext db = DbFactory.CreateDbContext();
-        UserResponseModel res = new();
+        TResponseModel<UserModelDB> res = new();
         lock (ServerContext.DbLocker)
         {
-            res.User = db.Users.FirstOrDefault(x => x.TelegramId == telegram_id);
+            res.Response = db.Users.FirstOrDefault(x => x.TelegramId == telegram_id);
         }
-        if (res.User is null)
+        if (res.Response is null)
             res.AddError("User is null. error {E2204B76-5A95-4A49-B7CF-8B5216238FFE}");
 
         return Task.FromResult(res);

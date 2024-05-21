@@ -10,7 +10,7 @@ namespace SharedLib;
 public class HardwareHtmlPageModel
 {
     /// <summary>
-    /// Haedware ID
+    /// Hardware ID
     /// </summary>
     public int Id { get; set; }
 

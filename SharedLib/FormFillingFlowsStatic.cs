@@ -14,13 +14,13 @@ public static class FormFillingFlowsStatic
     /// </summary>
     public static readonly Dictionary<string, FormMetadataModel> FormFillingFlows = new()
     {
-        { nameof(MqttConfigModel), new("Настройки MQTT", MqttConfigFormPropertyes) }
+        { nameof(MqttConfigModel), new("Настройки MQTT", MatConfigFormProperties) }
     };
 
     /// <summary>
-    /// MQTT config form propertyes
+    /// MQTT config form properties
     /// </summary>
-    public static PropertyFormSet[] MqttConfigFormPropertyes =>
+    public static PropertyFormSet[] MatConfigFormProperties =>
     [
         new PropertyFormSet(nameof(MqttConfigModel.Server), "Адрес сервера MQTT"),
         new PropertyFormSet(nameof(MqttConfigModel.Port), "Порт сервера (обычно 8883)"),

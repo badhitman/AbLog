@@ -27,7 +27,7 @@ public class PortHtmlDomModel : HtmlDomModel
         Links.Clear();
         _port_id = port_id;
         if (!this.Any())
-            return "данные отсутсвуют. error {9EDCD529-B1F4-45F5-9405-60AA5C2FB30B}";
+            return "данные отсутствуют. error {9EDCD529-B1F4-45F5-9405-60AA5C2FB30B}";
 
         last_tag_name = "";
         string res = "";

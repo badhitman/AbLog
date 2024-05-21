@@ -17,7 +17,7 @@ public class PaginationResponseModel : PaginationRequestModel
     public int TotalRowsCount { get; set; }
 
     /// <summary>
-    /// Количесвто страниц пагинатора
+    /// Количество страниц пагинатора
     /// </summary>
     /// <param name="page_size"></param>
     /// <param name="total_rows_count"></param>

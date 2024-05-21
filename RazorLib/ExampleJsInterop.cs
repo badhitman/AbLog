@@ -14,15 +14,10 @@ namespace RazorLib
     // components for use.
 
 #pragma warning disable CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена
-    public class ExampleJsInterop : IAsyncDisposable
+    public class ExampleJsInterop(IJSRuntime jsRuntime) : IAsyncDisposable
     {
-        private readonly Lazy<Task<IJSObjectReference>> moduleTask;
-
-        public ExampleJsInterop(IJSRuntime jsRuntime)
-        {
-            moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+        private readonly Lazy<Task<IJSObjectReference>> moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/RazorLib/exampleJsInterop.js").AsTask());
-        }
 
         public async ValueTask<string> Prompt(string message)
         {
@@ -34,9 +29,10 @@ namespace RazorLib
         {
             if (moduleTask.IsValueCreated)
             {
-                var module = await moduleTask.Value;
+                IJSObjectReference module = await moduleTask.Value;
                 await module.DisposeAsync();
             }
+            GC.SuppressFinalize(this);
         }
     }
 #pragma warning restore CS1591 // Отсутствует комментарий XML для открытого видимого типа или члена

@@ -14,9 +14,9 @@ namespace ServerLib;
 public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) : IConditionsService
 {
     /// <inheritdoc/>
-    public async Task<ConditionsAnonimResponseModel> ConditionDelete(int condition_id, ConditionsTypesEnum condition_type, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ConditionAnonymModel>>> ConditionDelete(int condition_id, ConditionsTypesEnum condition_type, CancellationToken cancellation_token = default)
     {
-        ConditionsAnonimResponseModel res_ac = new();
+        TResponseModel<List<ConditionAnonymModel>> res_ac = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
@@ -41,10 +41,10 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
 
             db.SaveChanges();
 
-            res_ac.Conditions = condition_type switch
+            res_ac.Response = condition_type switch
             {
-                ConditionsTypesEnum.Command => db.ConditionsCommands.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonimModel() { Id = x.Id, Name = x.Name, Value = x.Value, СomparisonMode = x.СomparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId }).ToArray(),
-                ConditionsTypesEnum.Trigger => db.TrigersConditions.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonimModel() { Id = x.Id, Name = x.Name, Value = x.Value, СomparisonMode = x.СomparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId }).ToArray(),
+                ConditionsTypesEnum.Command => [.. db.ConditionsCommands.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonymModel() { Id = x.Id, Name = x.Name, Value = x.Value, ComparisonMode = x.ComparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId })],
+                ConditionsTypesEnum.Trigger => [.. db.TrigersConditions.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonymModel() { Id = x.Id, Name = x.Name, Value = x.Value, ComparisonMode = x.ComparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId })],
                 _ => throw new NotImplementedException()
             };
         }
@@ -53,16 +53,16 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
     }
 
     /// <inheritdoc/>
-    public async Task<ConditionsAnonimResponseModel> ConditionsGetByOwner(int owner_id, ConditionsTypesEnum condition_type, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ConditionAnonymModel>>> ConditionsGetByOwner(int owner_id, ConditionsTypesEnum condition_type, CancellationToken cancellation_token = default)
     {
-        ConditionsAnonimResponseModel res_ac = new();
+        TResponseModel<List<ConditionAnonymModel>> res_ac = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            res_ac.Conditions = condition_type switch
+            res_ac.Response = condition_type switch
             {
-                ConditionsTypesEnum.Command => db.ConditionsCommands.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonimModel() { Id = x.Id, Name = x.Name, Value = x.Value, СomparisonMode = x.СomparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId }).ToArray(),
-                ConditionsTypesEnum.Trigger => db.TrigersConditions.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonimModel() { Id = x.Id, Name = x.Name, Value = x.Value, СomparisonMode = x.СomparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId }).ToArray(),
+                ConditionsTypesEnum.Command => [.. db.ConditionsCommands.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonymModel() { Id = x.Id, Name = x.Name, Value = x.Value, ComparisonMode = x.ComparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId })],
+                ConditionsTypesEnum.Trigger => [.. db.TrigersConditions.Where(x => x.OwnerId == owner_id).Select(x => new ConditionAnonymModel() { Id = x.Id, Name = x.Name, Value = x.Value, ComparisonMode = x.ComparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId })],
                 _ => throw new NotImplementedException()
             };
         }
@@ -70,9 +70,9 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
     }
 
     /// <inheritdoc/>
-    public async Task<ConditionsAnonimResponseModel> ConditionUpdateOrCreate(ConditionUpdateModel condition_request, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ConditionAnonymModel>>> ConditionUpdateOrCreate(ConditionUpdateModel condition_request, CancellationToken cancellation_token = default)
     {
-        ConditionsAnonimResponseModel res_ac = new();
+        TResponseModel<List<ConditionAnonymModel>> res_ac = new();
         if (condition_request is null)
         {
             res_ac.AddError("Ошибка выполнения запроса: {A6A02232-9F35-4BA3-AF50-D8767A5C2FC9}");
@@ -80,14 +80,14 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
         }
         ResponseBaseModel check = condition_request.ValidateCondition;
         if (!check.IsSuccess)
-            return (ConditionsAnonimResponseModel)check;
+            return (TResponseModel<List<ConditionAnonymModel>>)check;
 
         if (string.IsNullOrWhiteSpace(condition_request.Name))
         {
             res_ac.AddWarning($"Для элемента{(condition_request.Id > 0 ? $" #{condition_request.Id}" : "")} не указано имя (");
         }
 
-        if (condition_request.ConditionValueType == СomparisonsValuesTypesEnum.ValueAsDecimal && (condition_request.СomparisonMode == СomparisonsModesEnum.Equal || condition_request.СomparisonMode == СomparisonsModesEnum.NotEqual))
+        if (condition_request.ConditionValueType == СomparisonsValuesTypesEnum.ValueAsDecimal && (condition_request.ComparisonMode == СomparisonsModesEnum.Equal || condition_request.ComparisonMode == СomparisonsModesEnum.NotEqual))
         {
             res_ac.AddInfo($"Для элемента{(condition_request.Id > 0 ? $" #{condition_request.Id}" : "")} установлено строгое числовое соответсвие. Попадание в такое условие маловероятно!");
         }
@@ -147,10 +147,10 @@ public class ConditionsLocalService(IDbContextFactory<ServerContext> DbFactory) 
             }
             db.SaveChanges();
 
-            res_ac.Conditions = condition_request.ConditionType switch
+            res_ac.Response = condition_request.ConditionType switch
             {
-                ConditionsTypesEnum.Command => db.ConditionsCommands.Where(x => x.OwnerId == condition_request.OwnerId).Select(x => new ConditionAnonimModel() { Id = x.Id, Name = x.Name, Value = x.Value, СomparisonMode = x.СomparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId }).ToArray(),
-                ConditionsTypesEnum.Trigger => db.TrigersConditions.Where(x => x.OwnerId == condition_request.OwnerId).Select(x => new ConditionAnonimModel() { Id = x.Id, Name = x.Name, Value = x.Value, СomparisonMode = x.СomparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId }).ToArray(),
+                ConditionsTypesEnum.Command => [.. db.ConditionsCommands.Where(x => x.OwnerId == condition_request.OwnerId).Select(x => new ConditionAnonymModel() { Id = x.Id, Name = x.Name, Value = x.Value, ComparisonMode = x.ComparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId })],
+                ConditionsTypesEnum.Trigger => [.. db.TrigersConditions.Where(x => x.OwnerId == condition_request.OwnerId).Select(x => new ConditionAnonymModel() { Id = x.Id, Name = x.Name, Value = x.Value, ComparisonMode = x.ComparisonMode, ConditionValueType = x.ConditionValueType, HardwareId = x.HardwareId, PortId = x.PortId })],
                 _ => throw new NotImplementedException()
             };
         }

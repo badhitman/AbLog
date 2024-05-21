@@ -4,7 +4,7 @@
 @using MudBlazor;
 
 @inject ILogger<FormEditCommandComponent> _loger
-@inject IHardwaresService HardwaresService
+@inject IHardwiresService HardwiresService
 @inject ICommandsService CommandsService
 @inject ISnackbar _snackbar
 
@@ -21,7 +21,7 @@
                 <CustomInputTextComponent @bind-Value="CurrentCommand.Name" class="form-control" id="exampleInputTitle" aria-describedby="nameHelp" />
             </div>
         </div>
-        <div class="col-auto" title="Ппауза перед выполнением команды">
+        <div class="col-auto" title="Пауза перед выполнением команды">
             <div class="input-group">
                 <span class="input-group-text">Задержка:</span>
                 <input @bind="CurrentCommand.PauseSecondsBeforeExecution" type="number" min="1" class="form-control" aria-label="Amount (to the nearest dollar)">
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <MainSelectorCommandComponent AllCsripts="AllCsripts" RootSelectorHandler="MainSelectorHandler" @ref="action_selector_ref" CurrentCommand="CurrentCommand" EntriesTreeHW="EntriesTreeHW" />
+    <MainSelectorCommandComponent AllScripts="AllScripts" RootSelectorHandler="MainSelectorHandler" @ref="action_selector_ref" CurrentCommand="CurrentCommand" EntriesTreeHW="EntriesTreeHW" />
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
         <div class="btn-group btn-group-sm" role="group" aria-label="...">
@@ -69,11 +69,11 @@
     public int ScriptId { get; set; }
 
     [Parameter, EditorRequired]
-    public required IEnumerable<ScriptModelDB> AllCsripts { get; set; }
+    public required IEnumerable<ScriptModelDB> AllScripts { get; set; }
 
-    EntryNestedModel[] EntriesTreeHW { get; set; } = Array.Empty<EntryNestedModel>();
+    IEnumerable<EntryNestedModel> EntriesTreeHW { get; set; } = [];
 
-    EditCommandViewModel EditCommandOrign = new();
+    EditCommandViewModel EditCommandOrigin = new();
     CommandModelDB CurrentCommand = new();
     //
     EditForm? form_ref;
@@ -82,13 +82,13 @@
 
     private string ModalBodyText { get; set; } = string.Empty;
 
-    bool CanSaveCommand => EditCommandOrign != CurrentCommand || CurrentCommand.Id < 1;
+    bool CanSaveCommand => EditCommandOrigin != CurrentCommand || CurrentCommand.Id < 1;
 
     void MainSelectorHandler(CommandModelDB sender)
     {
         CurrentCommand.CommandType = sender.CommandType;
         CurrentCommand.Execution = sender.Execution;
-        CurrentCommand.ExecutionParametr = sender.ExecutionParametr;
+        CurrentCommand.ExecutionParameter = sender.ExecutionParameter;
         CurrentCommand.Sorting = sender.Sorting;
         StateHasChanged();
     }
@@ -98,16 +98,16 @@
         CurrentCommand.Id = CommandEntry.Id;
         CurrentCommand.Name = CommandEntry.Name;
 
-        EntriesNestedResponseModel rest = await HardwaresService.HardwaresGetTreeNestedEntries(CancellationToken);
+        TResponseModel<List<EntryNestedModel>> rest = await HardwiresService.HardwiresGetTreeNestedEntries(CancellationToken);
         string msg;
-        if (rest.Entries is null)
+        if (rest.Response is null)
         {
             msg = "rest.Entries is null. error {B28F5A75-4265-446E-A0D2-AC1A08FBCB2D}";
             _loger.LogError(msg);
             _snackbar.Add(msg, Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
-        EntriesTreeHW = rest.Entries;
+        EntriesTreeHW = rest.Response;
 
         if (CommandEntry.Id > 0)
             await Rest();
@@ -124,45 +124,45 @@
         }
     }
 
-    async Task Rest(bool upd_satte = false)
+    async Task Rest(bool upd_state = false)
     {
-        CommandResponseModel rest = await CommandsService.CommandGet(CommandEntry.Id, CancellationToken);
+        TResponseModel<CommandModelDB> rest = await CommandsService.CommandGet(CommandEntry.Id, CancellationToken);
         _snackbar.ShowMessagesResponse(rest.Messages);
         if (rest.IsSuccess != true)
             return;
 
         string msg = "rest.Command is null. error {FC7B35DD-B70B-45D9-9BF8-104D9B60DE5E}";
-        if (rest.Command is null)
+        if (rest.Response is null)
         {
             _loger.LogError(msg);
             _snackbar.Add(msg, Severity.Error, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
-        CurrentCommand = rest.Command;
+        CurrentCommand = rest.Response;
         CurrentCommand.ScriptId = ScriptId;
-        EditCommandOrign = (EditCommandViewModel)CurrentCommand;
-        if (upd_satte)
+        EditCommandOrigin = (EditCommandViewModel)CurrentCommand;
+        if (upd_state)
             StateHasChanged();
     }
 
-    void CancelCommandHandle() => CurrentCommand = (CommandModelDB)EditCommandOrign;
+    void CancelCommandHandle() => CurrentCommand = (CommandModelDB)EditCommandOrigin;
 
     async Task SaveCommandHandle()
     {
         CurrentCommand.ScriptId = ScriptId;
         CurrentCommand.Sorting = CommandSorting;
-        EditCommandOrign.Id = CurrentCommand.Id;
-        EditCommandOrign.Name = CurrentCommand.Name;
-        EditCommandOrign.Hidden = CurrentCommand.Hidden;
-        EditCommandOrign.PauseSecondsBeforeExecution = CurrentCommand.PauseSecondsBeforeExecution;
+        EditCommandOrigin.Id = CurrentCommand.Id;
+        EditCommandOrigin.Name = CurrentCommand.Name;
+        EditCommandOrigin.Hidden = CurrentCommand.Hidden;
+        EditCommandOrigin.PauseSecondsBeforeExecution = CurrentCommand.PauseSecondsBeforeExecution;
 
         ResponseBaseModel rest = await CommandsService.CommandUpdateOrCreate(CurrentCommand, CancellationToken);
         _snackbar.ShowMessagesResponse(rest.Messages);
         if (rest.IsSuccess != true)
             return;
 
-        CurrentCommand = (CommandModelDB)EditCommandOrign;
+        CurrentCommand = (CommandModelDB)EditCommandOrigin;
         UpdateCommand(CurrentCommand);
     }
 

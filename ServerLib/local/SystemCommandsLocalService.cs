@@ -37,14 +37,14 @@ public class SystemCommandsLocalService(IDbContextFactory<ServerContext> DbFacto
     }
 
     /// <inheritdoc/>
-    public Task<SystemCommandsResponseModel> CommandsGetAll(CancellationToken cancellation_token = default)
+    public Task<TResponseModel<List<SystemCommandModelDB>>> CommandsGetAll(CancellationToken cancellation_token = default)
     {
-        SystemCommandsResponseModel res = new();
+        TResponseModel<List<SystemCommandModelDB>> res = new();
         using ServerContext db = DbFactory.CreateDbContext();
 
         lock (ServerContext.DbLocker)
         {
-            res.SystemCommands = [.. db.SystemCommands];
+            res.Response = [.. db.SystemCommands];
         }
 
         return Task.FromResult(res);

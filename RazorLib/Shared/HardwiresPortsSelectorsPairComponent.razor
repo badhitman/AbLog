@@ -1,0 +1,70 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inject ISnackbar _snackbar
+
+<select @bind="SelectedHW" aria-label="hw" class="form-select">
+    @foreach (EntryNestedModel item in TreeHardwires)
+    {
+        <option value="@(item.Id)">
+            @(item.Name)
+        </option>
+    }
+</select>
+<select @bind="SelectedPort" disabled="@(!Ports.Any())" aria-label="port" class="form-select">
+    @if (Ports.Any())
+    {
+        @foreach (EntryModel item in Ports)
+        {
+            <option value="@(item.Id)">
+                @(item.Name)
+            </option>
+        }
+    }
+    else
+    {
+        <option value="-1" disabled selected>Выбор...</option>
+    }
+</select>
+
+@code {
+    [Parameter, EditorRequired]
+    public required ConditionAnonymModel Condition { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IEnumerable<EntryNestedModel> TreeHardwires { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Action StateHasChangedCall { get; set; }
+
+    EntryModel[] Ports
+    {
+        get
+        {
+            if (Condition.HardwareId < 1 || !TreeHardwires.Any())
+                return Array.Empty<EntryModel>();
+
+            return TreeHardwires.First(x => x.Id == Condition.HardwareId).Childs;
+        }
+    }
+
+    int SelectedHW
+    {
+        get => Condition.HardwareId;
+        set
+        {
+            Condition.HardwareId = value;
+            SelectedPort = Ports.First().Id;
+        }
+    }
+
+    int SelectedPort
+    {
+        get => Condition.PortId;
+        set
+        {
+            Condition.PortId = value;
+            StateHasChangedCall();
+        }
+    }
+}

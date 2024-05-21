@@ -1,4 +1,4 @@
-﻿@using RazorLib.Shared.hardwares
+﻿@using RazorLib.Shared.hardwires
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
@@ -6,7 +6,7 @@
 
 @inherits BlazorBusyComponentBaseModel
 
-@inject IHardwaresService _hardwares
+@inject IHardwiresService _hardwires
 @inject ISnackbar Snackbar
 
 <CascadingValue Value="@FormContext">
@@ -76,7 +76,7 @@
             {
                 IsBusyProgress = true;
                 string path_query = string.Join("&", FormContext.DataContext.Select(x => $"{x.Key}={x.Value.ToString()}"));
-                HttpResponseModel rest = await _hardwares.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id.Value, Path = $"?{path_query}" });
+                HttpResponseModel rest = await _hardwires.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id.Value, Path = $"?{path_query}" });
                 if (!rest.IsSuccess)
                 {
                     Snackbar.ShowMessagesResponse(rest.Messages);
@@ -92,11 +92,5 @@
                 IsBusyProgress = false;
             }
         });
-
-        //if (ReloadPageHandle is not null)
-        //{
-        //    FormContext?.DataContext.Clear();
-        //    ReloadPageHandle();
-        //}
     }
 }

@@ -1,7 +1,7 @@
 ﻿@using MudBlazor;
 @using SharedLib
 
-@inject IHardwaresService _hardwares
+@inject IHardwiresService _hardwires
 @inject ISnackbar _snackbar
 
 <div class="col-auto">
@@ -28,7 +28,7 @@
 }
 else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
 {
-    <ControllerCmdComponent CurrentCommand="CurrentCommand" HandlerAction="ControllerActionHandler" @ref="CommdControllerRef" />
+    <ControllerCmdComponent CurrentCommand="CurrentCommand" HandlerAction="ControllerActionHandler" @ref="CommandControllerRef" />
 }
 
 @code {
@@ -36,7 +36,7 @@ else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
     /// Перечень доступных контролеров вместе со своими портами
     /// </summary>
     [Parameter, EditorRequired]
-    public required EntryNestedModel[] EntriesTreeHW { get; set; }
+    public required IEnumerable<EntryNestedModel> EntriesTreeHW { get; set; }
 
     [Parameter, EditorRequired]
     public required Action ControllerActionHandler { get; set; }
@@ -86,7 +86,7 @@ else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
     /// Ссылка на вью компонента ввода команды (низкоуровневая) контроллера.
     /// i: Актуальна в случае, если
     /// </summary>
-    public ControllerCmdComponent? CommdControllerRef { get; private set; }
+    public ControllerCmdComponent? CommandControllerRef { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,15 +109,15 @@ else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
 
     async Task RestByPortId(int port_id)
     {
-        PortHardwareResponseModel rest = await _hardwares.HardwarePortGet(port_id);
-        CurrentPort = rest.Port;
+        TResponseModel<PortHardwareModel> rest = await _hardwires.HardwarePortGet(port_id);
+        CurrentPort = rest.Response;
         CurrentController = CurrentPort?.Hardware;
         await RestByControllerId(CurrentController!.Id);
     }
 
     async Task RestByControllerId(int controller_id)
     {
-        HardwareResponseModel rest = await _hardwares.HardwareGet(controller_id);
-        CurrentController = rest.Hardware;
+        TResponseModel<HardwareBaseModel> rest = await _hardwires.HardwareGet(controller_id);
+        CurrentController = rest.Response;
     }
 }

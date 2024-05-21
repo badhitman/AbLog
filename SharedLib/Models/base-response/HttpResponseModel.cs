@@ -9,7 +9,7 @@ namespace SharedLib;
 /// <summary>
 /// Ответ/результат на HTTP запрос
 /// </summary>
-public class HttpResponseModel : SimpleStringResponseModel
+public class HttpResponseModel : TResponseModel<string>
 {
     /// <inheritdoc/>
     public static HttpResponseModel Build(ResponseBaseModel responseBaseModel)
@@ -24,7 +24,7 @@ public class HttpResponseModel : SimpleStringResponseModel
     public override bool IsSuccess => base.IsSuccess && (int)StatusCode >= 200 && (int)StatusCode < 300;
 
     /// <summary>
-    /// HTTP Sattus code
+    /// HTTP Status code
     /// </summary>
     public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
 
@@ -34,7 +34,7 @@ public class HttpResponseModel : SimpleStringResponseModel
     public async Task<HtmlDomModel> GetDom()
     {
         HtmlDomModel res = [];
-        await res.Reload(TextPayload ?? "");
+        await res.Reload(Response ?? "");
         return res;
     }
 }

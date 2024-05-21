@@ -1,0 +1,40 @@
+﻿@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorBusyComponentBaseModel
+
+@inject IHardwiresService _hardwires
+@inject ISnackbar Snackbar
+
+<button @onclick="RequestPortStateSet" type="button" class="btn btn-primary">@BtnText</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public byte PortNum { get; set; }
+
+    [Parameter, EditorRequired]
+    public byte PortState { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string BtnText { get; set; }
+
+    [CascadingParameter, EditorRequired]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    public required Action ReloadPage { get; set; }
+
+    async Task RequestPortStateSet()
+    {
+        IsBusyProgress = true;
+        HttpResponseModel rest = await _hardwires.GetHardwareHtmlPage(new HardwareGetHttpRequestModel() { HardwareId = Id, Path = $"?cmd={PortNum}:{PortState}" });
+
+        Snackbar.ShowMessagesResponse(rest.Messages);
+        if (!rest.IsSuccess)
+            return;
+
+        Snackbar.Add($"cmd: {PortNum}:{PortState} > {rest.Response}", Severity.Info, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+        IsBusyProgress = false;
+        ReloadPage();
+    }
+}

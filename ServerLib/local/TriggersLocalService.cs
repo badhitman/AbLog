@@ -9,20 +9,20 @@ using SharedLib;
 namespace ServerLib;
 
 /// <summary>
-/// Тригеры событий
+/// Триггеры событий
 /// </summary>
 public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : ITriggersService
 {
     /// <inheritdoc/>
-    public async Task<TriggersResponseModel> TriggerDelete(int trigger_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<TrigerModelDB>>> TriggerDelete(int trigger_id, CancellationToken cancellation_token = default)
     {
-        TriggersResponseModel res_trigs = new();
+        TResponseModel<List<TrigerModelDB>> res_trigs = new();
 
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
 
-            TrigerModelDB? trigger_db = db.Trigers.FirstOrDefault(x => x.Id == trigger_id);
+            TrigerModelDB? trigger_db = db.Triggers.FirstOrDefault(x => x.Id == trigger_id);
 
             if (trigger_db is null)
             {
@@ -31,29 +31,29 @@ public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : 
             }
             db.Remove(trigger_db);
             db.SaveChanges();
-            res_trigs.Triggers = [.. db.Trigers];
+            res_trigs.Response = [.. db.Triggers];
         }
 
         return res_trigs;
     }
 
     /// <inheritdoc/>
-    public async Task<TriggersResponseModel> TriggersGetAll(CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<TrigerModelDB>>> TriggersGetAll(CancellationToken cancellation_token = default)
     {
-        TriggersResponseModel res_trigs = new();
+        TResponseModel<List<TrigerModelDB>> res_trigs = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            res_trigs.Triggers = [.. db.Trigers];
+            res_trigs.Response = [.. db.Triggers];
         }
 
         return res_trigs;
     }
 
     /// <inheritdoc/>
-    public async Task<TriggersResponseModel> TriggerUpdateOrCreate(TrigerModelDB trigger_json, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<TrigerModelDB>>> TriggerUpdateOrCreate(TrigerModelDB trigger_json, CancellationToken cancellation_token = default)
     {
-        TriggersResponseModel res_trigs = new();
+        TResponseModel<List<TrigerModelDB>> res_trigs = new();
 
         if (trigger_json is null)
         {
@@ -74,7 +74,7 @@ public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : 
             {
                 TrigerModelDB? trigger_db = null;
 
-                trigger_db = db.Trigers.FirstOrDefault(x => x.Id == trigger_json.Id);
+                trigger_db = db.Triggers.FirstOrDefault(x => x.Id == trigger_json.Id);
                 if (trigger_db is null)
                 {
                     res_trigs.AddError("Ошибка выполнения запроса: {A7D8E5AF-2046-422E-ABB9-2E1C9288EFE2}");
@@ -83,13 +83,13 @@ public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : 
                 if (trigger_db.Name == trigger_json.Name && trigger_db.Description == trigger_json.Description && trigger_db.IsDisable == trigger_json.IsDisable && trigger_db.ScriptId == trigger_json.ScriptId)
                 {
                     res_trigs.AddInfo("Сохранение не требуется");
-                    res_trigs.Triggers = [.. db.Trigers];
+                    res_trigs.Response = [.. db.Triggers];
                     return res_trigs;
                 }
 
-                if (db.Trigers.Any(x => x.Name.Equals(trigger_json.Name, StringComparison.CurrentCultureIgnoreCase) && x.Id != trigger_db.Id))
+                if (db.Triggers.Any(x => x.Name.Equals(trigger_json.Name, StringComparison.CurrentCultureIgnoreCase) && x.Id != trigger_db.Id))
                 {
-                    res_trigs.AddError("Имя тригера не уникально. Задайте другое имя.");
+                    res_trigs.AddError("Имя триггера не уникально. Задайте другое имя.");
                     return res_trigs;
                 }
 
@@ -100,7 +100,7 @@ public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : 
 
                 db.Update(trigger_db);
                 db.SaveChanges();
-                res_trigs.AddSuccess($"Тригер #{trigger_db.Id} обновлён");
+                res_trigs.AddSuccess($"Триггер #{trigger_db.Id} обновлён");
             }
             else
             {
@@ -110,7 +110,7 @@ public class TriggersLocalService(IDbContextFactory<ServerContext> DbFactory) : 
                 res_trigs.AddSuccess("Тригер создан");
             }
 
-            res_trigs.Triggers = [.. db.Trigers];
+            res_trigs.Response = [.. db.Triggers];
         }
 
         return res_trigs;

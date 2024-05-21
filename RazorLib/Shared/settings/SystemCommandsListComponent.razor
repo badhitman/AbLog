@@ -223,7 +223,7 @@
     async Task UpdateCommandsList()
     {
         IsBusyProgress = true;
-        SystemCommandsResponseModel elements = await _comm.CommandsGetAll();
+        TResponseModel<List<SystemCommandModelDB>> elements = await _comm.CommandsGetAll();
         IsBusyProgress = false;
         Severity _style;
         foreach (ResultMessage m in elements.Messages)
@@ -238,9 +238,9 @@
             };
             Snackbar.Add(m.Text, _style, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         }
-        if (elements.SystemCommands is not null)
+        if (elements.Response is not null)
         {
-            SystemCommands = elements.SystemCommands;
+            SystemCommands = elements.Response;
         }
     }
 

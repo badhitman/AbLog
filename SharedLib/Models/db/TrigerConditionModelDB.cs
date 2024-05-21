@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SharedLib;
 
 /// <summary>
-/// Условие/повод запуска тригера
+/// Условие/повод запуска триггера
 /// </summary>
 [Index(nameof(OwnerId), nameof(HardwareId), nameof(PortId), IsUnique = true)]
 public class TrigerConditionModelDB : ConditionBaseModelDB
@@ -26,12 +26,12 @@ public class TrigerConditionModelDB : ConditionBaseModelDB
             Name = condition_request.Name,
             Value = condition_request.Value,
             ConditionValueType = condition_request.ConditionValueType,
-            СomparisonMode = condition_request.СomparisonMode
+            ComparisonMode = condition_request.ComparisonMode
         };
     }
 
     /// <summary>
-    /// Тригер запуска скрипта
+    /// Триггер запуска скрипта
     /// </summary>
     [JsonIgnore, ForeignKey(nameof(OwnerId))]
     public TrigerModelDB? Triger { get; set; }

@@ -30,7 +30,7 @@
     {
         get => CurrentCommand?.CommandType switch
         {
-            TypesCommandsEnum.Controller => CurrentCommand.ExecutionParametr,
+            TypesCommandsEnum.Controller => CurrentCommand.ExecutionParameter,
             _ => null
         };
 
@@ -39,8 +39,8 @@
             if (CurrentCommand is null)
                 return;
 
-            bool is_upd = CurrentCommand.ExecutionParametr != value;
-            CurrentCommand.ExecutionParametr = value;
+            bool is_upd = CurrentCommand.ExecutionParameter != value;
+            CurrentCommand.ExecutionParameter = value;
             if (is_upd)
                 HandlerAction();
         }

@@ -20,7 +20,7 @@ public class PortHardwareCheckRequestModel
     public uint PortNum { get; set; }
 
     /// <summary>
-    /// Создать порт в базе данных (если отсуствует)
+    /// Создать порт в базе данных (если отсутствует)
     /// </summary>
-    public bool CreatePortIfNoptExist { get; set; } = true;
+    public bool CreatePortIfNotExist { get; set; } = true;
 }

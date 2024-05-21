@@ -17,7 +17,7 @@ public class SystemController(ISystemCommandsService com_service) : ControllerBa
     /// Команды (все)
     /// </summary>
     [HttpGet($"{GlobalStatic.Routes.System}-{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.LIST}")]
-    public async Task<SystemCommandsResponseModel> CommandsGetAll(CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<SystemCommandModelDB>>> CommandsGetAll(CancellationToken cancellation_token = default)
         => await com_service.CommandsGetAll(cancellation_token);
 
     /// <summary>
@@ -38,6 +38,6 @@ public class SystemController(ISystemCommandsService com_service) : ControllerBa
     /// Обновить/создать системную команду
     /// </summary>
     [HttpPost($"{GlobalStatic.Routes.System}-{GlobalStatic.Routes.Commands}/{GlobalStatic.Routes.UPDATE}")]
-    public async Task<ResponseBaseModel> CommadndRun(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
+    public async Task<ResponseBaseModel> CommandRun(SystemCommandModelDB comm, CancellationToken cancellation_token = default)
         => await com_service.CommandUpdateOrCreate(comm, cancellation_token);
 }

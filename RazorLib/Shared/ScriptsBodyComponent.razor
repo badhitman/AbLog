@@ -40,7 +40,7 @@ else
                 <div class="list-group">
                     @foreach (ScriptModelDB script in ScriptsAll)
                     {
-                        <span @key="@($"script-menu-item-{script.Id}")" @onclick="async () => { CurrentScript = script; ResetFormState(ResetFormModesEnum.EditToOrign); if(_commandsListRef is not null){ await _commandsListRef.Rest(script.Id); } if(_contentionsRef is not null){ await _contentionsRef.Rest(script.Id); } }" class="list-group-item list-group-item-action @(CurrentScript.Id == script.Id ? "active" : "")" aria-current="true">
+                        <span @key="@($"script-menu-item-{script.Id}")" @onclick="async () => { CurrentScript = script; ResetFormState(ResetFormModesEnum.EditToOrigin); if(_commandsListRef is not null){ await _commandsListRef.Rest(script.Id); } if(_contentionsRef is not null){ await _contentionsRef.Rest(script.Id); } }" class="list-group-item list-group-item-action @(CurrentScript.Id == script.Id ? "active" : "")" aria-current="true">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">
                                     @(script.Name)
@@ -106,7 +106,7 @@ else
                                     {
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                                             <button @onclick="SaveScriptHandle" disabled="@(!CanSaveScript)" class="btn btn-outline-primary" type="button">Сохранить</button>
-                                            <button @onclick="() => { ResetFormState(ResetFormModesEnum.OrignToEdit); }" disabled="@(!CanSaveScript)" class="btn btn-outline-info" type="button">Отмена</button>
+                                            <button @onclick="() => { ResetFormState(ResetFormModesEnum.OriginToEdit); }" disabled="@(!CanSaveScript)" class="btn btn-outline-info" type="button">Отмена</button>
                                             <button @onclick="DeleteScript" class="btn btn-outline-danger" type="button">@(script_init_del ? "Подтвердить удаление" : "Удалить")</button>
                                         </div>
                                     }

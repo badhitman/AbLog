@@ -88,9 +88,9 @@ public partial class CommandsListComponent : BlazorBusyComponentBaseModel
         IsBusyProgress = true;
         StateHasChanged();
 
-        EntriesSortingResponseModel rest = await CommandsService.CommandSortingSet(req);
+        TResponseModel<List<EntrySortingModel>> rest = await CommandsService.CommandSortingSet(req);
         Snackbar.ShowMessagesResponse(rest.Messages);
-        if (rest.Entries is null)
+        if (rest.Response is null)
         {
             Snackbar.Add("rest.Content?.Entries is null ошибка {D73FEEE5-38BC-4AFF-B1FA-E00CE50673F4}", Severity.Error, opt => opt.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
@@ -99,8 +99,8 @@ public partial class CommandsListComponent : BlazorBusyComponentBaseModel
         if (!rest.IsSuccess)
             return;
 
-        EntrySortingModel[] for_add = rest.Entries.Where(x => !Commands.Any(y => y.Id == x.Id)).ToArray();
-        int[] for_del = Commands.Where(x => !rest.Entries.Any(y => y.Id == x.Id)).Select(x => x.Id).ToArray();
+        EntrySortingModel[] for_add = rest.Response.Where(x => !Commands.Any(y => y.Id == x.Id)).ToArray();
+        int[] for_del = Commands.Where(x => !rest.Response.Any(y => y.Id == x.Id)).Select(x => x.Id).ToArray();
         if (for_add.Length != 0)
         {
             Commands.AddRange(for_add);
@@ -109,7 +109,7 @@ public partial class CommandsListComponent : BlazorBusyComponentBaseModel
         {
             Commands = Commands.Where(x => !for_del.Contains(x.Id)).ToList();
         }
-        Commands.ForEach(x => { EntrySortingModel? y = rest.Entries.FirstOrDefault(z => z.Id == x.Id); if (y is not null) { x.Sorting = y.Sorting; } });
+        Commands.ForEach(x => { EntrySortingModel? y = rest.Response.FirstOrDefault(z => z.Id == x.Id); if (y is not null) { x.Sorting = y.Sorting; } });
         Commands = Commands.OrderBy(x => x.Sorting).ToList();
         IsBusyProgress = false;
         StateHasChanged();
@@ -203,14 +203,14 @@ public partial class CommandsListComponent : BlazorBusyComponentBaseModel
     public async Task Rest(int id, bool hard_reload = true)
     {
         IsBusyProgress = true;
-        EntriesSortingResponseModel rest = await CommandsService.GetCommandsEntriesByScript(id);
+        TResponseModel<List<EntrySortingModel>> rest = await CommandsService.GetCommandsEntriesByScript(id);
         if (hard_reload)
         {
-            Commands = [.. rest.Entries ?? []];
+            Commands = [.. rest.Response ?? []];
         }
         else
         {
-            List<EntrySortingModel> cashe_commands = new(rest.Entries ?? []);
+            List<EntrySortingModel> cashe_commands = new(rest.Response ?? []);
 
             IEnumerable<EntrySortingModel> commands_add = cashe_commands.Where(x => !Commands.Any(y => y.Id == x.Id)).ToArray();
             if (commands_add.Any())

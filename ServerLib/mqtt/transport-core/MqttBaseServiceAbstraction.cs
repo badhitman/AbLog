@@ -142,7 +142,7 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
             res.AddSuccess("Соединение закрыто");
         }
         else
-            res.AddInfo("Соединение отсутсвует (закрывать нечего)");
+            res.AddInfo("Соединение отсутствует (закрывать нечего)");
 
         using ParametersContext _context = await _dbFactory.CreateDbContextAsync(cancellation_token);
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
@@ -166,9 +166,9 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
     }
 
     /// <inheritdoc/>
-    public Task<BoolResponseModel> StatusService()
+    public Task<TResponseModel<bool>> StatusService()
     {
-        BoolResponseModel res = new()
+        TResponseModel<bool> res = new()
         {
             Response = _mqttClient.IsConnected
         };
@@ -223,10 +223,10 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
     }
 
     /// <inheritdoc/>
-    public async Task<SimpleStringResponseModel> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token)
+    public async Task<TResponseModel<string>> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token)
     {
-        SimpleStringResponseModel res = new();
-        BoolResponseModel status = await StatusService();
+        TResponseModel<string> res = new();
+        TResponseModel<bool> status = await StatusService();
         if (!status.Response)
         {
             res.AddMessages(status.Messages);
@@ -249,17 +249,21 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
             ResponseTopics = [response_topic]
         };
 
+        Stopwatch stopwatch = new();
         async Task MessageReceivedEvent(MqttApplicationMessageReceivedEventArgs e)
         {
             if (e.ApplicationMessage.Topic.Equals(response_topic))
             {
+                _mqttClient.ApplicationMessageReceivedAsync -= MessageReceivedEvent;
+                stopwatch.Stop();
                 byte[] payload_bytes = await CipherService.DecryptAsync([.. e.ApplicationMessage.PayloadSegment], _mqtt_settings.Secret ?? CipherService.DefaultSecret, e.ApplicationMessage.CorrelationData);
-                res.TextPayload = Encoding.UTF8.GetString(payload_bytes);
+                res.Response = Encoding.UTF8.GetString(payload_bytes);
             }
         }
 
         _mqttClient.ApplicationMessageReceivedAsync += MessageReceivedEvent;
         MqttPublishMessageResultModel send_msg;
+        stopwatch.Start();
         try
         {
             send_msg = await PublishMessage(p_msg, cancellation_token);
@@ -269,10 +273,9 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
             res.AddError(ex.Message);
             return res;
         }
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
+
         int mqtt_dbg_step = 0;
-        while (res.TextPayload is null)
+        while (stopwatch.IsRunning)
         {
             await Task.Delay(100, cancellation_token);
 
@@ -281,13 +284,9 @@ public abstract class MqttBaseServiceAbstraction(IMqttClient mqttClient, MqttCon
                 mqtt_dbg_step = 0;
                 notifyService.MqttDebug((stopwatch.Elapsed, null, topic));
             }
-
-
         }
-        notifyService.MqttDebug((stopwatch.Elapsed, res.TextPayload, topic));
-        stopwatch.Stop();
+        notifyService.MqttDebug((stopwatch.Elapsed, res.Response, topic));
 
-        _mqttClient.ApplicationMessageReceivedAsync -= MessageReceivedEvent;
         MqttClientUnsubscribeOptions unsubscr_opt = _mqttFactory.CreateUnsubscribeOptionsBuilder()
             .WithTopicFilter(response_topic)
                .Build();

@@ -23,13 +23,13 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
     public async Task<ResponseBaseModel> StopMqtt(CancellationToken cancellation_token) => await MqttClientService.StopService(cancellation_token);
 
     /// <inheritdoc/>
-    public Task<BoolResponseModel> StatusMqtt() => MqttClientService.StatusService();
+    public Task<TResponseModel<bool>> StatusMqtt() => MqttClientService.StatusService();
 
     /// <inheritdoc/>
     public virtual async Task<ResponseBaseModel> TestEmailConnect(EmailConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        conf ??= (await ParameterStorage.GetEmailConfig(cancellation_token)).Conf;
+        conf ??= (await ParameterStorage.GetEmailConfig(cancellation_token)).Response;
         if (!conf!.IsConfigured)
         {
             res.AddError("Конфигурация не установлена");
@@ -43,7 +43,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
     public async Task<ResponseBaseModel> TestMqttConnect(MqttConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         ResponseBaseModel res = new();
-        conf ??= (await ParameterStorage.GetMqttConfig(cancellation_token)).Conf;
+        conf ??= (await ParameterStorage.GetMqttConfig(cancellation_token)).Response;
         if (!conf!.IsConfigured)
         {
             res.AddError("Конфигурация не установлена");
@@ -88,7 +88,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
     public virtual async Task<TelegramBotCheckResponseModel> TestTelegramBotConnect(TelegramBotConfigModel? conf = null, CancellationToken cancellation_token = default)
     {
         TelegramBotCheckResponseModel res = new();
-        conf ??= (await ParameterStorage.GetTelegramBotConfig(cancellation_token)).Conf;
+        conf ??= (await ParameterStorage.GetTelegramBotConfig(cancellation_token)).Response;
 
         if (string.IsNullOrEmpty(conf?.TelegramBotToken))
         {

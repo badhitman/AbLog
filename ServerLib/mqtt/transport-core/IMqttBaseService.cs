@@ -43,7 +43,7 @@ public interface IMqttBaseService
     /// <summary>
     /// Получить статус службы
     /// </summary>
-    public Task<BoolResponseModel> StatusService();
+    public Task<TResponseModel<bool>> StatusService();
 
     /// <summary>
     /// Опубликовать сообщение
@@ -53,5 +53,5 @@ public interface IMqttBaseService
     /// <summary>
     /// Удалённый вызов серверного функционала через MQTT
     /// </summary>
-    public Task<SimpleStringResponseModel> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token);
+    public Task<TResponseModel<string>> MqttRemoteCall(object request, string topic, CancellationToken cancellation_token);
 }

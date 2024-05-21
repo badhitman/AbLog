@@ -55,7 +55,7 @@ public class EmailConfigModel
         MailAddress.TryCreate(Email, out _);
 
     /// <summary>
-    /// Опратор равенства
+    /// Оператор равенства
     /// </summary>
     public static bool operator ==(EmailConfigModel l, EmailConfigModel r)
     {

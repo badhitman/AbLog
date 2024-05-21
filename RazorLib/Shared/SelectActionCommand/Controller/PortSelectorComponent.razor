@@ -52,7 +52,7 @@
     /// </summary>
     public PortsCommandsEnum PortCommand
     {
-        get => CurrentCommand?.ExecutionParametr?.ToLower() switch
+        get => CurrentCommand?.ExecutionParameter?.ToLower() switch
         {
             "on" => PortsCommandsEnum.On,
             "off" => PortsCommandsEnum.Off,
@@ -63,7 +63,7 @@
             if (CurrentCommand is null)
                 return;
 
-            string? contr_val_string = CurrentCommand?.ExecutionParametr?.ToLower();
+            string? contr_val_string = CurrentCommand?.ExecutionParameter?.ToLower();
             PortsCommandsEnum contr_val = contr_val_string switch
             {
                 "on" => PortsCommandsEnum.On,
@@ -72,7 +72,7 @@
             };
 
             bool is_upd = contr_val != value;
-            CurrentCommand!.ExecutionParametr = value switch
+            CurrentCommand!.ExecutionParameter = value switch
             {
                 PortsCommandsEnum.On => "on",
                 PortsCommandsEnum.Off => "off",

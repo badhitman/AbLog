@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Тригер запуска скрипта
+/// Триггер запуска скрипта
 /// </summary>
 public class TrigerModelDB : EntryDescriptionModel
 {
@@ -25,7 +25,7 @@ public class TrigerModelDB : EntryDescriptionModel
     public ScriptModelDB? Script { get; set; }
 
     /// <summary>
-    /// Включён/отключён тригер
+    /// Включён/отключён триггер
     /// </summary>
     public bool IsDisable { get; set; } = false;
 }

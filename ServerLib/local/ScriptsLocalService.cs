@@ -14,21 +14,21 @@ namespace ServerLib;
 public class ScriptsLocalService(IDbContextFactory<ServerContext> DbFactory) : IScriptsService
 {
     /// <inheritdoc/>
-    public async Task<ScriptsResponseModel> ScriptsGetAll(CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ScriptModelDB>>> ScriptsGetAll(CancellationToken cancellation_token = default)
     {
-        ScriptsResponseModel res_s = new();
+        TResponseModel<List<ScriptModelDB>> res_s = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            res_s.Scripts = [.. db.Scripts.Include(x => x.Commands)];
+            res_s.Response = [.. db.Scripts.Include(x => x.Commands)];
         }
         return res_s;
     }
 
     /// <inheritdoc/>
-    public async Task<ScriptsResponseModel> ScriptDelete(int script_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ScriptModelDB>>> ScriptDelete(int script_id, CancellationToken cancellation_token = default)
     {
-        ScriptsResponseModel res_s = new();
+        TResponseModel<List<ScriptModelDB>> res_s = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
@@ -41,16 +41,16 @@ public class ScriptsLocalService(IDbContextFactory<ServerContext> DbFactory) : I
             }
             db.Remove(script_db);
             db.SaveChanges();
-            res_s.Scripts = db.Scripts.Include(x => x.Commands).ToList();
+            res_s.Response = db.Scripts.Include(x => x.Commands).ToList();
         }
 
         return res_s;
     }
 
     /// <inheritdoc/>
-    public async Task<ScriptsResponseModel> ScriptUpdateOrCreate(EntryDescriptionModel script, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ScriptModelDB>>> ScriptUpdateOrCreate(EntryDescriptionModel script, CancellationToken cancellation_token = default)
     {
-        ScriptsResponseModel res_s = new();
+        TResponseModel<List<ScriptModelDB>> res_s = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
@@ -66,11 +66,11 @@ public class ScriptsLocalService(IDbContextFactory<ServerContext> DbFactory) : I
                 if (script_db.Name == script.Name && script_db.Description == script.Description)
                 {
                     res_s.AddInfo("Сохранение не требуется");
-                    res_s.Scripts = db.Scripts.Include(x => x.Commands).ToList();
+                    res_s.Response = [.. db.Scripts.Include(x => x.Commands)];
                     return res_s;
                 }
 
-                if (db.Scripts.Any(x => x.Name.ToLower() == script.Name.ToLower() && x.Id != script_db.Id))
+                if (db.Scripts.Any(x => x.Name.Equals(script.Name, StringComparison.CurrentCultureIgnoreCase) && x.Id != script_db.Id))
                 {
                     res_s.AddError("Имя скрипта не уникально. Задайте другое имя.");
                     return res_s;
@@ -94,7 +94,7 @@ public class ScriptsLocalService(IDbContextFactory<ServerContext> DbFactory) : I
                 db.SaveChanges();
             }
 
-            res_s.Scripts = db.Scripts.Include(x => x.Commands).ToList();
+            res_s.Response = [.. db.Scripts.Include(x => x.Commands)];
         }
 
         return res_s;

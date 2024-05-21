@@ -33,7 +33,7 @@ public abstract class BlazorAngleTreeComponentBaseModel : BlazorBusyComponentBas
     /// <summary>
     /// 
     /// </summary>
-    protected HtmlDomModel TreeItems { get; set; } = new();
+    protected HtmlDomModel TreeItems { get; set; } = [];
 
     /// <summary>
     /// Обновляет код разметки, парсит данные (AngleHtml) и вызывает StateHasChanged.

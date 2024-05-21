@@ -28,7 +28,7 @@
                 <button @onclick="() => { IsOpen = !IsOpen; }" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
                 <div>
-                    <FormEditCommandComponent AllCsripts="AllCsripts" UpdateCommand="UpdateCommand" ScriptId="ScriptId" DeleteCommand="DeleteCommand" CommandSorting="@(Command?.Sorting ?? 0)" CommandEntry="@Command" />
+                    <FormEditCommandComponent AllScripts="AllScripts" UpdateCommand="UpdateCommand" ScriptId="ScriptId" DeleteCommand="DeleteCommand" CommandSorting="@(Command?.Sorting ?? 0)" CommandEntry="@Command" />
                 </div>
             </div>
             <button @onclick="() => { if(AddCommandAct is not null) { AddCommandAct(SequenceNumber); } }" style="z-index:20;" type="button" class="position-absolute top-100 start-100 translate-middle badge rounded-pill bg-success border border-success">
@@ -101,7 +101,7 @@
     public required Action<CommandModelDB> UpdateCommand { get; set; }
 
     [Parameter, EditorRequired]
-    public required IEnumerable<ScriptModelDB> AllCsripts { get; set; }
+    public required IEnumerable<ScriptModelDB> AllScripts { get; set; }
 
     [Parameter, EditorRequired]
     public bool AllowUpMove { get; set; }

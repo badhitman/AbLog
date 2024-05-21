@@ -19,7 +19,7 @@ public interface IParametersStorageService
     /// <summary>
     /// Получить конфигурацию TelegramBot токена
     /// </summary>
-    public Task<TelegramBotConfigResponseModel> GetTelegramBotConfig(CancellationToken cancellationToken);
+    public Task<TResponseModel<TelegramBotConfigModel>> GetTelegramBotConfig(CancellationToken cancellationToken);
 
     #endregion
 
@@ -33,7 +33,7 @@ public interface IParametersStorageService
     /// <summary>
     /// Получить конфигурацию Email подключения
     /// </summary>
-    public Task<EmailConfigResponseModel> GetEmailConfig(CancellationToken cancellationToken);
+    public Task<TResponseModel<EmailConfigModel>> GetEmailConfig(CancellationToken cancellationToken);
 
     #endregion
 
@@ -47,7 +47,7 @@ public interface IParametersStorageService
     /// <summary>
     /// Получить настройки MQTT
     /// </summary>
-    public Task<MqttConfigResponseModel> GetMqttConfig(CancellationToken cancellationToken);
+    public Task<TResponseModel<MqttConfigModel>> GetMqttConfig(CancellationToken cancellationToken);
 
     #endregion
 }

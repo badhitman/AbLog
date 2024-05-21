@@ -17,10 +17,10 @@ public interface IUsersService
     /// <summary>
     /// Получить пользователя
     /// </summary>
-    public Task<UserResponseModel> GetUser(long telegram_id, CancellationToken cancellation_token = default);
+    public Task<TResponseModel<UserModelDB>> GetUser(long telegram_id, CancellationToken cancellation_token = default);
 
     /// <summary>
-    /// Установть настройки пользователю
+    /// Установить настройки пользователю
     /// </summary>
     public Task<ResponseBaseModel> UpdateUser(UpdateUserModel req, CancellationToken cancellation_token = default);
 }

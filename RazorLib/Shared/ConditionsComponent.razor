@@ -1,7 +1,7 @@
 ﻿@using SharedLib;
 @using MudBlazor;
 
-@inject ILogger<ConditionsComponent> _loger;
+@inject ILogger<ConditionsComponent> _logger;
 @inject IConditionsService _conditions;
 @inject ISnackbar _snackbar;
 
@@ -57,9 +57,9 @@ else
                 <ul class="list-group">
                     @if (Data.Any())
                     {
-                        @foreach (ConditionAnonimModel cond in Data.OrderBy(x => $"{x.Name}{x.Id}"))
+                        @foreach (ConditionAnonymModel cond in Data.OrderBy(x => $"{x.Name}{x.Id}"))
                         {
-                            <ConditionListRowComponent DeleteNewConditionAct="DeleteNewConditionAct" @key="@($"{cond.ConditionValueType}/{cond.Id}")" UpdateAct="UpdateAct" OwnerId="OwnerId" ConditionType="ConditionType" TreeHardwares="EntriesTreeHW" Condition="cond" SequenceNumber="@(++i)" />
+                            <ConditionListRowComponent DeleteNewConditionAct="DeleteNewConditionAct" @key="@($"{cond.ConditionValueType}/{cond.Id}")" UpdateAct="UpdateAct" OwnerId="OwnerId" ConditionType="ConditionType" TreeHardwires="EntriesTreeHW" Condition="cond" SequenceNumber="@(++i)" />
                         }
                     }
                     else
@@ -87,9 +87,9 @@ else
     public ConditionsTypesEnum ConditionType { get; set; }
 
     [Parameter, EditorRequired]
-    public required EntryNestedModel[] EntriesTreeHW { get; set; }
+    public required IEnumerable<EntryNestedModel> EntriesTreeHW { get; set; }
 
-    List<ConditionAnonimModel> Data = new List<ConditionAnonimModel>();
+    List<ConditionAnonymModel> Data = new List<ConditionAnonymModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,9 +110,9 @@ else
         }
     }
 
-    void UpdateAct(IEnumerable<ConditionAnonimModel> data)
+    void UpdateAct(IEnumerable<ConditionAnonymModel> data)
     {
-        ConditionAnonimModel[] add = data.Where(x => !Data.Any(y => y.Id == x.Id)).ToArray();
+        ConditionAnonymModel[] add = data.Where(x => !Data.Any(y => y.Id == x.Id)).ToArray();
         if (add.Any())
         {
             Data.AddRange(add);
@@ -145,9 +145,9 @@ else
             return;
         IsBusyProgress = true;
 
-        ConditionsAnonimResponseModel rest_conditions = await _conditions.ConditionsGetByOwner(OwnerId, ConditionType);
-        if (rest_conditions.Conditions?.Any() == true)
-            UpdateAct(rest_conditions.Conditions);
+        TResponseModel<List<ConditionAnonymModel>> rest_conditions = await _conditions.ConditionsGetByOwner(OwnerId, ConditionType);
+        if (rest_conditions.Response?.Any() == true)
+            UpdateAct(rest_conditions.Response);
 
         IsBusyProgress = false;
         StateHasChanged();
@@ -166,7 +166,7 @@ else
             if (!Data.Any(x => x.Name == name))
                 break;
         }
-        Data.Add(new ConditionAnonimModel() { Id = id, Name = name });
+        Data.Add(new ConditionAnonymModel() { Id = id, Name = name });
         StateHasChanged();
     }
 }

@@ -26,7 +26,7 @@ public class CommandConditionModelDB : ConditionBaseModelDB
             Name = condition_request.Name,
             Value = condition_request.Value,
             ConditionValueType = condition_request.ConditionValueType,
-            СomparisonMode = condition_request.СomparisonMode
+            ComparisonMode = condition_request.ComparisonMode
         };
     }
 

@@ -18,7 +18,7 @@ public class StorageController(IParametersStorageService parameters_storage) : C
     /// Получить конфигурацию TelegramBot
     /// </summary>
     [HttpGet($"{GlobalStatic.Routes.TelegramBot}/{GlobalStatic.Routes.CONFIG}/{GlobalStatic.Routes.GET}")]
-    public async Task<TelegramBotConfigResponseModel> TelegramBotConfigGet(CancellationToken cancellationToken = default)
+    public async Task<TResponseModel<TelegramBotConfigModel>> TelegramBotConfigGet(CancellationToken cancellationToken = default)
         => await parameters_storage.GetTelegramBotConfig(cancellationToken);
 
     /// <summary>
@@ -34,7 +34,7 @@ public class StorageController(IParametersStorageService parameters_storage) : C
     /// Получить конфигурацию Email (smtp)
     /// </summary>
     [HttpGet($"{GlobalStatic.Routes.Email}/{GlobalStatic.Routes.CONFIG}/{GlobalStatic.Routes.GET}")]
-    public async Task<EmailConfigResponseModel> EmailConfigGet(CancellationToken cancellationToken = default)
+    public async Task<TResponseModel<EmailConfigModel>> EmailConfigGet(CancellationToken cancellationToken = default)
         => await parameters_storage.GetEmailConfig(cancellationToken);
 
     /// <summary>
@@ -50,7 +50,7 @@ public class StorageController(IParametersStorageService parameters_storage) : C
     /// Получить конфигурацию Mqtt
     /// </summary>
     [HttpGet($"{GlobalStatic.Routes.Mqtt}/{GlobalStatic.Routes.CONFIG}/{GlobalStatic.Routes.GET}")]
-    public async Task<MqttConfigResponseModel> MqttConfigGet(CancellationToken cancellationToken = default)
+    public async Task<TResponseModel<MqttConfigModel>> MqttConfigGet(CancellationToken cancellationToken = default)
         => await parameters_storage.GetMqttConfig(cancellationToken);
 
     /// <summary>

@@ -30,7 +30,7 @@ else if (Commands?.Any() == true)
             @foreach (EntrySortingModel com in Commands.OrderBy(x => x.Sorting))
             {
                 ++i;
-                <CommandRowOfListComponent MoveCommandAction="MoveCommandAction" AllowUpMove="@(i > 1)" AllowDownMove="@(i != count_commans)" AllCsripts="AllScripts" UpdateCommand="UpdateCommand" ScriptId="ScriptId" @key="com.Id" DeleteCommand="DeleteCommand" AddCommandAct="AddCommand" Command="com" SequenceNumber="@i" />
+                <CommandRowOfListComponent MoveCommandAction="MoveCommandAction" AllowUpMove="@(i > 1)" AllowDownMove="@(i != count_commans)" AllScripts="AllScripts" UpdateCommand="UpdateCommand" ScriptId="ScriptId" @key="com.Id" DeleteCommand="DeleteCommand" AddCommandAct="AddCommand" Command="com" SequenceNumber="@i" />
             }
         </tbody>
     </table>

@@ -12,7 +12,7 @@ public interface ISystemCommandsService
     /// <summary>
     /// Команды (все)
     /// </summary>
-    public Task<SystemCommandsResponseModel> CommandsGetAll(CancellationToken cancellation_token = default);
+    public Task<TResponseModel<List<SystemCommandModelDB>>> CommandsGetAll(CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Обновить команду

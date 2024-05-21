@@ -75,11 +75,11 @@ public static class GlobalStatic
     /// <summary>
     /// префикс файла базы данных (SQLite)
     /// </summary>
-    public static string PefixDbFile { get; set; } = "";
+    public static string PrefixDbFile { get; set; } = "";
     /// <summary>
-    /// имя файла основной базы данны
+    /// имя файла основной базы данных
     /// </summary>
-    private static string MainDatabaseFilename => $"main-db{PefixDbFile}.sqlite";
+    private static string MainDatabaseFilename => $"main-db{PrefixDbFile}.sqlite";
     /// <summary>
     /// путь к файлу основной базы данных
     /// </summary>
@@ -88,7 +88,7 @@ public static class GlobalStatic
     /// <summary>
     /// имя файла базы данных хранения параметров
     /// </summary>
-    private static string ParametersStorageDatabaseFilename => $"parameters-db{PefixDbFile}.sqlite";
+    private static string ParametersStorageDatabaseFilename => $"parameters-db{PrefixDbFile}.sqlite";
     /// <summary>
     /// путь к файлу базы данных хранения параметров
     /// </summary>
@@ -103,7 +103,7 @@ public static class GlobalStatic
     public static IPAddress IpAddress => Dns.GetHostEntry(Dns.GetHostName()).AddressList.Last();
 
     /// <summary>
-    /// Текущие сетевые интерфесы (локальные)
+    /// Текущие сетевые интерфейсы (локальные)
     /// </summary>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]
@@ -138,7 +138,7 @@ public static class GlobalStatic
     public record struct NetworkInterfaceModel(NetworkInterface Interface, IPAddress? Address);
 
     /// <summary>
-    /// Преобразовать размер файла в человекочитаемы вид
+    /// Преобразовать размер файла в человеко-читаемый вид
     /// </summary>
     public static string SizeDataAsString(long SizeFile)
     {
@@ -153,7 +153,7 @@ public static class GlobalStatic
     }
 
     /// <summary>
-    /// Имя парамтра хранения токена Telegram бота
+    /// Имя параметра хранения токена Telegram бота
     /// </summary>
     public const string TELEGRAM_TOKEN = "ab.action.TELEGRAM_TELEGRAM_TOKEN";
 
@@ -175,7 +175,7 @@ public static class GlobalStatic
     }
 
     /// <summary>
-    /// Клон объекта (через сереализацию)
+    /// Клон объекта (через сериализацию)
     /// </summary>
     public static T CreateDeepCopy<T>(T obj)
     {
@@ -218,7 +218,7 @@ public static class GlobalStatic
         /// <summary>
         /// 
         /// </summary>
-        public const string Hardwares = "hardwares";
+        public const string Hardwires = "hardwires";
         /// <summary>
         /// 
         /// </summary>

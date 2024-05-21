@@ -20,7 +20,7 @@ public class TelegramMessageModelDB : EntryModel
     public required string UserSenderId { get; set; }
 
     /// <summary>
-    /// Идентификатр чата сообщения
+    /// Идентификатор чата сообщения
     /// </summary>
     public required string ChatId { get; set; }
 }

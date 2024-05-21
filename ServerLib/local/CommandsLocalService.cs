@@ -14,9 +14,9 @@ namespace ServerLib;
 public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : ICommandsService
 {
     /// <inheritdoc/>
-    public async Task<EntriesSortingResponseModel> GetCommandsEntriesByScript(int script_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<EntrySortingModel>>> GetCommandsEntriesByScript(int script_id, CancellationToken cancellation_token = default)
     {
-        EntriesSortingResponseModel res_oe = new();
+        TResponseModel<List<EntrySortingModel>> res_oe = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
@@ -26,20 +26,24 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
                 res_oe.AddError("Ошибка выполнения запроса: {7E6A8D50-3C9C-4BC0-A790-8001A9D3F7B4}");
                 return res_oe;
             }
-            res_oe.Entries = db_script.Commands.OrderBy(x => x.Sorting).Select(x => new EntrySortingModel() { Id = x.Id, Name = x.Name, Sorting = x.Sorting }).ToArray();
+            res_oe.Response = db_script
+                .Commands
+                .OrderBy(x => x.Sorting)
+                .Select(x => new EntrySortingModel() { Id = x.Id, Name = x.Name, Sorting = x.Sorting })
+                .ToList();
         }
         return res_oe;
     }
 
     /// <inheritdoc/>
-    public async Task<CommandResponseModel> CommandGet(int command_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<CommandModelDB>> CommandGet(int command_id, CancellationToken cancellation_token = default)
     {
-        CommandResponseModel res_c = new();
+        TResponseModel<CommandModelDB> res_c = new();
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
         lock (ServerContext.DbLocker)
         {
-            res_c.Command = db.Commands.Include(x => x.Conditions).FirstOrDefault(x => x.Id == command_id);
-            if (res_c.Command is null)
+            res_c.Response = db.Commands.Include(x => x.Conditions).FirstOrDefault(x => x.Id == command_id);
+            if (res_c.Response is null)
                 res_c.AddError("Ошибка выполнения запроса: {29F5A45E-B0C0-4DDD-B135-39E5BC735028}");
         }
         return res_c;
@@ -55,11 +59,11 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
             return res_b;
         }
         using ServerContext db = await DbFactory.CreateDbContextAsync(cancellation_token);
-        command_json.ExecutionParametr = command_json.ExecutionParametr?.Trim();
+        command_json.ExecutionParameter = command_json.ExecutionParameter?.Trim();
         switch (command_json.CommandType)
         {
             case TypesCommandsEnum.Controller:
-                if (string.IsNullOrWhiteSpace(command_json.ExecutionParametr))
+                if (string.IsNullOrWhiteSpace(command_json.ExecutionParameter))
                     res_b.AddError("Не указана команда контроллера");
                 if (command_json.Execution < 1)
                     res_b.AddError("Не указан контроллер");
@@ -68,7 +72,7 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
 
                 lock (ServerContext.DbLocker)
                 {
-                    HardwareModelDB? hw_db = db.Hardwares.FirstOrDefault(x => x.Id == command_json.Execution);
+                    HardwareModelDB? hw_db = db.Hardwires.FirstOrDefault(x => x.Id == command_json.Execution);
                     if (hw_db is null)
                     {
                         res_b.AddError($"Не найден контроллер {command_json.Execution}");
@@ -127,7 +131,7 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
                 com_db.CommandType = command_json.CommandType;
                 com_db.Conditions = command_json.Conditions;
                 com_db.Execution = command_json.Execution;
-                com_db.ExecutionParametr = command_json.ExecutionParametr;
+                com_db.ExecutionParameter = command_json.ExecutionParameter;
                 com_db.Hidden = command_json.Hidden;
                 com_db.PauseSecondsBeforeExecution = command_json.PauseSecondsBeforeExecution;
                 com_db.ScriptId = command_json.ScriptId;
@@ -144,7 +148,7 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
                     CommandType = command_json.CommandType,
                     Conditions = command_json.Conditions,
                     Execution = command_json.Execution,
-                    ExecutionParametr = command_json.ExecutionParametr,
+                    ExecutionParameter = command_json.ExecutionParameter,
                     Hidden = command_json.Hidden,
                     PauseSecondsBeforeExecution = command_json.PauseSecondsBeforeExecution,
                     ScriptId = command_json.ScriptId,
@@ -159,9 +163,9 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
     }
 
     /// <inheritdoc/>
-    public async Task<EntriesSortingResponseModel> CommandSortingSet(IdsPairModel req, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<EntrySortingModel>>> CommandSortingSet(IdsPairModel req, CancellationToken cancellation_token = default)
     {
-        EntriesSortingResponseModel res_oe = new();
+        TResponseModel<List<EntrySortingModel>> res_oe = new();
         if (req is null)
         {
             res_oe.AddError("Ошибка выполнения запроса: {3CA6C382-45D7-4B4A-BD50-CDD1D630CE16}");
@@ -191,7 +195,7 @@ public class CommandsLocalService(IDbContextFactory<ServerContext> DbFactory) : 
             db.UpdateRange(c1, c2);
             db.SaveChanges();
 
-            res_oe.Entries = [.. db.Commands
+            res_oe.Response = [.. db.Commands
                 .Where(x => x.ScriptId == c1.ScriptId)
                 .OrderBy(x => x.Sorting)
                 .Select(x => new EntrySortingModel() { Id = x.Id, Name = x.Name, Sorting = x.Sorting })];

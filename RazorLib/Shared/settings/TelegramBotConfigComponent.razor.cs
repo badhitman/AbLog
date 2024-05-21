@@ -49,11 +49,11 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel, 
     {
         NotifyService.Notify += CheckTelegramUserHandleNotify;
         IsBusyProgress = true;
-        TelegramBotConfigResponseModel _bot_conf = await Storage.GetTelegramBotConfig(CancellationToken);
+        TResponseModel<TelegramBotConfigModel> _bot_conf = await Storage.GetTelegramBotConfig(CancellationToken);
         IsBusyProgress = false;
         SnackBar.ShowMessagesResponse(_bot_conf.Messages);
 
-        _conf = _bot_conf.Conf ?? new();
+        _conf = _bot_conf.Response ?? new();
         _conf_self = GlobalStatic.CreateDeepCopy(_conf);
         StateHasChanged();
     }
@@ -96,21 +96,21 @@ public partial class TelegramBotConfigComponent : BlazorBusyComponentBaseModel, 
         IsBusyProgress = false;
     }
 
-    void CheckTelegramUserHandleNotify(UserResponseModel user)
+    void CheckTelegramUserHandleNotify(TResponseModel<UserModelDB> user)
     {
-        if (user.User is null)
+        if (user.Response is null)
         {
             SnackBar.Add($"error {{8B0B5C84-3FAC-4289-97A8-096AD5023C38}} User is null", Severity.Error, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
 
-        if (user.User.IsDisabled)
+        if (user.Response.IsDisabled)
         {
             SnackBar.Add($"Сообщение Telegram отключённого пользователя:\n{JsonConvert.SerializeObject(user, Formatting.Indented)}", Severity.Normal, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         }
         else
         {
-            SnackBar.Add($"Сообщение Telegram:\n{JsonConvert.SerializeObject(new { user.User.Name, user.User.FirstName, user.User.LastName, user.User.AlarmSubscriber, user.User.AllowChangeMqttConfig, user.User.AllowSystemCommands, user.User.CommandsAllowed, user.User.Email }, Formatting.Indented)}", Severity.Info, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            SnackBar.Add($"Сообщение Telegram:\n{JsonConvert.SerializeObject(new { user.Response.Name, user.Response.FirstName, user.Response.LastName, user.Response.AlarmSubscriber, user.Response.AllowChangeMqttConfig, user.Response.AllowSystemCommands, user.Response.CommandsAllowed, user.Response.Email }, Formatting.Indented)}", Severity.Info, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
         }
     }
 

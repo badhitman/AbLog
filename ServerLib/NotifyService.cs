@@ -23,7 +23,7 @@ public class NotifyService(ILogger<NotifyService> Logger) : INotifyService
     /// <summary>
     /// Notify: Check Telegram user
     /// </summary>
-    public void CheckTelegramUser(UserResponseModel user)
+    public void CheckTelegramUser(TResponseModel<UserModelDB> user)
     {
         Logger.LogDebug($"call > {nameof(Notify)}: {JsonConvert.SerializeObject(user, Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })}");
         Notify?.Invoke(user);

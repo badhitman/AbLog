@@ -35,7 +35,7 @@ public class Program
                     .LoadConfigurationFromAppSettings()
                     .GetCurrentClassLogger();
 
-        GlobalStatic.PefixDbFile = "-server";
+        GlobalStatic.PrefixDbFile = "-server";
         logger.Warn("init main");
         logger.Warn($"main-db: {GlobalStatic.MainDatabasePath}");
         logger.Warn($"storage-db: {GlobalStatic.ParametersStorageDatabasePath}");
@@ -89,7 +89,7 @@ public class Program
         builder.Services.AddScoped<ICamerasService, FlashCamLocalService>();
         builder.Services.AddScoped<IParametersStorageService, ParametersStorageLocalService>();
         builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsLocalService>();
-        builder.Services.AddSingleton<IHardwaresService, HardwaresLocalService>();
+        builder.Services.AddSingleton<IHardwiresService, HardwiresLocalService>();
         builder.Services.AddSingleton<IMqttBaseService, MqttServerService>();
         builder.Services.AddSingleton<IEmailService, EmailLocalService>();
         builder.Services.AddSingleton<IUsersService, UsersLocalService>();
@@ -100,7 +100,7 @@ public class Program
         builder.Services.AddScoped<IContentionsService, ContentionsLocalService>();
         builder.Services.AddScoped<ITriggersService, TriggersLocalService>();
 
-        builder.Services.AddSingleton<ITelegramBotFormFillingServive, TelegramBotFormFillingServive>();
+        builder.Services.AddSingleton<ITelegramBotFormFillingService, TelegramBotFormFillingService>();
         builder.Services.AddSingleton<ITelegramBotHardwareViewServive, TelegramBotHardwareViewServive>();
 
         builder.Services.AddControllers()

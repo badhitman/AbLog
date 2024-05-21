@@ -23,7 +23,7 @@ namespace Telegram.Bot.Services;
 /// </summary>
 public class UpdateHandler : IUpdateHandler
 {
-    readonly ITelegramBotFormFillingServive _form_fill;
+    readonly ITelegramBotFormFillingService _form_fill;
     readonly ITelegramBotHardwareViewServive _hardware_view;
     readonly IParametersStorageService _storage;
     readonly ILogger<UpdateHandler> _logger;
@@ -40,7 +40,7 @@ public class UpdateHandler : IUpdateHandler
     /// <summary>
     /// 
     /// </summary>
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingServive form_fill, IParametersStorageService storage, IToolsService tools, ITelegramBotHardwareViewServive hardware_view, INotifyService notify, IDbContextFactory<ServerContext> db_factory)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, ITelegramBotFormFillingService form_fill, IParametersStorageService storage, IToolsService tools, ITelegramBotHardwareViewServive hardware_view, INotifyService notify, IDbContextFactory<ServerContext> db_factory)
     {
         _botClient = botClient;
         _logger = logger;
@@ -85,19 +85,19 @@ public class UpdateHandler : IUpdateHandler
                chatAction: ChatAction.Typing,
                cancellationToken: cancellationToken);
 
-        UserResponseModel check_user = CheckTelegramUser(message.From);
+        TResponseModel<UserModelDB> check_user = CheckTelegramUser(message.From);
         _notify.CheckTelegramUser(check_user);
 
         using ServerContext context = _db_factory.CreateDbContext();
 
-        if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled)
+        if (!check_user.IsSuccess || check_user.Response is null || check_user.Response.IsDisabled)
             return;
 
         Task<Message> action = messageText.Split(' ')[0] switch
         {
-            "/start" => GetStartMessage(check_user.User, message, "Приветсвую!\n", cancellationToken),
+            "/start" => GetStartMessage(check_user.Response, message, "Приветсвую!\n", cancellationToken),
             "/throw" => FailingHandler(_botClient, message, cancellationToken),
-            _ => Usage(_botClient, check_user.User, message, cancellationToken)
+            _ => Usage(_botClient, check_user.Response, message, cancellationToken)
         };
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
@@ -133,58 +133,58 @@ public class UpdateHandler : IUpdateHandler
         if (callbackQuery.Message is null || callbackQuery.From.IsBot || callbackQuery.Data is null)
             return;
 
-        UserResponseModel check_user = CheckTelegramUser(callbackQuery.From);
+        TResponseModel<UserModelDB> check_user = CheckTelegramUser(callbackQuery.From);
         _notify.CheckTelegramUser(check_user);
 
         using ServerContext context = _db_factory.CreateDbContext();
 
-        if (!check_user.IsSuccess || check_user.User is null || check_user.User.IsDisabled == true)
+        if (!check_user.IsSuccess || check_user.Response is null || check_user.Response.IsDisabled == true)
             return;
 
         Message res_msg;
-        if (check_user.User.UserForm is not null)
+        if (check_user.Response.UserForm is not null)
         {
-            if (check_user.User.UserForm.Properties?.Any(x => string.IsNullOrEmpty(x.PropValue)) == true)
+            if (check_user.Response.UserForm.Properties?.Any(x => string.IsNullOrEmpty(x.PropValue)) == true)
             {
-                res_msg = await _form_fill.FormFillingHandle(check_user.User.UserForm, callbackQuery.Message.MessageId, TypeValueTelegramBotHandle.CallbackQuery, callbackQuery.Data, cancellationToken);
+                res_msg = await _form_fill.FormFillingHandle(check_user.Response.UserForm, callbackQuery.Message.MessageId, TypeValueTelegramBotHandle.CallbackQuery, callbackQuery.Data, cancellationToken);
             }
-            else if (check_user.User.UserForm.Properties?.Any() == true)
+            else if (check_user.Response.UserForm.Properties?.Any() == true)
             {
-                switch (check_user.User.UserForm.FormMapCode)
+                switch (check_user.Response.UserForm.FormMapCode)
                 {
                     case nameof(MqttConfigModel):
-                        UserFormPropertyModelDb username_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Username)));
-                        UserFormPropertyModelDb password_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Password)));
-                        UserFormPropertyModelDb server_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Server)));
-                        UserFormPropertyModelDb port_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Port)));
-                        UserFormPropertyModelDb secret_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Secret)));
-                        UserFormPropertyModelDb topics_prefix_prop = check_user.User.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.PrefixMqtt)));
+                        UserFormPropertyModelDb username_prop = check_user.Response.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Username)));
+                        UserFormPropertyModelDb password_prop = check_user.Response.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Password)));
+                        UserFormPropertyModelDb server_prop = check_user.Response.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Server)));
+                        UserFormPropertyModelDb port_prop = check_user.Response.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Port)));
+                        UserFormPropertyModelDb secret_prop = check_user.Response.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.Secret)));
+                        UserFormPropertyModelDb topics_prefix_prop = check_user.Response.UserForm.Properties.First(x => x.Code.Equals(nameof(MqttConfigModel.PrefixMqtt)));
 
                         if (!int.TryParse(port_prop?.PropValue, out int port_int))
                         {
                             callbackQuery.Message.Text = "/start";
-                            res_msg = await GetStartMessage(check_user.User, callbackQuery.Message, "<u>Ошибка значения порта. Парамтры не применились!</u>\n", cancellationToken);
+                            res_msg = await GetStartMessage(check_user.Response, callbackQuery.Message, "<u>Ошибка значения порта. Парамтры не применились!</u>\n", cancellationToken);
                         }
                         else
                         {
-                            MqttConfigResponseModel conf_db = await _storage.GetMqttConfig(cancellationToken);
-                            if (conf_db.Conf is null)
+                            TResponseModel<MqttConfigModel> conf_db = await _storage.GetMqttConfig(cancellationToken);
+                            if (conf_db.Response is null)
                             {
                                 callbackQuery.Message.Text = "/start";
-                                res_msg = await GetStartMessage(check_user.User, callbackQuery.Message, "<u>conf_db.Conf is null. error {F49ED342-4555-4B48-845F-98F2CF412F0D}!</u>\n", cancellationToken);
+                                res_msg = await GetStartMessage(check_user.Response, callbackQuery.Message, "<u>conf_db.Conf is null. error {F49ED342-4555-4B48-845F-98F2CF412F0D}!</u>\n", cancellationToken);
                             }
                             else
                             {
-                                conf_db.Conf.Username = username_prop.PropValue ?? "";
-                                conf_db.Conf.Password = password_prop.PropValue ?? "";
-                                conf_db.Conf.Server = server_prop.PropValue ?? "";
-                                conf_db.Conf.Port = port_int;
-                                conf_db.Conf.Secret = secret_prop.PropValue ?? "";
-                                conf_db.Conf.PrefixMqtt = topics_prefix_prop.PropValue;
+                                conf_db.Response.Username = username_prop.PropValue ?? "";
+                                conf_db.Response.Password = password_prop.PropValue ?? "";
+                                conf_db.Response.Server = server_prop.PropValue ?? "";
+                                conf_db.Response.Port = port_int;
+                                conf_db.Response.Secret = secret_prop.PropValue ?? "";
+                                conf_db.Response.PrefixMqtt = topics_prefix_prop.PropValue;
 
-                                await _storage.SaveMqttConfig(conf_db.Conf, cancellationToken);
+                                await _storage.SaveMqttConfig(conf_db.Response, cancellationToken);
                                 callbackQuery.Message.Text = "/start";
-                                res_msg = await GetStartMessage(check_user.User, callbackQuery.Message, "<u>Параметры сохранены! Перезапустите MQTT что бы параметры применились...</u>\n", cancellationToken);
+                                res_msg = await GetStartMessage(check_user.Response, callbackQuery.Message, "<u>Параметры сохранены! Перезапустите MQTT что бы параметры применились...</u>\n", cancellationToken);
                             }
                         }
 
@@ -209,11 +209,11 @@ public class UpdateHandler : IUpdateHandler
                    chatAction: ChatAction.Typing,
                    cancellationToken: cancellationToken);
 
-            await GetStartMessage(check_user.User, callbackQuery.Message, null, cancellationToken);
+            await GetStartMessage(check_user.Response, callbackQuery.Message, null, cancellationToken);
             return;
         }
 
-        else if (callbackQuery.Data.Equals(GetMQTT) && check_user.User.AllowChangeMqttConfig)
+        else if (callbackQuery.Data.Equals(GetMQTT) && check_user.Response.AllowChangeMqttConfig)
         {
             await _botClient.SendChatActionAsync(
                    chatId: callbackQuery.Message.Chat.Id,
@@ -221,71 +221,71 @@ public class UpdateHandler : IUpdateHandler
                    cancellationToken: cancellationToken);
 
             string message_report = "";
-            MqttConfigResponseModel conf_db = await _storage.GetMqttConfig(cancellationToken);
+            TResponseModel<MqttConfigModel> conf_db = await _storage.GetMqttConfig(cancellationToken);
             if (!conf_db.IsSuccess)
             {
                 message_report += $"Ошибка чтения конфигурации: {conf_db.Message}";
             }
-            else if (conf_db.Conf is null)
+            else if (conf_db.Response is null)
             {
                 message_report += "conf_db.Conf is null. error {47C6FB81-3E66-4754-A1D2-50C15D87B4FF}";
             }
             else
             {
-                Type myType = conf_db.Conf.GetType();
+                Type myType = conf_db.Response.GetType();
                 IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties());
 
                 foreach (PropertyInfo prop in props)
                 {
-                    object? propValue = prop.GetValue(conf_db.Conf, null);
+                    object? propValue = prop.GetValue(conf_db.Response, null);
                     message_report += $"\n<b>{prop.Name}</b>: <code>{propValue}</code>";
                 }
             }
 
-            BoolResponseModel ststus_mqtt = await _tools.StatusMqtt();
+            TResponseModel<bool> ststus_mqtt = await _tools.StatusMqtt();
             message_report += $"\n-- || -- - -- - -- - || - -- - -- - -- || --\n<u>Status MQTT</u>: {ststus_mqtt.Message}";
 
-            _ = await _botClient.SendTextMessageAsync(check_user.User.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
+            _ = await _botClient.SendTextMessageAsync(check_user.Response.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
             return;
         }
-        else if (callbackQuery.Data.Equals(nameof(UserFormModelDb)) && check_user.User.AllowChangeMqttConfig)
+        else if (callbackQuery.Data.Equals(nameof(UserFormModelDb)) && check_user.Response.AllowChangeMqttConfig)
         {
             lock (ServerContext.DbLocker)
             {
-                if (check_user.User.UserForm is not null && _db.UsersForms.Any(x => x.Id == check_user.User.UserForm.Id))
+                if (check_user.Response.UserForm is not null && _db.UsersForms.Any(x => x.Id == check_user.Response.UserForm.Id))
                 {
-                    _db.Remove(check_user.User.UserForm);
+                    _db.Remove(check_user.Response.UserForm);
                     _db.SaveChanges(true);
                 }
                 FormMetadataModel form_metadata = FormFillingFlowsStatic.FormFillingFlows[nameof(MqttConfigModel)];
                 form = new()
                 {
-                    OwnerUserId = check_user.User.Id,
+                    OwnerUserId = check_user.Response.Id,
                     FormMapCode = nameof(MqttConfigModel)
                 };
 
                 _db.Add(form);
                 _db.SaveChanges(true);
-                form.Properties = form_metadata.MqttConfigFormPropertyes.Select(x => new UserFormPropertyModelDb() { Code = x.Code, Name = x.Title, OwnerFormId = form.Id }).ToList();
+                form.Properties = form_metadata.FormProperties.Select(x => new UserFormPropertyModelDb() { Code = x.Code, Name = x.Title, OwnerFormId = form.Id }).ToList();
                 _db.AddRange(form.Properties);
                 _db.SaveChanges(true);
-                check_user.User.UserForm = _db.UsersForms.Include(x => x.OwnerUser).FirstOrDefault(x => x.OwnerUserId == check_user.User.Id);
+                check_user.Response.UserForm = _db.UsersForms.Include(x => x.OwnerUser).FirstOrDefault(x => x.OwnerUserId == check_user.Response.Id);
             }
 
             form.Properties.ForEach(x => x.OwnerForm = form);
-            form.OwnerUser = check_user.User;
+            form.OwnerUser = check_user.Response;
 
-            if (check_user.User.UserForm is null)
+            if (check_user.Response.UserForm is null)
             {
                 _logger.LogError($"check_user.User.UserForm is null. error C0AB0CE4-5442-4617-A324-A8E3A4D0E414");
                 return;
             }
 
-            res_msg = await _form_fill.FormFillingHandle(check_user.User.UserForm, callbackQuery.Message.MessageId, TypeValueTelegramBotHandle.CallbackQuery, callbackQuery.Data, cancellationToken);
+            res_msg = await _form_fill.FormFillingHandle(check_user.Response.UserForm, callbackQuery.Message.MessageId, TypeValueTelegramBotHandle.CallbackQuery, callbackQuery.Data, cancellationToken);
             return;
         }
 
-        else if (callbackQuery.Data.Equals(RestartMQTT) && check_user.User.AllowSystemCommands)
+        else if (callbackQuery.Data.Equals(RestartMQTT) && check_user.Response.AllowSystemCommands)
         {
             await _botClient.SendChatActionAsync(
                    chatId: callbackQuery.Message.Chat.Id,
@@ -295,10 +295,10 @@ public class UpdateHandler : IUpdateHandler
             string message_report = "Перезапуск/запуск службы MQTT.\n";
             ResponseBaseModel start_mqtt = await _tools.StartMqtt(cancellationToken);
             message_report += $"\n{start_mqtt.Message}";
-            _ = await _botClient.SendTextMessageAsync(check_user.User.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
+            _ = await _botClient.SendTextMessageAsync(check_user.Response.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
             return;
         }
-        else if (callbackQuery.Data.Equals(GetProcesses) && check_user.User.AllowSystemCommands)
+        else if (callbackQuery.Data.Equals(GetProcesses) && check_user.Response.AllowSystemCommands)
         {
             await _botClient.SendChatActionAsync(
                    chatId: callbackQuery.Message.Chat.Id,
@@ -332,10 +332,10 @@ public class UpdateHandler : IUpdateHandler
             await _botClient.SendTextMessageAsync(callbackQuery.Message!.Chat.Id, output.Trim(),
                             parseMode: ParseMode.Html,
                             cancellationToken: cancellationToken);
-            await GetStartMessage(check_user.User, null, cancellationToken: cancellationToken);
+            await GetStartMessage(check_user.Response, null, cancellationToken: cancellationToken);
             return;
         }
-        else if (callbackQuery.Data.StartsWith(SystemCommandPrefix) && check_user.User.AllowSystemCommands)
+        else if (callbackQuery.Data.StartsWith(SystemCommandPrefix) && check_user.Response.AllowSystemCommands)
         {
             string sys_com_id = callbackQuery.Data[SystemCommandPrefix.Length..];
 
@@ -363,17 +363,17 @@ public class UpdateHandler : IUpdateHandler
             if (output.Length > 4000)
                 output = output[0..4000];
         }
-        else if (callbackQuery.Data.StartsWith(GlobalStatic.Routes.AbPrefix) && check_user.User.CommandsAllowed)
+        else if (callbackQuery.Data.StartsWith(GlobalStatic.Routes.AbPrefix) && check_user.Response.CommandsAllowed)
         {
             callbackQuery.Data = callbackQuery.Data[GlobalStatic.Routes.AbPrefix.Length..];
             Match match = Regex.Match(callbackQuery.Data, @"^(?<hw_id>\d+)");
             callbackQuery.Data = callbackQuery.Data[(match.Groups["hw_id"].Value.Length)..];
             if (callbackQuery.Data.StartsWith(':'))
                 callbackQuery.Data = callbackQuery.Data[1..];
-            res_msg = await _hardware_view.HardwareViewMainHandle(check_user.User.ChatId, check_user.User.MessageId, callbackQuery.Data, int.Parse(match.Groups["hw_id"].Value), cancellationToken);
+            res_msg = await _hardware_view.HardwareViewMainHandle(check_user.Response.ChatId, check_user.Response.MessageId, callbackQuery.Data, int.Parse(match.Groups["hw_id"].Value), cancellationToken);
             return;
         }
-        else if (callbackQuery.Data.StartsWith($"{GlobalStatic.Routes.Port}:") && check_user.User.CommandsAllowed)
+        else if (callbackQuery.Data.StartsWith($"{GlobalStatic.Routes.Port}:") && check_user.Response.CommandsAllowed)
         {
             callbackQuery.Data = callbackQuery.Data[(GlobalStatic.Routes.Port.Length + 1)..];
             Match match = Regex.Match(callbackQuery.Data, @"^(?<pt_id>\d+)");
@@ -387,14 +387,14 @@ public class UpdateHandler : IUpdateHandler
             if (callbackQuery.Data.StartsWith(cmd_set))
                 callbackQuery.Data = callbackQuery.Data[cmd_set.Length..];
 
-            res_msg = await _hardware_view.HardwarePortViewHandle(check_user.User.ChatId, check_user.User.MessageId, callbackQuery.Data, int.Parse(match.Groups["pt_id"].Value), cancellationToken);
+            res_msg = await _hardware_view.HardwarePortViewHandle(check_user.Response.ChatId, check_user.Response.MessageId, callbackQuery.Data, int.Parse(match.Groups["pt_id"].Value), cancellationToken);
 
-            if (res_msg.MessageId != check_user.User.MessageId)
+            if (res_msg.MessageId != check_user.Response.MessageId)
             {
-                check_user.User.MessageId = res_msg.MessageId;
+                check_user.Response.MessageId = res_msg.MessageId;
                 lock (ServerContext.DbLocker)
                 {
-                    _db.Update(check_user.User);
+                    _db.Update(check_user.Response);
                     _db.SaveChanges(true);
                 }
             }
@@ -405,8 +405,8 @@ public class UpdateHandler : IUpdateHandler
         try
         {
             await _botClient.EditMessageTextAsync(
-                chatId: check_user.User.ChatId,
-                messageId: check_user.User.MessageId,
+                chatId: check_user.Response.ChatId,
+                messageId: check_user.Response.MessageId,
                 text: $"Received {callbackQuery.Data}:\n\n{output}",
                 parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
@@ -416,16 +416,16 @@ public class UpdateHandler : IUpdateHandler
             _logger.LogError("error {B55C5A58-3D2A-4782-92FA-CC16D2FBFEBB}", ex);
 
             Message msg = await _botClient.SendTextMessageAsync(
-                chatId: check_user.User.ChatId,
+                chatId: check_user.Response.ChatId,
                 text: $"Received {callbackQuery.Data}:\n\n{output}",
                 parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
 
             lock (ServerContext.DbLocker)
             {
-                check_user.User.ChatId = msg.Chat.Id;
-                check_user.User.MessageId = msg.MessageId;
-                _db.Update(check_user.User);
+                check_user.Response.ChatId = msg.Chat.Id;
+                check_user.Response.MessageId = msg.MessageId;
+                _db.Update(check_user.Response);
                 _db.SaveChanges();
             }
         }
@@ -470,12 +470,12 @@ public class UpdateHandler : IUpdateHandler
         }
         if (User.CommandsAllowed)
         {
-            HardwareModelDB[] hardwares;
+            HardwareModelDB[] hardwires;
             lock (ServerContext.DbLocker)
             {
-                hardwares = [.. _context.Hardwares];
+                hardwires = [.. _context.Hardwires];
             }
-            foreach (HardwareModelDB hw in hardwares)
+            foreach (HardwareModelDB hw in hardwires)
             {
                 kb_rows.Add([InlineKeyboardButton.WithCallbackData($"•• {(string.IsNullOrWhiteSpace(hw.Name) ? hw.Address : hw.Name)} ••", $"{GlobalStatic.Routes.AbPrefix}{hw.Id}")]);
             }
@@ -543,9 +543,9 @@ public class UpdateHandler : IUpdateHandler
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
     }
 
-    private UserResponseModel CheckTelegramUser(User? from)
+    private TResponseModel<UserModelDB> CheckTelegramUser(User? from)
     {
-        UserResponseModel res = new();
+        TResponseModel<UserModelDB> res = new();
         if (from is null)
         {
             res.AddError("from is null. error {5513E9FE-75DB-4C9F-92A3-7537072AD3CD}");
@@ -555,14 +555,14 @@ public class UpdateHandler : IUpdateHandler
         using ServerContext context = _db_factory.CreateDbContext();
         lock (ServerContext.DbLocker)
         {
-            res.User = context.Users
+            res.Response = context.Users
                 .Include(x => x.UserForm)
                 .ThenInclude(x => x!.Properties)
                 .FirstOrDefault(x => x.TelegramId == from.Id);
 
-            if (res.User is null)
+            if (res.Response is null)
             {
-                res.User = new()
+                res.Response = new()
                 {
                     FirstName = from.FirstName,
                     LastName = from.LastName,
@@ -574,22 +574,22 @@ public class UpdateHandler : IUpdateHandler
                     AllowSystemCommands = false,
                     IsDisabled = true
                 };
-                context.Add(res.User);
+                context.Add(res.Response);
                 res.AddInfo("Пользователь Telegram: создан");
             }
             else
             {
-                res.User.FirstName = from.FirstName;
-                res.User.LastName = from.LastName;
-                res.User.Name = from.Username ?? "";
-                res.User.LastUpdate = DateTime.Now;
-                context.Update(res.User);
+                res.Response.FirstName = from.FirstName;
+                res.Response.LastName = from.LastName;
+                res.Response.Name = from.Username ?? "";
+                res.Response.LastUpdate = DateTime.Now;
+                context.Update(res.Response);
                 res.AddInfo("Данные Telegram пользователя: обновлены");
             }
 
             context.SaveChanges(true);
 
-            res.User = context.Users
+            res.Response = context.Users
                 .Include(x => x.UserForm)
                 .ThenInclude(x => x!.Properties)
                 .FirstOrDefault(x => x.TelegramId == from.Id);

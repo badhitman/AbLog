@@ -10,7 +10,7 @@ namespace SharedLib;
 public class TaskModelDB : EntryModel
 {
     /// <summary>
-    /// Тип запуска/инициализации задачи: ручной, тригер, Telegram
+    /// Тип запуска/инициализации задачи: ручной, триггер, Telegram
     /// </summary>
     public TaskInitiatorsTypesEnum TaskInitiatorType { get; set; }
 
@@ -20,7 +20,7 @@ public class TaskModelDB : EntryModel
     public required int TaskInitiatorId { get; set; }
 
     /// <summary>
-    /// Дата/время запуска/иниализации
+    /// Дата/время запуска/инициализации
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 

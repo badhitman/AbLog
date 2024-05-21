@@ -1,10 +1,10 @@
-﻿@using RazorLib.Shared.hardwares
+﻿@using RazorLib.Shared.hardwires
 @using Newtonsoft.Json;
 @using MudBlazor;
 @using SharedLib;
 
 @inject ClientConfigModel _conf
-@inject IHardwaresService _hardwares
+@inject IHardwiresService _hardwires
 @inject ISnackbar _snackbar
 @inject ILogger<HtmlInputTranslatorComponent> _logger
 
@@ -17,7 +17,6 @@
                 <button @onclick="() => SendForm(InputName, InputValue)" type="button" class="btn btn-warning mb-1">@InputValue</button>
                 break;
             case InputFormTypesEnum.Checkbox:
-                //bool is_checked = NodeData.Attributes?.Any(x => x.Key.Equals("checked", StringComparison.OrdinalIgnoreCase)) == true;
                 <HtmlCheckboxTranslatorComponent SetValueHandler="SetInputValue" InputName="@InputName" InputValue="@InputValue" />
                 break;
             case InputFormTypesEnum.Hidden:
@@ -207,6 +206,4 @@
 #else
     bool IsDebug => false;
 #endif
-
-
 }

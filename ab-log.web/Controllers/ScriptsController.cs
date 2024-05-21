@@ -17,21 +17,21 @@ public class ScriptsController(IScriptsService Scripts) : ControllerBase
     /// Scripts: Get All
     /// </summary>
     [HttpGet($"/{GlobalStatic.Routes.Scripts}/{GlobalStatic.Routes.LIST}")]
-    public async Task<ScriptsResponseModel> ScriptsGetAll(CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ScriptModelDB>>> ScriptsGetAll(CancellationToken cancellation_token = default)
         => await Scripts.ScriptsGetAll(cancellation_token);
 
     /// <summary>
     /// Script delete
     /// </summary>
     [HttpDelete($"/{GlobalStatic.Routes.Scripts}/{{script_id}}")]
-    public async Task<ScriptsResponseModel> ScriptDelete([FromRoute] int script_id, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ScriptModelDB>>> ScriptDelete([FromRoute] int script_id, CancellationToken cancellation_token = default)
         => await Scripts.ScriptDelete(script_id, cancellation_token);
 
     /// <summary>
     /// Script update or create
     /// </summary>
     [HttpPost($"/{GlobalStatic.Routes.Scripts}/{GlobalStatic.Routes.UPDATE}")]
-    public async Task<ScriptsResponseModel> ScriptUpdateOrCreate(EntryDescriptionModel script, CancellationToken cancellation_token = default)
+    public async Task<TResponseModel<List<ScriptModelDB>>> ScriptUpdateOrCreate(EntryDescriptionModel script, CancellationToken cancellation_token = default)
         => await Scripts.ScriptUpdateOrCreate(script, cancellation_token);
 
     /// <summary>

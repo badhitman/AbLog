@@ -16,7 +16,9 @@ public class ParametersContext : DbContext
     /// Атрибут блокировки (для lock {}).
     /// В частности SQLite на слабом Android железе иногда не поспевала записывать данные
     /// </summary>
+#pragma warning disable CA2211 // Поля, не являющиеся константами, не должны быть видимыми
     public static object DbLocker = new();
+#pragma warning restore CA2211 // Поля, не являющиеся константами, не должны быть видимыми
 
     public string? ConnectString { get; private set; }
 
@@ -70,7 +72,7 @@ public class ParametersContext : DbContext
         ParametersStorageModelDB? dataRow;
         lock (DbLocker)
         {
-            dataRow = ParametersStorage.FirstOrDefault(x => x.Name.ToLower() == name.ToLower() && x.TypeName.ToLower() == t_name);
+            dataRow = ParametersStorage.FirstOrDefault(x => x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) && x.TypeName.Equals(t_name, StringComparison.CurrentCultureIgnoreCase));
             if (dataRow is null)
             {
                 dataRow = new ParametersStorageModelDB()
@@ -96,13 +98,13 @@ public class ParametersContext : DbContext
     {
         name = name.Trim();
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentNullException("name");
+            throw new ArgumentNullException(nameof(name));
 
         string t_name = typeof(T).Name.ToLower();
         ParametersStorageModelDB? dataRow;
         lock (DbLocker)
         {
-            dataRow = ParametersStorage.FirstOrDefault(x => x.Name.ToLower() == name.ToLower() && x.TypeName.ToLower() == t_name);
+            dataRow = ParametersStorage.FirstOrDefault(x => x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) && x.TypeName.Equals(t_name, StringComparison.CurrentCultureIgnoreCase));
             if (dataRow is null)
             {
                 dataRow = new ParametersStorageModelDB() { Name = name, StoredValue = value?.ToString() ?? string.Empty, TypeName = t_name };

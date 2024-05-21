@@ -12,10 +12,10 @@ public interface IContentionsService
     /// <summary>
     /// Получить настройки конкуренции команд скриптов
     /// </summary>
-    public Task<IdsResponseModel> ContentionsGetByScript(int script_id, CancellationToken cancellation_token = default);
+    public Task<TResponseModel<List<int>>> ContentionsGetByScript(int script_id, CancellationToken cancellation_token = default);
 
     /// <summary>
     /// Установить правила конкуренции выполнения команд скриптов
     /// </summary>
-    public Task<IdsResponseModel> ContentionSet(ContentionUpdateModel contention_json, CancellationToken cancellation_token = default);
+    public Task<TResponseModel<List<int>>> ContentionSet(ContentionUpdateModel contention_json, CancellationToken cancellation_token = default);
 }

@@ -10,7 +10,7 @@ namespace SharedLib;
 public class ConditionUpdateModel : ConditionBaseModelDB
 {
     /// <inheritdoc/>
-    public static ConditionUpdateModel Build(ConditionAnonimModel init, ConditionsTypesEnum ConditionType, int OwnerId)
+    public static ConditionUpdateModel Build(ConditionAnonymModel init, ConditionsTypesEnum ConditionType, int OwnerId)
     {
         return new ConditionUpdateModel()
         {
@@ -19,7 +19,7 @@ public class ConditionUpdateModel : ConditionBaseModelDB
             HardwareId = init.HardwareId,
             PortId = init.PortId,
             ConditionValueType = init.ConditionValueType,
-            СomparisonMode = init.СomparisonMode,
+            ComparisonMode = init.ComparisonMode,
             Value = init.Value,
             ConditionType = ConditionType,
             OwnerId = OwnerId

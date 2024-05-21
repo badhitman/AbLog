@@ -18,11 +18,9 @@ namespace RazorLib.Shared.html
             {
                 string _t = $"{Text} <{NodeName}/>"; ;
 
-                if (Attributes?.Any() == true)
+                if (Attributes is not null && Attributes.Length != 0)
                     foreach (KeyValuePair<string, string?> at in Attributes)
-                    {
                         _t += $" [{at.Key}:{at.Value}];";
-                    }
 
                 return _t.Trim();
             }

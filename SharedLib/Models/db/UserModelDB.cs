@@ -24,7 +24,7 @@ public class UserModelDB : UniversalModelDB
     public bool IsDisabled { get; set; } = true;
 
     /// <summary>
-    /// Разрешён доступ к системному меню комманд
+    /// Разрешён доступ к системному меню команд
     /// </summary>
     public bool AllowSystemCommands { get; set; } = true;
 

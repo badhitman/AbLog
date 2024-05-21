@@ -4,7 +4,7 @@
 @using SharedLib
 
 @inject ILogger<MainSelectorCommandComponent> _loger
-@* @inject IRefitHardwaresService _refit *@
+@* @inject IRefitHardwiresService _refit *@
 @inject ISnackbar _snackbar
 
 @inherits BlazorBusyComponentBaseModel
@@ -28,7 +28,7 @@
             }
             else if (CommandType == TypesCommandsEnum.Exit)
             {
-                <ExitSelectorComponent AllCsripts="AllCsripts" SelectDirectHandler="SelectHandlerAction" CurrentCommand="CurrentCommand" @ref="ExitSelectorRef" />
+                <ExitSelectorComponent AllScripts="AllScripts" SelectDirectHandler="SelectHandlerAction" CurrentCommand="CurrentCommand" @ref="ExitSelectorRef" />
             }
         </div>
     </div>
@@ -39,7 +39,7 @@
     /// Устройства
     /// </summary>
     [Parameter, EditorRequired]
-    public required EntryNestedModel[] EntriesTreeHW { get; set; }
+    public required IEnumerable<EntryNestedModel> EntriesTreeHW { get; set; }
 
     /// <summary>
     /// Выбранная/текущая команда перехода (если null, то выход)
@@ -51,7 +51,7 @@
     public required Action<CommandModelDB> RootSelectorHandler { get; set; }
 
     [Parameter, EditorRequired]
-    public required IEnumerable<ScriptModelDB> AllCsripts { get; set; }
+    public required IEnumerable<ScriptModelDB> AllScripts { get; set; }
 
     /// <summary>
     /// Типы команд:

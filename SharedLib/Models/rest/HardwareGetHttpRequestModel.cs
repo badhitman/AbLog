@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Hardware пet HTTP кequest
+/// Hardware пet HTTP request
 /// </summary>
 public class HardwareGetHttpRequestModel
 {

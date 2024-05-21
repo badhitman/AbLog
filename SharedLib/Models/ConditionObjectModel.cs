@@ -5,7 +5,7 @@
 namespace SharedLib;
 
 /// <summary>
-/// Условие/ограничения (для тригера или команды)
+/// Условие/ограничения (для триггера или команды)
 /// </summary>
 public class ConditionObjectModel
 {

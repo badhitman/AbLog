@@ -1,17 +1,17 @@
 ﻿@using MudBlazor;
 @using SharedLib
 
-@* @inject IRefitHardwaresService _refit *@
+@* @inject IRefitHardwiresService _refit *@
 @inject ISnackbar _snackbar
 
 <div class="col-auto">
     <div class="input-group">
         <label class="input-group-text" for="inputGroupSelectCommandSetFirst">Options</label>
         <select @bind="CurrentCommandId" class="form-select" id="inputGroupSelectCommandSetFirst">
-            @if (AllCsripts?.Any() == true)
+            @if (AllScripts?.Any() == true)
             {
                 <option class="text-danger" title="Прекратить выполнение" value="0">Выйти</option>
-                @foreach (ScriptModelDB script in AllCsripts!.Where(x => x.Commands?.Any(y => y.Id != CurrentCommandId) == true).AsEnumerable())
+                @foreach (ScriptModelDB script in AllScripts!.Where(x => x.Commands?.Any(y => y.Id != CurrentCommandId) == true).AsEnumerable())
                 {
                     <optgroup label="@(script.Name)">
                         @foreach (CommandModelDB opt in script.Commands!.AsEnumerable())
@@ -36,7 +36,7 @@
     public Action? SelectDirectHandler { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<ScriptModelDB>? AllCsripts { get; set; }
+    public IEnumerable<ScriptModelDB>? AllScripts { get; set; }
 
     int orign_command_id;
     public int CurrentCommandId

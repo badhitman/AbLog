@@ -19,7 +19,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        GlobalStatic.PefixDbFile = "-client";
+        GlobalStatic.PrefixDbFile = "-client";
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -54,7 +54,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IParametersStorageService, ParametersStorageRemoteService>();
         builder.Services.AddSingleton<ISystemCommandsService, SystemCommandsMqttService>();
-        builder.Services.AddSingleton<IHardwaresService, HardwaresMqttService>();
+        builder.Services.AddSingleton<IHardwiresService, HardwiresMqttService>();
         builder.Services.AddSingleton<IMqttBaseService, MqttClientService>();
         builder.Services.AddSingleton<IEmailService, EmailLocalService>();
         builder.Services.AddSingleton<IUsersService, UsersMqttService>();
