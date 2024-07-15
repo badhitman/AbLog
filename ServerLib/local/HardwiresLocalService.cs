@@ -3,8 +3,10 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using AngleSharp.Io;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MudBlazor;
 using SharedLib;
 using System.Collections.Specialized;
 using System.Net;
@@ -286,7 +288,7 @@ public class HardwiresLocalService(ILogger<HardwiresLocalService> Logger, IDbCon
             res.AddError(ex.Message);
         }
 
-        HtmlDomModel dom = await http_resp!.GetDom();
+        HtmlDomModel dom = await GetDom(http_resp?.Response ?? "");
 
         HtmlDomModel sub_dom;
         NameValueCollection query_parameters;
@@ -295,12 +297,14 @@ public class HardwiresLocalService(ILogger<HardwiresLocalService> Logger, IDbCon
         string? _port_key;
         string? _port_num;
         string? _href;
-        dom.RemoveWhere(x => !x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) || (x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) && !x.Attributes?.Any(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true) == true));
-        foreach (HtmlDomTreeItemDataModel link in dom)
+
+        dom.RemoveAll(x => !x.Value!.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) || (x.Value!.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase) && !x.Value!.Attributes?.Any(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true) == true));
+
+        foreach (TreeItemData<HtmlDomTreeItemDataModel> link in dom)
         {
-            _href = link.Attributes!.First(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
+            _href = link.Value!.Attributes!.First(x => x.Key.Equals("href", StringComparison.OrdinalIgnoreCase)).Value;
             hw_request.Path = _href;
-            _href = _href![(_href!.IndexOf("?") + 1)..];
+            _href = _href![(_href!.IndexOf('?') + 1)..];
             query_parameters = HttpUtility.ParseQueryString(_href);
             _port_key = query_parameters.AllKeys.FirstOrDefault(x => x?.Equals("pt", StringComparison.OrdinalIgnoreCase) == true);
             _port_num = query_parameters[_port_key];
@@ -311,13 +315,13 @@ public class HardwiresLocalService(ILogger<HardwiresLocalService> Logger, IDbCon
             try
             {
                 http_resp = await GetHardwareHtmlPage(hw_request, cancellation_token);
-                sub_dom = await http_resp.GetDom();
-                sub_dom.RemoveWhere(x =>
+                sub_dom = await GetDom(http_resp.Response ?? "");
+                sub_dom.RemoveAll(x =>
                 {
-                    if (!x.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase))
+                    if (!x.Value!.NodeName.Equals("a", StringComparison.OrdinalIgnoreCase))
                         return true;
 
-                    _href = x.Attributes?.FirstOrDefault(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true).Value;
+                    _href = x.Value!.Attributes?.FirstOrDefault(y => y.Key.Equals("href", StringComparison.OrdinalIgnoreCase) && y.Value?.StartsWith($"/{db_hw.Password}/?", StringComparison.OrdinalIgnoreCase) == true).Value;
                     if (string.IsNullOrWhiteSpace(_href))
                         return true;
                     _href = _href[(_href.IndexOf("?") + 1)..];
@@ -362,6 +366,18 @@ public class HardwiresLocalService(ILogger<HardwiresLocalService> Logger, IDbCon
             }
         }
 
+        return res;
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public async Task<HtmlDomModel> GetDom(string raw)
+    {
+        HtmlDomModel res = [];
+        await res.Reload(raw ?? "");
         return res;
     }
 

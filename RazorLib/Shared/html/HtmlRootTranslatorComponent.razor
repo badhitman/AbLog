@@ -19,9 +19,9 @@ else
     <div class="card text-bg-dark">
         <div class="card-body">
             <div class="vstack">
-                @foreach (HtmlDomTreeItemDataModel node in TreeItems)
+                @foreach (TreeItemData<HtmlDomTreeItemDataModel> node in TreeItems)
                 {
-                    <HtmlNodeTranslatorComponent NodeData="node" />
+                    <HtmlNodeTranslatorComponent NodeData="node.Value" />
                 }
             </div>
         </div>

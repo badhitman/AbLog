@@ -27,14 +27,4 @@ public class HttpResponseModel : TResponseModel<string>
     /// HTTP Status code
     /// </summary>
     public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public async Task<HtmlDomModel> GetDom()
-    {
-        HtmlDomModel res = [];
-        await res.Reload(Response ?? "");
-        return res;
-    }
 }

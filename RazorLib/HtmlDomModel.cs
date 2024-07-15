@@ -5,6 +5,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using MudBlazor;
 using System.Text.RegularExpressions;
 
 namespace SharedLib;
@@ -12,7 +13,7 @@ namespace SharedLib;
 /// <summary>
 /// HTML Dom
 /// </summary>
-public partial class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
+public partial class HtmlDomModel : List<TreeItemData<HtmlDomTreeItemDataModel>>
 {
     /// <summary>
     /// HTML исходники
@@ -52,10 +53,10 @@ public partial class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
                     InjectChilds(ref t, cn.ChildNodes);
                 }
 
-                Add(t);
+                Add(new TreeItemData<HtmlDomTreeItemDataModel>() { Value = t });
             }
 
-        while (this.FirstOrDefault()?.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
+        while (this.FirstOrDefault()?.Value!.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
             Remove(this.First());
     }
 
@@ -72,9 +73,9 @@ public partial class HtmlDomModel : HashSet<HtmlDomTreeItemDataModel>
                 t.TreeItems = [];
                 InjectChilds(ref t, cn.ChildNodes);
             }
-            nd.TreeItems!.Add(t);
+            nd.TreeItems!.Add(new() { Value = t });
         }
-        while (nd.TreeItems?.FirstOrDefault()?.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
+        while (nd.TreeItems?.FirstOrDefault()?.Value!.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase) == true)
             nd.TreeItems.Remove(nd.TreeItems.First());
     }
 

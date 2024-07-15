@@ -9,30 +9,22 @@ using SharedLib;
 namespace RazorLib;
 
 /// <summary>
-/// 
+/// Blazor Angle-tree
 /// </summary>
 public abstract class BlazorAngleTreeComponentBaseModel : BlazorBusyComponentBaseModel
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     [CascadingParameter, EditorRequired]
     public int Id { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     [Parameter, EditorRequired]
     public string? HtmlSource { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected IHtmlDocument? Document;
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <inheritdoc/>
     protected HtmlDomModel TreeItems { get; set; } = [];
 
     /// <summary>

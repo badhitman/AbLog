@@ -2,9 +2,9 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
-using AngleSharp;
-using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using AngleSharp.Dom;
+using AngleSharp;
 
 namespace SharedLib;
 

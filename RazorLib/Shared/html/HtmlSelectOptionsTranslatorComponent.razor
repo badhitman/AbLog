@@ -12,9 +12,9 @@
         <optgroup label="@label">
             @if (NodeData.TreeItems?.Any() == true)
             {
-                foreach (HtmlDomTreeItemDataModel opt_node in NodeData.TreeItems)
+                foreach (TreeItemData<HtmlDomTreeItemDataModel> opt_node in NodeData.TreeItems)
                 {
-                    <HtmlSelectOptionsTranslatorComponent NodeData="opt_node" />
+                    <HtmlSelectOptionsTranslatorComponent NodeData="opt_node.Value" />
                 }
             }
         </optgroup>

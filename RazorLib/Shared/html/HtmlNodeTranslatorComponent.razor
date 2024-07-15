@@ -66,9 +66,9 @@
                 @NodeData.Title
                 @if (NodeData.TreeItems?.Any() == true)
                 {
-                    foreach (HtmlDomTreeItemDataModel node in NodeData.TreeItems)
+                    foreach (TreeItemData<HtmlDomTreeItemDataModel> node in NodeData.TreeItems)
                     {
-                        <HtmlNodeTranslatorComponent NodeData="node" />
+                        <HtmlNodeTranslatorComponent NodeData="node.Value" />
                     }
                 }
             </div>

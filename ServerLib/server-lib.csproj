@@ -10,16 +10,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
-		<PackageReference Include="MailKit" Version="4.4.0" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
+		<PackageReference Include="MailKit" Version="4.7.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-		<PackageReference Include="MQTTnet" Version="4.3.3.952" />
+		<PackageReference Include="MQTTnet" Version="4.3.6.1152" />
 		<PackageReference Include="Telegram.Bot" Version="19.0.0" />
+		<PackageReference Include="MudBlazor" Version="7.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DBContextLib\db-context.csproj" />
 	  <ProjectReference Include="..\FlashCap\FlashCap\FlashCap.csproj" />
+	  <ProjectReference Include="..\RazorLib\razor-lib.csproj" />
 	</ItemGroup>
 
 </Project>

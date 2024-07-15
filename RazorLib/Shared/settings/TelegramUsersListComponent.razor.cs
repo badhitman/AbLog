@@ -75,14 +75,14 @@ public partial class TelegramUsersListComponent : BlazorBusyComponentBaseModel
     void BeckupEditItem(object element)
     {
         UserModelDB sender = (UserModelDB)element;
-        elementBeforeEdit = GlobalStatic.CreateDeepCopy<UserModelDB>(sender);
+        elementBeforeEdit = GlobalStatic.CreateDeepCopy(sender);
         StateHasChanged();
     }
 
     /// <summary>
     /// Here we simulate getting the paged, filtered and ordered data from the server
     /// </summary>
-    private async Task<TableData<UserModelDB>> ServerReload(TableState state)
+    private async Task<TableData<UserModelDB>> ServerReload(TableState state, CancellationToken cancellationToken)
     {
         IsBusyProgress = true;
         StateHasChanged();

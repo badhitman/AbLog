@@ -15,9 +15,9 @@
             <h4>@NodeData.Text</h4>
             @if (NodeData.TreeItems?.Any() == true)
             {
-                foreach (HtmlDomTreeItemDataModel node in NodeData.TreeItems)
+                foreach (TreeItemData<HtmlDomTreeItemDataModel> node in NodeData.TreeItems)
                 {
-                    <HtmlNodeTranslatorComponent NodeData="node" />
+                    <HtmlNodeTranslatorComponent NodeData="node.Value" />
                 }
             }
         </form>

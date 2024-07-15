@@ -16,8 +16,7 @@ else
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <MudTreeView Items="TreeItems">
             <ItemTemplate>
-                <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context"
-                                 Text="@context.Title" EndText="@context.ChildElementsCount.ToString()" EndTextTypo="@Typo.caption" />
+                <MudTreeViewItem Items="@context.Value!.TreeItems" Text="@context.Value.Title" EndText="@context.Value.ChildElementsCount.ToString()" EndTextTypo="@Typo.caption" />
             </ItemTemplate>
         </MudTreeView>
     </div>

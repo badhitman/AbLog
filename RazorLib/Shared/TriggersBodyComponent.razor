@@ -25,7 +25,7 @@ else
 {
     <div class="row">
         <div class="col-3">
-            <MudList @ref="_listRef" Clickable="true" @bind-SelectedValue="SelectedValue">
+            <MudList @ref="_listRef" @bind-SelectedValue="SelectedValue">
                 <MudDivider DividerType="DividerType.Middle" />
                 @foreach (TrigerModelDB trig in Triggers.OrderBy(x => x.Name))
                 {

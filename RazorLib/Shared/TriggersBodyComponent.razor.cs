@@ -48,10 +48,8 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
 
     ConditionsComponent? conditions_ref;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    protected MudList? _listRef;
+    /// <inheritdoc/>
+    protected MudList<object>? _listRef;
 
     object _selVal = 0;
     object SelectedValue

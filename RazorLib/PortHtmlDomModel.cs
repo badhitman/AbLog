@@ -2,6 +2,7 @@
 // © https://github.com/badhitman 
 ////////////////////////////////////////////////
 
+using MudBlazor;
 using System.Collections.Specialized;
 using System.Web;
 
@@ -31,8 +32,8 @@ public class PortHtmlDomModel : HtmlDomModel
 
         last_tag_name = "";
         string res = "";
-        foreach (HtmlDomTreeItemDataModel item in this)
-            ReadNode(ref res, item);
+        foreach (TreeItemData<HtmlDomTreeItemDataModel> item in this)
+            ReadNode(ref res, item.Value!);
 
         return res;
     }
@@ -75,8 +76,8 @@ public class PortHtmlDomModel : HtmlDomModel
                 {
                     last_tag_name = "";
                     deep_num++;
-                    foreach (HtmlDomTreeItemDataModel sub_item in item.TreeItems.Where(x => !x.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase)))
-                        ReadNode(ref tg_resp_html, sub_item, deep_num);
+                    foreach (TreeItemData<HtmlDomTreeItemDataModel>? sub_item in item.TreeItems.Where(x => !x.Value!.NodeName.Equals("br", StringComparison.OrdinalIgnoreCase)))
+                        ReadNode(ref tg_resp_html, sub_item.Value!, deep_num);
                 }
                 break;
             case "input":
@@ -111,8 +112,8 @@ public class PortHtmlDomModel : HtmlDomModel
                 {
                     deep_num++;
                     last_tag_name = "";
-                    foreach (HtmlDomTreeItemDataModel sub_item in item.TreeItems)
-                        ReadNode(ref tg_resp_html, sub_item, deep_num);
+                    foreach (TreeItemData<HtmlDomTreeItemDataModel> sub_item in item.TreeItems)
+                        ReadNode(ref tg_resp_html, sub_item.Value!, deep_num);
                 }
                 if (tg_resp_html.TrimEnd().EndsWith('○'))
                     tg_resp_html = $"{tg_resp_html[..tg_resp_html.LastIndexOf('○')]}\n";
@@ -135,11 +136,11 @@ public class PortHtmlDomModel : HtmlDomModel
             return "";
 
         string? value_prop = null; ;
-        foreach (HtmlDomTreeItemDataModel item in treeItems)
+        foreach (TreeItemData<HtmlDomTreeItemDataModel> item in treeItems)
         {
-            if (item.Attributes?.Any(x => x.Key.Equals("selected", StringComparison.OrdinalIgnoreCase)) == true)
+            if (item.Value!.Attributes?.Any(x => x.Key.Equals("selected", StringComparison.OrdinalIgnoreCase)) == true)
             {
-                value_prop = item.Attributes.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
+                value_prop = item.Value!.Attributes.FirstOrDefault(x => x.Key.Equals("value", StringComparison.OrdinalIgnoreCase)).Value;
                 return $"'<code>{item.Text}</code>'";
             }
         }
