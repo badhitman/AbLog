@@ -134,10 +134,14 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
         TResponseModel<List<ScriptModelDB>> rest_all_scripts = await ScriptsService.ScriptsGetAll(CancellationToken);
         SnackBar.ShowMessagesResponse(rest_all_scripts.Messages);
         if (!rest_all_scripts.IsSuccess)
+        {
+            IsBusyProgress = false;
             return;
+        }
 
         if (rest_all_scripts.Response is null)
         {
+            IsBusyProgress = false;
             SnackBar.Add("rest_all_scripts.Scripts is null ошибка {5B557F50-0F44-40CD-A5B4-10A58F78D701}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
@@ -146,10 +150,14 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
         TResponseModel<List<TrigerModelDB>> rest_all_triggers = await TriggersService.TriggersGetAll(CancellationToken);
         SnackBar.ShowMessagesResponse(rest_all_triggers.Messages);
         if (!rest_all_triggers.IsSuccess)
+        {
+            IsBusyProgress = false;
             return;
+        }
 
         if (rest_all_triggers.Response is null)
         {
+            IsBusyProgress = false;
             SnackBar.Add("rest_all_triggers.Triggers is null ошибка {4334BFB1-481E-460D-9E21-B8782DEA3DCA}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
@@ -160,10 +168,14 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
         TResponseModel<List<EntryNestedModel>> rest_hw_tree = await HardwiresService.HardwiresGetTreeNestedEntries(CancellationToken);
         SnackBar.ShowMessagesResponse(rest_hw_tree.Messages);
         if (!rest_hw_tree.IsSuccess)
+        {
+            IsBusyProgress = false;
             return;
+        }
 
         if (rest_hw_tree.Response is null)
         {
+            IsBusyProgress = false;
             SnackBar.Add("rest_hw_tree.Entries is null ошибка {7A0F6B2C-8286-4CB5-84AB-7F954831FE94}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }
@@ -282,7 +294,5 @@ public partial class TriggersBodyComponent : BlazorBusyComponentBaseModel
         Triggers.RemoveAt(Triggers.FindIndex(x => x.Id == src.Id));
         Triggers.Add(src);
         SelectedValue = src.Id;
-
-        IsBusyProgress = false;
     }
 }

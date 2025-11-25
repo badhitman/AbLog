@@ -1,4 +1,5 @@
-Add-Migration ab_storage_001 -Context ParametersContext
-Update-Database -Context ParametersContext
-Add-Migration ab_server_015 -Context ServerContext
-Update-Database -Context ServerContext
+Add-Migration ab_storage_001 -Context ParametersContext -Project db-context -StartupProject db-context
+Update-Database -Context ab_storage_001 -Project db-context -StartupProject db-context
+
+Add-Migration ab_server_001 -Context ServerContext -Project db-context -StartupProject db-context
+Update-Database -Context ServerContext -Project db-context -StartupProject db-context

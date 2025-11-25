@@ -127,10 +127,14 @@ public partial class ScriptsBodyComponent : BlazorBusyComponentBaseModel
         TResponseModel<List<ScriptModelDB>> res = await ScriptsService.ScriptsGetAll(CancellationToken);
         Snackbar.ShowMessagesResponse(res.Messages);
         if (!res.IsSuccess)
+        {
+            IsBusyProgress = false;
             return;
+        }
 
         if (res.Response is null)
         {
+            IsBusyProgress = false;
             Snackbar.Add("res.Content?.Scripts is null ошибка {EB6B7427-DB32-4B76-8F85-D4B10E5B2488}", Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
             return;
         }

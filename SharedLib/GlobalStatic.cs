@@ -15,7 +15,7 @@ namespace SharedLib;
 /// </summary>
 public static class GlobalStatic
 {
-    static string PersonalFolderPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "ab-log-droid");
+    static string PersonalFolderPath => Path.Combine("/storage/emulated/0/Documents", "ab-log-droid");//Environment.GetFolderPath(Environment.SpecialFolder.Personal)
 
     /// <summary>
     /// Путь к папке с файлами базы данных

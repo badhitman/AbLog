@@ -72,7 +72,7 @@ public class ParametersContext : DbContext
         ParametersStorageModelDB? dataRow;
         lock (DbLocker)
         {
-            dataRow = ParametersStorage.FirstOrDefault(x => x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) && x.TypeName.Equals(t_name, StringComparison.CurrentCultureIgnoreCase));
+            dataRow = ParametersStorage.FirstOrDefault(x => x.Name == name && x.TypeName == t_name);
             if (dataRow is null)
             {
                 dataRow = new ParametersStorageModelDB()

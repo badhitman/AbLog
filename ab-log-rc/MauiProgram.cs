@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MQTTnet;
@@ -67,6 +68,11 @@ public static class MauiProgram
         builder.Services.AddScoped<ITriggersService, TriggersMqttService>();
 
         builder.Services.AddSingleton<INotifyService, NotifyService>();
+
+        
+         builder.Services.AddDbContextFactory<ParametersContext>(opt =>
+            opt.UseSqlite());
+         
 
         using ParametersContext _context = new();
         string _mqttConfig = _context.GetStoredParameter(nameof(MqttConfigModel), "").StoredValue;
