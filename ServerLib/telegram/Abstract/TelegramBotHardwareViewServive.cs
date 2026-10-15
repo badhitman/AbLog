@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////
 
 using ab.context;
+using AbLogNet.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -45,7 +46,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         {
             output = "hw_db is null. error {65D334FE-8131-405C-81C3-C7EA72517DC4}";
             Logger.LogError(output);
-            return await BotClient.EditMessageTextAsync(chat_id, message_id, output, cancellationToken: cancellation_token);
+            return await BotClient.EditMessageText(chat_id, message_id, output, cancellationToken: cancellation_token);
         }
 
         if (!string.IsNullOrWhiteSpace(hw_db.Name))
@@ -56,7 +57,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         if (hw_db.Ports?.Any() != true)
         {
             output += "hw_db.Ports?.Any() != true. error {DF48A07D-098E-4B2C-A5B0-7B6B162566EF}";
-            return await BotClient.EditMessageTextAsync(chat_id, message_id, output, parseMode: ParseMode.Html, cancellationToken: cancellation_token);
+            return await BotClient.EditMessageText(chat_id, message_id, output, parseMode: ParseMode.Html, cancellationToken: cancellation_token);
         }
 
         List<InlineKeyboardButton[]> kb_rows = [];
@@ -76,7 +77,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
             return await HardwarePortViewHandle(chat_id, message_id, set_value, int.Parse(match.Groups["port_id"].Value), cancellation_token);
         }
 
-        return await BotClient.EditMessageTextAsync(chat_id, message_id, output, replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
+        return await BotClient.EditMessageText(chat_id, message_id, output, replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
     }
 
     /// <inheritdoc/>
@@ -95,7 +96,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         {
             output = "port_db?.Hardware is null. error {9D8C8A6D-D1EC-4D45-A45D-9C5A56C494A3}";
             Logger.LogError(output);
-            return await BotClient.EditMessageTextAsync(chat_id, message_id, output, cancellationToken: cancellation_token);
+            return await BotClient.EditMessageText(chat_id, message_id, output, cancellationToken: cancellation_token);
         }
 
         if (!string.IsNullOrWhiteSpace(port_db.Hardware.Name))
@@ -128,7 +129,7 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         {
             output = http_resp.Message;
             Logger.LogError(output);
-            return await BotClient.EditMessageTextAsync(chat_id, message_id, output, replyMarkup: new InlineKeyboardMarkup(kb_rows), cancellationToken: cancellation_token);
+            return await BotClient.EditMessageText(chat_id, message_id, output, replyMarkup: new InlineKeyboardMarkup(kb_rows), cancellationToken: cancellation_token);
         }
 
         PortHtmlDomModel dom = [];
@@ -138,12 +139,12 @@ public partial class TelegramBotHardwareViewServive(ITelegramBotClient BotClient
         foreach ((string text, string href) in dom.Links)
             kb_rows.Add([InlineKeyboardButton.WithCallbackData($"🔗 {text}", href)]);
         if (string.IsNullOrEmpty(set_value))
-            return await BotClient.EditMessageTextAsync(chat_id, message_id, $"{output}\n{_tg_resp_msg}", replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
+            return await BotClient.EditMessageText(chat_id, message_id, $"{output}\n{_tg_resp_msg}", replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
 
-        Message new_msg = await BotClient.SendTextMessageAsync(chat_id, $"{output}\n{_tg_resp_msg}", replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
+        Message new_msg = await BotClient.SendMessage(chat_id, $"{output}\n{_tg_resp_msg}", replyMarkup: new InlineKeyboardMarkup(kb_rows), parseMode: ParseMode.Html, cancellationToken: cancellation_token);
         try
         {
-            await BotClient.DeleteMessageAsync(chat_id, message_id, cancellationToken: cancellation_token);
+            await BotClient.DeleteMessage(chat_id, message_id, cancellationToken: cancellation_token);
         }
         catch (Exception ex)
         {

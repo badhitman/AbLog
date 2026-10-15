@@ -1,0 +1,39 @@
+﻿@using Newtonsoft.Json;
+@using MudBlazor;
+@using SharedLib;
+
+@inject ClientConfigModel _conf
+@inject ISnackbar _snackbar
+
+<input type="checkbox" @bind="isChecked" name="@InputValue" class="form-check-input" aria-describedby="@($"{InputName}Help")" />
+<div id="@($"{InputName}Help")" class="form-text mb-3">@((MarkupString)(_conf.AboutInputInfo(InputName, PagePath, FormContext) ?? $"error `{InputName}` 08396691-95CC-4EC7-B91F-FDF4476D5A44"))</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string InputName { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string InputValue { get; set; }
+
+    /// <inheritdoc/>
+    [CascadingParameter(Name = "PagePath")]
+    public required string PagePath { get; set; }
+
+    public bool isChecked
+    {
+        set
+        {
+            SetValueHandler((value ? InputValue : null), InputName);
+        }
+        get
+        {
+            return FormContext?.DataContext.ContainsKey(InputName) == true;
+        }
+    }
+
+    [Parameter, EditorRequired]
+    public required Action<string?, string?> SetValueHandler { get; set; }
+
+    [CascadingParameter]
+    public FormContextModel? FormContext { get; set; }
+}

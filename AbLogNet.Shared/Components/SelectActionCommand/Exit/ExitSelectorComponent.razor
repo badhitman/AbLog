@@ -1,0 +1,25 @@
+﻿@using MudBlazor;
+@using SharedLib
+
+@inject ISnackbar _snackbar
+
+<div class="col-auto">
+    <div class="input-group">
+        <label class="input-group-text" for="inputGroupSelectCommandSetFirst">Options</label>
+        <select @bind="CurrentCommandId" class="form-select" id="inputGroupSelectCommandSetFirst">
+            @if (AllScripts?.Any() == true)
+            {
+                <option class="text-danger" title="Прекратить выполнение" value="0">Выйти</option>
+                @foreach (ScriptModelDB script in AllScripts!.Where(x => x.Commands?.Any(y => y.Id != CurrentCommandId) == true).AsEnumerable())
+                {
+                    <optgroup label="@(script.Name)">
+                        @foreach (CommandModelDB opt in script.Commands!.AsEnumerable())
+                        {
+                            <option class="text-@(opt.Id == orign_command_id ? "success" : "body")" value="@(opt.Id)">@(opt.Name)</option>
+                        }
+                    </optgroup>
+                }
+            }
+        </select>
+    </div>
+</div>

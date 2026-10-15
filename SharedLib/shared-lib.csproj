@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SharedLib</RootNamespace>
@@ -15,8 +15,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.8.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.7" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.13" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 
 </Project>

@@ -1,0 +1,184 @@
+﻿@using AbLogNet.Shared.Components.SelectActionCommand
+@using Microsoft.AspNetCore.Components.Forms;
+@using MudBlazor;
+@using SharedLib;
+
+@inject ILogger<FormEditCommandComponent> _loger
+@inject IHardwiresService HardwiresService
+@inject ICommandsService CommandsService
+@inject ISnackbar _snackbar
+
+@inherits BlazorBusyComponentBaseModel
+
+<EditForm @ref="form_ref" autocomplete="off" Model="@CurrentCommand">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row gy-2 gx-3 align-items-center">
+        <div class="col-auto">
+            <div class="input-group">
+                <span class="input-group-text">Имя:</span>
+                <CustomInputTextComponent @bind-Value="CurrentCommand.Name" class="form-control" id="exampleInputTitle" aria-describedby="nameHelp" />
+            </div>
+        </div>
+        <div class="col-auto" title="Пауза перед выполнением команды">
+            <div class="input-group">
+                <span class="input-group-text">Задержка:</span>
+                <input @bind="CurrentCommand.PauseSecondsBeforeExecution" type="number" min="1" class="form-control" aria-label="Amount (to the nearest dollar)">
+                <span class="input-group-text"> сек.</span>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="form-check form-switch">
+                <InputCheckbox @bind-Value="CurrentCommand.Hidden" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                <label class="form-check-label" for="flexSwitchCheckDefault">Скрытая команда</label>
+            </div>
+        </div>
+    </div>
+
+    <MainSelectorCommandComponent AllScripts="AllScripts" RootSelectorHandler="MainSelectorHandler" @ref="action_selector_ref" CurrentCommand="CurrentCommand" EntriesTreeHW="EntriesTreeHW" />
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+        <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            @if (CanSaveCommand && CurrentCommand.Id > 0)
+            {
+                <button @onclick="CancelCommandHandle" class="btn btn-outline-info" type="button" title="Отменить изменения команды">Отмена</button>
+            }
+            <button @onclick="SaveCommandHandle" disabled="@(!CanSaveCommand)" class="btn btn-outline-primary" type="button" title="Сохранить изменения в БД">Сохранить</button>
+            <button @onclick="DeleteCommandHandle" class="btn btn-outline-danger" type="button" title="@(CommandInitDel ? "Подтвердить удаление команды" : "Удалить команду?")">@(CommandInitDel ? "Подтвердить удаление" : "Удалить")</button>
+        </div>
+    </div>
+    <hr />
+    <ConditionsComponent EntriesTreeHW="EntriesTreeHW" OwnerId="CurrentCommand.Id" ConditionType="ConditionsTypesEnum.Command" />
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public required EntrySortingModel CommandEntry { get; set; }
+
+    [Parameter, EditorRequired]
+    public double CommandSorting { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Action<int> DeleteCommand { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Action<CommandModelDB> UpdateCommand { get; set; }
+
+    [Parameter, EditorRequired]
+    public int ScriptId { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IEnumerable<ScriptModelDB> AllScripts { get; set; }
+
+    IEnumerable<EntryNestedModel> EntriesTreeHW { get; set; } = [];
+
+    EditCommandViewModel EditCommandOrigin = new();
+    CommandModelDB CurrentCommand = new();
+    //
+    EditForm? form_ref;
+
+    MainSelectorCommandComponent? action_selector_ref;
+
+    private string ModalBodyText { get; set; } = string.Empty;
+
+    bool CanSaveCommand => EditCommandOrigin != CurrentCommand || CurrentCommand.Id < 1;
+
+    void MainSelectorHandler(CommandModelDB sender)
+    {
+        CurrentCommand.CommandType = sender.CommandType;
+        CurrentCommand.Execution = sender.Execution;
+        CurrentCommand.ExecutionParameter = sender.ExecutionParameter;
+        CurrentCommand.Sorting = sender.Sorting;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentCommand.Id = CommandEntry.Id;
+        CurrentCommand.Name = CommandEntry.Name;
+
+        TResponseModel<List<EntryNestedModel>> rest = await HardwiresService.HardwiresGetTreeNestedEntries(CancellationToken);
+        string msg;
+        if (rest.Response is null)
+        {
+            msg = "rest.Entries is null. error {B28F5A75-4265-446E-A0D2-AC1A08FBCB2D}";
+            _loger.LogError(msg);
+            _snackbar.Add(msg, Severity.Error, conf => conf.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+        EntriesTreeHW = rest.Response;
+
+        if (CommandEntry.Id > 0)
+            await Rest();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender && CurrentCommand.Id != CommandEntry.Id)
+        {
+            if (CommandEntry.Id < 1)
+                CurrentCommand = new() { Id = CommandEntry.Id, Name = CommandEntry.Name };
+            else
+                await Rest(true);
+        }
+    }
+
+    async Task Rest(bool upd_state = false)
+    {
+        TResponseModel<CommandModelDB> rest = await CommandsService.CommandGet(CommandEntry.Id, CancellationToken);
+        _snackbar.ShowMessagesResponse(rest.Messages);
+        if (rest.IsSuccess != true)
+            return;
+
+        string msg = "rest.Command is null. error {FC7B35DD-B70B-45D9-9BF8-104D9B60DE5E}";
+        if (rest.Response is null)
+        {
+            _loger.LogError(msg);
+            _snackbar.Add(msg, Severity.Error, c => c.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow);
+            return;
+        }
+
+        CurrentCommand = rest.Response;
+        CurrentCommand.ScriptId = ScriptId;
+        EditCommandOrigin = (EditCommandViewModel)CurrentCommand;
+        if (upd_state)
+            StateHasChanged();
+    }
+
+    void CancelCommandHandle() => CurrentCommand = (CommandModelDB)EditCommandOrigin;
+
+    async Task SaveCommandHandle()
+    {
+        CurrentCommand.ScriptId = ScriptId;
+        CurrentCommand.Sorting = CommandSorting;
+        EditCommandOrigin.Id = CurrentCommand.Id;
+        EditCommandOrigin.Name = CurrentCommand.Name;
+        EditCommandOrigin.Hidden = CurrentCommand.Hidden;
+        EditCommandOrigin.PauseSecondsBeforeExecution = CurrentCommand.PauseSecondsBeforeExecution;
+
+        ResponseBaseModel rest = await CommandsService.CommandUpdateOrCreate(CurrentCommand, CancellationToken);
+        _snackbar.ShowMessagesResponse(rest.Messages);
+        if (rest.IsSuccess != true)
+            return;
+
+        CurrentCommand = (CommandModelDB)EditCommandOrigin;
+        UpdateCommand(CurrentCommand);
+    }
+
+    bool CommandInitDel = false;
+    async Task DeleteCommandHandle()
+    {
+        CommandInitDel = !CommandInitDel;
+        if (CommandInitDel)
+            return;
+
+        ResponseBaseModel rest = await CommandsService.CommandDelete(CommandEntry.Id, CancellationToken);
+        _snackbar.ShowMessagesResponse(rest.Messages);
+
+        if (!rest.IsSuccess)
+            return;
+
+        DeleteCommand(CommandEntry.Id);
+    }
+}

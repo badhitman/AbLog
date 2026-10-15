@@ -1,0 +1,27 @@
+﻿@using System.Text.RegularExpressions;
+@using AngleSharp.Html.Parser;
+@using AngleSharp.Html.Dom;
+@using Microsoft.JSInterop;
+@using AngleSharp.Dom;
+@using MudBlazor;
+@using SharedLib;
+
+@inherits BlazorAngleTreeComponentBaseModel
+
+@if (IsBusyProgress)
+{
+    <span>Парсинг ...</span>
+}
+else
+{
+    <div class="card text-bg-dark">
+        <div class="card-body">
+            <div class="vstack">
+                @foreach (TreeItemData<HtmlDomTreeItemDataModel> node in TreeItems)
+                {
+                    <HtmlNodeTranslatorComponent NodeData="node.Value" />
+                }
+            </div>
+        </div>
+    </div>
+}

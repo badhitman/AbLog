@@ -28,18 +28,17 @@ public abstract class ReceiverServiceBase<TUpdateHandler> : IReceiverService
     /// <summary>
     /// Start to service Updates with provided Update Handler class
     /// </summary>
-    /// <param name="stoppingToken"></param>
-    /// <returns></returns>
     public async Task ReceiveAsync(CancellationToken stoppingToken)
     {
         // ToDo: we can inject ReceiverOptions through IOptions container
-        var receiverOptions = new ReceiverOptions()
+        ReceiverOptions receiverOptions = new()
         {
-            AllowedUpdates = Array.Empty<UpdateType>(),
-            ThrowPendingUpdates = true,
+            AllowedUpdates = [],
+            //ThrowPendingUpdates = true,
+            DropPendingUpdates = true
         };
 
-        var me = await _botClient.GetMeAsync(stoppingToken);
+        var me = await _botClient.GetMe(stoppingToken);
         _logger.LogInformation("Start receiving updates for {BotName}", me.Username ?? "My Awesome Bot");
 
         // Start receiving updates

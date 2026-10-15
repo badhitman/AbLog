@@ -1,0 +1,32 @@
+﻿@using MudBlazor;
+@using SharedLib
+
+@inject IHardwiresService _hardwires
+@inject ISnackbar _snackbar
+
+<div class="col-auto">
+    <div class="input-group">
+        <label class="input-group-text" for="inputGroupSelectCommandSetFirst">Блок</label>
+        <select @bind="SelectedControllerId" class="form-select" id="inputGroupSelectCommandSetFirst">
+            @foreach (EntryNestedModel hw in EntriesTreeHW)
+            {
+                <option value="@(hw.Id)">@(hw.Name) <sup>[#@(hw.Id)]</sup></option>
+            }
+        </select>
+    </div>
+</div>
+
+@if (CurrentCommand?.CommandType == TypesCommandsEnum.Port && SelectedControllerId > 0)
+{
+    EntryNestedModel? curr_entry = EntriesTreeHW.FirstOrDefault(x => x.Id == SelectedControllerId);
+    int _selectedPortId = SelectorPortRef?.SelectedPortId.GetValueOrDefault(0) ?? 0;
+    if (_selectedPortId < 1 && curr_entry?.Childs.Any() == true)
+    {
+        _selectedPortId = curr_entry.Childs.First().Id;
+    }
+    <PortSelectorComponent CurrentPort="CurrentPort" CurrentCommand="CurrentCommand" SelectPortHandler="ControllerActionHandler" @ref="SelectorPortRef" Ports="@(curr_entry?.Childs)" />
+}
+else if (CurrentCommand?.CommandType == TypesCommandsEnum.Controller)
+{
+    <ControllerCmdComponent CurrentCommand="CurrentCommand" HandlerAction="ControllerActionHandler" @ref="CommandControllerRef" />
+}

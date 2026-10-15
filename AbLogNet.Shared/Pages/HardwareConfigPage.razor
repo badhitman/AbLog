@@ -1,0 +1,24 @@
+﻿@page "/hardware-page/{Id:int}"
+@using AbLogNet.Shared.Components.hardwires
+@using AbLogNet.Shared.Components.navs.tabs
+
+@inherits BlazorBusyComponentBaseModel
+
+<PageTitle>
+    Управляющий блок #@(Id)
+</PageTitle>
+
+<h1>Настройка управляющего блока</h1>
+
+<CascadingValue Value="@Id">
+    <TabSetComponent>
+        <TabComponent Tooltip="Управляющий блок" Title="Управляющий блок">
+            <HardwareFormComponent />
+        </TabComponent>
+        <TabComponent Tooltip="Ретранслятор" Title="Ретранслятор">
+            <CascadingValue Value="@("/")" Name="PagePath">
+                <HardwareTranslateMainLayerComponent />
+            </CascadingValue>
+        </TabComponent>
+    </TabSetComponent>
+</CascadingValue>

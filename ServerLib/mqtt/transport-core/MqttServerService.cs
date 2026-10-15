@@ -282,7 +282,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
             try
             {
                 TelegramBotClient tbot_cli = new(options, _http_client);
-                Telegram.Bot.Types.User _me = await tbot_cli.GetMeAsync();
+                Telegram.Bot.Types.User _me = await tbot_cli.GetMe();
                 res.FirstName = _me.FirstName;
                 res.LastName = _me.LastName;
                 res.Username = _me.Username;
@@ -291,7 +291,7 @@ public class MqttServerService : MqttBaseServiceAbstraction
                 ITelegramBotClient? tbc = _service_provider.GetService<ITelegramBotClient>();
                 if (tbc is not null)
                 {
-                    Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync();
+                    Telegram.Bot.Types.User _demon_me = await tbc.GetMe();
                     res.ServiceIsRunning = new()
                     {
                         FirstName = _demon_me.FirstName,

@@ -47,6 +47,15 @@ public class EmailLocalService : IEmailService, IDisposable
             _ => SecureSocketOptions.Auto,
         };
 
+        if (string.IsNullOrWhiteSpace(conf.HostSmtp))
+            throw new ArgumentNullException(nameof(conf.HostSmtp));
+
+        if (string.IsNullOrWhiteSpace(conf.Login))
+            throw new ArgumentNullException(nameof(conf.Login));
+
+        if (string.IsNullOrWhiteSpace(conf.Password))
+            throw new ArgumentNullException(nameof(conf.Password));
+
         try
         {
             await client_smtp.ConnectAsync(conf.HostSmtp, conf.PortSmtp, _sec_opt);
@@ -63,6 +72,9 @@ public class EmailLocalService : IEmailService, IDisposable
     /// <inheritdoc/>
     public async Task<ResponseBaseModel> SendEmailAsync(string email, string subject, string message, bool html_format, EmailConfigModel conf)
     {
+        if (string.IsNullOrWhiteSpace(conf.Email))
+            throw new ArgumentNullException(nameof(conf.Email));
+
         using MimeMessage emailMessage = new();
 
         emailMessage.From.Add(new MailboxAddress(conf.Email, conf.Email));

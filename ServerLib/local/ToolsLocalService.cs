@@ -101,7 +101,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
         try
         {
             TelegramBotClient tbot_cli = new(options, HttpClient);
-            Telegram.Bot.Types.User _me = await tbot_cli.GetMeAsync(cancellationToken: cancellation_token);
+            Telegram.Bot.Types.User _me = await tbot_cli.GetMe(cancellationToken: cancellation_token);
 
             res.FirstName = _me.FirstName;
             res.LastName = _me.LastName;
@@ -112,7 +112,7 @@ public class ToolsLocalService(IMqttBaseService MqttClientService, IParametersSt
 
             if (tbc is not null)
             {
-                Telegram.Bot.Types.User _demon_me = await tbc.GetMeAsync(cancellationToken: cancellation_token);
+                Telegram.Bot.Types.User _demon_me = await tbc.GetMe(cancellationToken: cancellation_token);
                 res.ServiceIsRunning = new()
                 {
                     FirstName = _demon_me.FirstName,

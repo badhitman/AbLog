@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AbLogNet.Shared\AbLogNet.Shared.csproj" />
+  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="..\AbLogNet.Shared\libman.json" />
+		<EmbeddedResource Include="..\AbLogNet.Shared\conf.json" Link="conf.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+</Project>

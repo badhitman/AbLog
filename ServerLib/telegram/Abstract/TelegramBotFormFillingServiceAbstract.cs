@@ -70,7 +70,7 @@ public abstract class TelegramBotFormFillingServiceAbstract : ITelegramBotFormFi
             next_prop.PropValue = set_value;
             db.Update(next_prop);
             db.SaveChanges();
-            await BotClient.DeleteMessageAsync(form.OwnerUser.ChatId, message_id, cancellationToken: cancellation_token);
+            await BotClient.DeleteMessage(form.OwnerUser.ChatId, message_id, cancellationToken: cancellation_token);
             return await FormFillingHandle(form, message_id, TypeValueTelegramBotHandle.Message, "", cancellation_token);
         }
 
@@ -92,12 +92,12 @@ public abstract class TelegramBotFormFillingServiceAbstract : ITelegramBotFormFi
                         : null;
         try
         {
-            return await BotClient.EditMessageTextAsync(form.OwnerUser.ChatId, form.OwnerUser.MessageId, html_response, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: kb, cancellationToken: cancellation_token);
+            return await BotClient.EditMessageText(form.OwnerUser.ChatId, form.OwnerUser.MessageId, html_response, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: kb, cancellationToken: cancellation_token);
         }
         catch (Exception ex)
         {
             Logger.LogError("error {BA749E66-C485-4EA0-A14D-C6ECF30F594C}", ex);
-            Message msg = await BotClient.SendTextMessageAsync(form.OwnerUser.ChatId, html_response, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: kb, cancellationToken: cancellation_token);
+            Message msg = await BotClient.SendMessage(form.OwnerUser.ChatId, html_response, parseMode: Telegram.Bot.Types.Enums.ParseMode.Html, replyMarkup: kb, cancellationToken: cancellation_token);
             form.OwnerUser.MessageId = msg.MessageId;
             lock (ServerContext.DbLocker)
             {

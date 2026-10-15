@@ -1,0 +1,39 @@
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Routing
+@using MudBlazor
+
+<MudNavMenu>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Настройки</MudNavLink>
+    <MudNavLink Href="hardwires-page" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Устройства</MudNavLink>
+    <MudNavLink Href="mqtt-config-page" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">MQTT</MudNavLink>
+    @if (IsDebug)
+    {
+        <MudNavLink Href="scripts-page" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Скрипты</MudNavLink>
+        <MudNavLink Href="triggers-page" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Триггеры</MudNavLink>
+    }
+</MudNavMenu>
+<a target="_blank" class="link-success" href="https://ab-log.ru">
+    https://ab-log.ru
+</a>
+@code {
+    string get_version
+    {
+        get
+        {
+#if DEBUG
+            var test = Assembly.GetExecutingAssembly();
+#endif
+
+            string v = (Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "error version detect");
+
+            return v.Contains("+") ? v[..v.IndexOf("+")] : v;
+        }
+    }
+
+#if DEBUG
+    bool IsDebug = true;
+#else
+    bool IsDebug = false;
+#endif
+
+}

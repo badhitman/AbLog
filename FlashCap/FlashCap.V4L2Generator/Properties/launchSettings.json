@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "FlashCap.V4L2Generator": {
-        "commandName": "Project",
-        "commandLineArgs": "3 videodev2.h.members.json ."
-    }
-  }
-}

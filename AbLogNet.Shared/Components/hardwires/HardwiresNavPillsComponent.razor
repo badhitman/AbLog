@@ -1,0 +1,41 @@
+﻿@using AbLogNet.Shared.Components.html
+@using AbLogNet.Shared.Components.navs.pills
+
+@if (IsDebug)
+{
+    <PillsSetComponent>
+        <PillComponent Tooltip="Рендеринг" Title="Рендеринг">
+            <CascadingValue Value="@ReloadPage">
+                <HtmlRootTranslatorComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" />
+            </CascadingValue>
+        </PillComponent>
+        <PillComponent Tooltip="Парсинг исходного HTML в DOM" Title="Дерево">
+            <HtmlTreeDomComponent HtmlSource="@HtmlSource" />
+        </PillComponent>
+        <PillComponent Tooltip="Исходный HTML" Title="Исходники">
+            <HtmlShowComponent Html="@HtmlSource" />
+        </PillComponent>
+    </PillsSetComponent>
+}
+else
+{
+    <CascadingValue Value="@ReloadPage">
+        <HtmlRootTranslatorComponent @ref="refHtmlRoot" HtmlSource="@HtmlSource" />
+    </CascadingValue>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required Action ReloadPage { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? HtmlSource { get; set; }
+
+#if DEBUG
+    bool IsDebug = true;
+#else
+    bool IsDebug = false;
+#endif
+
+    public HtmlRootTranslatorComponent? refHtmlRoot { get; private set; }
+}

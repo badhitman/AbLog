@@ -1,0 +1,10 @@
+﻿namespace AbLogNet
+{
+    public partial class MainPage : ContentPage
+    {
+        public MainPage()
+        {
+            InitializeComponent();
+        }
+    }
+}

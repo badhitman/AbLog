@@ -80,9 +80,9 @@ public class UpdateHandler : IUpdateHandler
         if (message.Text is not { } messageText || message.From?.IsBot == true)
             return;
 
-        await _botClient.SendChatActionAsync(
+        await _botClient.SendChatAction(
                chatId: message.Chat.Id,
-               chatAction: ChatAction.Typing,
+               action: ChatAction.Typing,
                cancellationToken: cancellationToken);
 
         TResponseModel<UserModelDB> check_user = CheckTelegramUser(message.From);
@@ -109,7 +109,7 @@ public class UpdateHandler : IUpdateHandler
             if (user.UserForm is not null)
                 return await _form_fill.FormFillingHandle(user.UserForm, message.MessageId, TypeValueTelegramBotHandle.Message, message.Text, cancellationToken);
 
-            return await botClient.SendTextMessageAsync(
+            return await botClient.SendMessage(
                 chatId: message.Chat.Id,
                 text: usage,
                 cancellationToken: cancellationToken);
@@ -204,9 +204,9 @@ public class UpdateHandler : IUpdateHandler
 
         if (callbackQuery.Data.Equals("/start"))
         {
-            await _botClient.SendChatActionAsync(
+            await _botClient.SendChatAction(
                    chatId: callbackQuery.Message.Chat.Id,
-                   chatAction: ChatAction.Typing,
+                   action: ChatAction.Typing,
                    cancellationToken: cancellationToken);
 
             await GetStartMessage(check_user.Response, callbackQuery.Message, null, cancellationToken);
@@ -215,9 +215,9 @@ public class UpdateHandler : IUpdateHandler
 
         else if (callbackQuery.Data.Equals(GetMQTT) && check_user.Response.AllowChangeMqttConfig)
         {
-            await _botClient.SendChatActionAsync(
+            await _botClient.SendChatAction(
                    chatId: callbackQuery.Message.Chat.Id,
-                   chatAction: ChatAction.Typing,
+                   action: ChatAction.Typing,
                    cancellationToken: cancellationToken);
 
             string message_report = "";
@@ -245,7 +245,7 @@ public class UpdateHandler : IUpdateHandler
             TResponseModel<bool> ststus_mqtt = await _tools.StatusMqtt();
             message_report += $"\n-- || -- - -- - -- - || - -- - -- - -- || --\n<u>Status MQTT</u>: {ststus_mqtt.Message}";
 
-            _ = await _botClient.SendTextMessageAsync(check_user.Response.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
+            _ = await _botClient.SendMessage(check_user.Response.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
             return;
         }
         else if (callbackQuery.Data.Equals(nameof(UserFormModelDb)) && check_user.Response.AllowChangeMqttConfig)
@@ -287,22 +287,22 @@ public class UpdateHandler : IUpdateHandler
 
         else if (callbackQuery.Data.Equals(RestartMQTT) && check_user.Response.AllowSystemCommands)
         {
-            await _botClient.SendChatActionAsync(
+            await _botClient.SendChatAction(
                    chatId: callbackQuery.Message.Chat.Id,
-                   chatAction: ChatAction.Typing,
+                   action: ChatAction.Typing,
                    cancellationToken: cancellationToken);
 
             string message_report = "Перезапуск/запуск службы MQTT.\n";
             ResponseBaseModel start_mqtt = await _tools.StartMqtt(cancellationToken);
             message_report += $"\n{start_mqtt.Message}";
-            _ = await _botClient.SendTextMessageAsync(check_user.Response.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
+            _ = await _botClient.SendMessage(check_user.Response.ChatId, message_report, parseMode: ParseMode.Html, cancellationToken: cancellationToken);
             return;
         }
         else if (callbackQuery.Data.Equals(GetProcesses) && check_user.Response.AllowSystemCommands)
         {
-            await _botClient.SendChatActionAsync(
+            await _botClient.SendChatAction(
                    chatId: callbackQuery.Message.Chat.Id,
-                   chatAction: ChatAction.Typing,
+                   action: ChatAction.Typing,
                    cancellationToken: cancellationToken);
 
             Process[] localAll = Process.GetProcesses().OrderBy(x => x.ProcessName).ToArray();
@@ -318,7 +318,7 @@ public class UpdateHandler : IUpdateHandler
                 }
                 else
                 {
-                    await _botClient.SendTextMessageAsync(
+                    await _botClient.SendMessage(
                             chatId: callbackQuery.Message!.Chat.Id,
                             text: $"{output.Trim()}\n\n... продолжение следует",
                             parseMode: ParseMode.Html,
@@ -329,7 +329,7 @@ public class UpdateHandler : IUpdateHandler
             }
 
             output += $"\n------------\ntotal mem.: <b>{GlobalStatic.SizeDataAsString(total_mem_used)}</b>";
-            await _botClient.SendTextMessageAsync(callbackQuery.Message!.Chat.Id, output.Trim(),
+            await _botClient.SendMessage(callbackQuery.Message!.Chat.Id, output.Trim(),
                             parseMode: ParseMode.Html,
                             cancellationToken: cancellationToken);
             await GetStartMessage(check_user.Response, null, cancellationToken: cancellationToken);
@@ -404,7 +404,7 @@ public class UpdateHandler : IUpdateHandler
 
         try
         {
-            await _botClient.EditMessageTextAsync(
+            await _botClient.EditMessageText(
                 chatId: check_user.Response.ChatId,
                 messageId: check_user.Response.MessageId,
                 text: $"Received {callbackQuery.Data}:\n\n{output}",
@@ -415,7 +415,7 @@ public class UpdateHandler : IUpdateHandler
         {
             _logger.LogError("error {B55C5A58-3D2A-4782-92FA-CC16D2FBFEBB}", ex);
 
-            Message msg = await _botClient.SendTextMessageAsync(
+            Message msg = await _botClient.SendMessage(
                 chatId: check_user.Response.ChatId,
                 text: $"Received {callbackQuery.Data}:\n\n{output}",
                 parseMode: ParseMode.Html,
@@ -490,7 +490,7 @@ public class UpdateHandler : IUpdateHandler
             _context.SaveChanges(true);
         }
 
-        Message msg_res = await _botClient.SendTextMessageAsync(message_request?.Chat.Id ?? chat_id_old, usage,
+        Message msg_res = await _botClient.SendMessage(message_request?.Chat.Id ?? chat_id_old, usage,
         parseMode: ParseMode.Html,
         replyMarkup: kb_rows.Count != 0 ? new InlineKeyboardMarkup(kb_rows) : new ReplyKeyboardRemove(),
         cancellationToken: cancellationToken);
@@ -507,7 +507,7 @@ public class UpdateHandler : IUpdateHandler
         {
             try
             {
-                await _botClient.DeleteMessageAsync(chat_id_old, message_id_old, cancellationToken: cancellationToken);
+                await _botClient.DeleteMessage(chat_id_old, message_id_old, cancellationToken: cancellationToken);
             }
             catch (Exception ex)
             {
@@ -515,7 +515,7 @@ public class UpdateHandler : IUpdateHandler
             }
         }
         if (message_request is not null)
-            await _botClient.DeleteMessageAsync(message_request.Chat.Id, message_request.MessageId, cancellationToken: cancellationToken);
+            await _botClient.DeleteMessage(message_request.Chat.Id, message_request.MessageId, cancellationToken: cancellationToken);
         return msg_res;
     }
 
@@ -596,5 +596,12 @@ public class UpdateHandler : IUpdateHandler
         }
 
         return res;
+    }
+
+    /// <inheritdoc/>
+    public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
+    {
+        _logger.LogError(exception, nameof(HandleErrorAsync));
+        return Task.CompletedTask;
     }
 }
